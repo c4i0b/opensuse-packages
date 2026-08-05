@@ -1,8 +1,8 @@
 <project name="@@PROJECT@@">
   <title>Personal @@CATEGORY@@ packages</title>
   <description>RPMs from the opensuse-packages monorepo.</description>
-  <repository name="opensuse_tumbleweed">
+  <repository name="@@REPO@@">
     <path project="openSUSE:Tumbleweed" repository="standard"/>
-    <arch>x86_64</arch>
+    <arch>@@ARCH@@</arch>
   </repository>
 </project>

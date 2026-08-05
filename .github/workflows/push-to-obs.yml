@@ -3,6 +3,12 @@ name: push-to-obs
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'README*'
+      - 'LICENSE*'
+      - '.gitignore'
+      - 'renovate.json'
   workflow_dispatch:
     inputs:
       packages:
@@ -15,15 +21,20 @@ run-name: "push-to-obs - ${{ github.event.head_commit.message || github.event.in
 permissions:
   contents: read
 
+concurrency:
+  group: push-to-obs-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
-      - name: Resolve packages
+      - name: Resolve changed packages
         id: resolve
         env:
           INPUT_PACKAGES: ${{ github.event.inputs.packages }}
@@ -31,44 +42,67 @@ jobs:
           AFTER: ${{ github.event.after }}
         run: |
           set -euo pipefail
+          empty_tree="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+          zero="0000000000000000000000000000000000000000"
+
           detect() {
-            git diff --name-only "$@" \
+            git diff --name-only --diff-filter=ACMR "$1" "$2" \
               | grep -E '^[^./][^/]*/[^./][^/]*/' \
               | grep -vE '/(VERSION|fetch\.sh|bump\.sh|\.obsignore)$' \
               | grep -vE '\.(tar\.gz|zip)$' \
               | cut -d/ -f1-2 | sort -u \
-              | while read -r p; do if [ -d "$p" ]; then echo "$p"; fi; done \
+              | while IFS= read -r p; do [ -d "$p" ] && echo "$p"; done \
               | paste -sd, - || true
           }
-          if [ -n "$INPUT_PACKAGES" ]; then
+
+          if [ -n "${INPUT_PACKAGES:-}" ]; then
             pkgs="$INPUT_PACKAGES"
-          elif [ -n "${BEFORE:-}" ] && [ "${BEFORE}" != "0000000000000000000000000000000000000000" ]; then
-            pkgs=$(detect "${BEFORE}" "${AFTER}")
           else
-            pkgs=$(detect HEAD~1 HEAD)
+            after="${AFTER:-${GITHUB_SHA}}"
+            before="${BEFORE:-}"
+            if [ -z "$before" ] || [ "$before" = "$zero" ]; then
+              if git rev-parse --verify --quiet 'HEAD~1' >/dev/null; then
+                pkgs="$(detect 'HEAD~1' "$after")"
+              else
+                pkgs="$(detect "$empty_tree" "$after")"
+              fi
+            else
+              pkgs="$(detect "$before" "$after")"
+            fi
           fi
           pkgs="${pkgs// /}"
           echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
           echo "Resolved: ${pkgs:-<none>}"
 
-      - name: Install tooling
+      - name: Setup just
         if: steps.resolve.outputs.packages != ''
-        run: |
-          curl -fsSL https://just.systems/install.sh | sudo bash -s -- --to /usr/local/bin
-          pip install osc
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+      - name: Setup Python
+        if: steps.resolve.outputs.packages != ''
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.x'
+          cache: pip
+          cache-dependency-path: .github/requirements-osc.txt
+
+      - name: Install osc
+        if: steps.resolve.outputs.packages != ''
+        run: pip install -r .github/requirements-osc.txt
 
       - name: Configure osc
         if: steps.resolve.outputs.packages != ''
         env:
-          OBS_USER: ${{ secrets.OBS_USER }}
+          OBS_AUTH_USER: ${{ secrets.OBS_AUTH_USER }}
           OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
         run: |
+          set -euo pipefail
           install -m 600 /dev/null ~/.oscrc
           {
             echo "[general]"
             echo "apiurl = https://api.opensuse.org"
             echo "[https://api.opensuse.org]"
-            echo "user = ${OBS_USER}"
+            echo "user = ${OBS_AUTH_USER}"
             echo "pass = ${OBS_PASSWORD}"
           } > ~/.oscrc
 
@@ -77,6 +111,7 @@ jobs:
         if: steps.resolve.outputs.packages != ''
         env:
           CI: "true"
+          OSC_RUN: ""
           PACKAGES: ${{ steps.resolve.outputs.packages }}
         run: |
           set -euo pipefail

@@ -1,35 +1,40 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "description": "Track upstream anomalyco/opencode releases for the openSUSE opencode package",
+  "schedule": ["before 6am"],
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate dashboard — opensuse-packages",
+  "labels": ["dependencies", "opencode"],
+  "branchPrefix": "renovate/",
+  "prConcurrentLimit": 1,
+  "lockFileMaintenance": { "enabled": false },
   "customManagers": [
     {
+      "description": "Bump opencode version atomically across VERSION, _service and .spec",
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "anomalyco/opencode",
-      "fileMatch": ["^tools/opencode/VERSION$"],
-      "matchStrings": ["^(?<currentValue>\\S+)\\s*$"]
-    },
-    {
-      "customType": "regex",
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "anomalyco/opencode",
-      "fileMatch": ["^tools/opencode/_service$"],
-      "matchStrings": ["/v(?<currentValue>[^/]+)/opencode-linux-x64"]
-    },
-    {
-      "customType": "regex",
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "anomalyco/opencode",
-      "fileMatch": ["^tools/opencode/opencode\\.spec$"],
-      "matchStrings": ["^Version:\\s*(?<currentValue>\\S+)"]
+      "managerFilePatterns": [
+        "^tools/opencode/VERSION$",
+        "^tools/opencode/_service$",
+        "^tools/opencode/opencode\\.spec$"
+      ],
+      "matchStrings": [
+        "^(?<currentValue>\\S+)\\s*$",
+        "/v(?<currentValue>[^/]+)/",
+        "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"
+      ]
     }
   ],
   "packageRules": [
     {
+      "description": "opencode versioning and commit style",
       "matchDatasources": ["github-releases"],
       "matchDepNames": ["anomalyco/opencode"],
-      "commitMessagePrefix": "chore(opencode):",
-      "commitMessageTopic": "bump to {{newVersion}}"
+      "versioning": "semver",
+      "extractVersion": "^v?(?<version>.+)$",
+      "commitMessage": "chore(opencode): bump to {{newVersion}}"
     }
   ]
 }

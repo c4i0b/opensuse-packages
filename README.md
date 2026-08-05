@@ -21,16 +21,22 @@ repository. Packages that depend on each other must live in the same category.
 
 ## Setup
 
-Set `OBS_USER`, `OBS_NAME`, `OBS_EMAIL` (and `OBS_API` if needed) at the top of
-the `justfile`.
+Set `OBS_USER` (OBS namespace), `OBS_AUTH_USER` (login), `OBS_NAME`, `OBS_EMAIL`
+at the top of the `justfile`. `OBS_REPO`/`OBS_ARCH` default to Tumbleweed/x86_64.
 
     just bootstrap
 
-OBS access runs from a disposable openSUSE distrobox (keeps the host clean,
-credentials isolated under `~/Distrobox/obs`):
+All `osc` calls run through the `obs` distrobox by default (host stays clean;
+credentials isolated under `~/Distrobox/obs`). Override with `OSC_RUN=""` to use
+a host `osc` instead (this is what CI does).
 
     just obs-create            create the 'obs' distrobox (osc/git/build)
-    just obs-login             one-time: enter OBS user/password (writes ~/.oscrc)
+    just obs-login             one-time: log in as OBS_AUTH_USER (writes ~/.oscrc in the distrobox)
+
+Recommended: use a **dedicated OBS bot account** (e.g. `caiobruno-bot`) as
+`OBS_AUTH_USER`, added as maintainer of your namespace project
+(`osc maintainer -a caiobruno-bot home:<USER>:<category>`). This keeps your
+personal password out of CI.
 
 ## Workflow
 
@@ -53,14 +59,14 @@ before pushing:
 `<pkg>` is `<category>/<name>`. Builds run inside `registry.opensuse.org/opensuse/tumbleweed`
 with `HOME=/tmp`. Pass flags directly, e.g. `just run <pkg> --version`.
 
-Inspect and manage OBS from the distrobox:
+Inspect and manage OBS:
 
     just vc       <pkg>             add a `.changes` entry (openSUSE format, opens $EDITOR)
     just results  <pkg>             build status
     just log      <pkg>             build log
     just binaries <pkg>             download published RPMs to .binaries/
     just obs-build <pkg>            local `osc build` (faithful to OBS; heavier)
-    just osc      <osc args...>     run any osc command in the distrobox
+    just osc      <osc args...>     run any osc command (via OSC_RUN)
     just obs-enter                  shell into the distrobox
 
 Version bump (if the package ships a `bump.sh`):
@@ -72,21 +78,22 @@ Version bump (if the package ships a `bump.sh`):
 New upstream releases are picked up automatically:
 
 1. [Renovate](https://renovatebot.com) (`renovate.json`) opens a PR bumping
-   `VERSION`, `_service`, and the RPM `Version:` at once.
+   `VERSION`, `_service`, and the RPM `Version:` atomically.
 2. On merge to `main`, `.github/workflows/push-to-obs.yml` detects which
    packages changed and runs `just push` for each. OBS then rebuilds and
    publishes natively. Run manually with a package list:
 
        gh workflow run push-to-obs.yml -f packages=tools/opencode
 
-The workflow needs two repository secrets:
+The workflow needs two repository secrets (use the **bot** account):
 
-| secret         | value                          |
-|----------------|--------------------------------|
-| `OBS_USER`     | OBS login (e.g. `caiobruno`)   |
-| `OBS_PASSWORD` | OBS password                   |
+| secret           | value                              |
+|------------------|------------------------------------|
+| `OBS_AUTH_USER`  | OBS login, e.g. `caiobruno-bot`    |
+| `OBS_PASSWORD`   | that account's password            |
 
-`push` skips its interactive confirmation when `CI=true` (set by GitHub Actions).
+`push` skips its interactive confirmation when `CI=true` (set by GitHub Actions,
+which also sets `OSC_RUN=""` to use the runner's host `osc`).
 
 ## Conventions
 
@@ -99,6 +106,7 @@ The workflow needs two repository secrets:
   (server-side) or by the package `fetch.sh` (local).
 - RPM specs follow openSUSE practice: SPDX `License`, shipped `%license`,
   shell completions under the standard dirs, `ExclusiveArch` for arch-specific
-  prebuilts, `%global debug_package %{nil}` to avoid stripping them.
+  prebuilts, `%global debug_package %{nil}` + `%global __strip /bin/true` so
+  prebuilt binaries are not stripped.
 - RPM packages build against `openSUSE:Tumbleweed`; container packages build
   on `registry.opensuse.org/opensuse/tumbleweed`.
