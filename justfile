@@ -97,9 +97,10 @@ build pkg:
     elif ls "$dir"/*.spec >/dev/null 2>&1; then
       out="{{repo}}/.build/${name}"
       mkdir -p "$out"
+      buildreqs=$(grep '^BuildRequires:' "$dir"/*.spec | sed 's/BuildRequires:\s*//;s/\s*$//' | tr '\n' ' ' || true)
       podman run --rm -e HOME=/tmp -v "$dir:/src:Z" -v "$out:/out:Z" \
         registry.opensuse.org/opensuse/tumbleweed \
-        bash -lc 'set -e; zypper --non-interactive install --no-recommends rpm-build tar gzip; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" *.spec'
+        bash -lc 'set -e; zypper --non-interactive install --no-recommends rpm-build rpmlint tar gzip '"$buildreqs"' >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" *.spec; echo "--- rpmlint ---"; rpmlint /out/*/*.rpm 2>&1 | tail -20 || true'
       echo "RPMs -> $out"
     else
       echo "no Dockerfile or .spec in {{pkg}}" >&2; exit 1
