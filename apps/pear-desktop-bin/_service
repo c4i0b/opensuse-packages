@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/pear-devs/pear-desktop/releases/download/v3.12.0/youtube-music-3.12.0.tar.gz</param>
+    <param name="filename">youtube-music-3.12.0.tar.gz</param>
+  </service>
+</services>
