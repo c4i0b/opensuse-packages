@@ -1,5 +1,5 @@
 %global debug_package %{nil}
-%global __strip       /bin/true
+%global __os_install_post %{nil}
 
 Name:           opencode-bin
 Version:        1.18.13
