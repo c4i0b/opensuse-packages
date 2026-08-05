@@ -2,7 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "description": "Track upstream anomalyco/opencode releases for the openSUSE opencode package",
-  "schedule": ["before 6am"],
+  "schedule": ["at any time"],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate dashboard — opensuse-packages",
   "labels": ["dependencies", "opencode"],
