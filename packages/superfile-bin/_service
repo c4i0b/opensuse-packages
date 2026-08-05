@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/yorukot/superfile/releases/download/v1.6.0/superfile-linux-v1.6.0-amd64.tar.gz</param>
+    <param name="filename">superfile-linux-v1.6.0-amd64.tar.gz</param>
+  </service>
+</services>
