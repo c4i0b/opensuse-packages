@@ -1,11 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "description": "Track upstream anomalyco/opencode releases for the openSUSE opencode package",
+  "description": "Track upstream releases for openSUSE packages",
   "schedule": ["at any time"],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate dashboard — opensuse-packages",
-  "labels": ["dependencies", "opencode"],
+  "labels": ["dependencies"],
   "branchPrefix": "renovate/",
   "prConcurrentLimit": 1,
   "lockFileMaintenance": { "enabled": false },
@@ -25,6 +25,23 @@
         "/v(?<currentValue>[^/]+)/",
         "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"
       ]
+    },
+    {
+      "description": "Bump fisher version atomically across VERSION, _service and .spec",
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "jorgebucaran/fisher",
+      "managerFilePatterns": [
+        "^tools/fisher/VERSION$",
+        "^tools/fisher/_service$",
+        "^tools/fisher/fisher\\.spec$"
+      ],
+      "matchStrings": [
+        "^(?<currentValue>\\S+)\\s*$",
+        "/fisher/archive/(?<currentValue>[^/]+)/",
+        "fisher-(?<currentValue>[^/]+)\\.tar\\.gz",
+        "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"
+      ]
     }
   ],
   "packageRules": [
@@ -35,6 +52,17 @@
       "versioning": "semver",
       "extractVersion": "^v?(?<version>.+)$",
       "commitMessage": "chore(opencode): bump to {{newVersion}}",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "requiredStatusChecks": ["validate-bump"]
+    },
+    {
+      "description": "fisher versioning, commit style and automerge",
+      "matchDatasources": ["github-releases"],
+      "matchDepNames": ["jorgebucaran/fisher"],
+      "versioning": "semver",
+      "commitMessage": "chore(fisher): bump to {{newVersion}}",
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
