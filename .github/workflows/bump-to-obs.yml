@@ -1,0 +1,47 @@
+name: bump-to-obs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/opencode-image/VERSION'
+      - 'tools/opencode-image/_service'
+      - 'tools/opencode/opencode.spec'
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tooling
+        run: |
+          curl -fsSL https://just.systems/install.sh | sudo bash -s -- --to /usr/local/bin
+          python -m pip install --upgrade pip
+          pip install osc
+
+      - name: Configure osc
+        env:
+          OBS_USER: ${{ secrets.OBS_USER }}
+          OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
+        run: |
+          install -m 600 /dev/null ~/.oscrc
+          {
+            echo "[general]"
+            echo "apiurl = https://api.opensuse.org"
+            echo "[https://api.opensuse.org]"
+            echo "user = ${OBS_USER}"
+            echo "pass = ${OBS_PASSWORD}"
+          } > ~/.oscrc
+
+      - name: Push packages to OBS
+        env:
+          CI: "true"
+        run: |
+          ver="$(cat tools/opencode-image/VERSION)"
+          just create-project tools
+          just push tools/opencode-image "chore(opencode): bump to ${ver}"
+          just push tools/opencode "chore(opencode): bump to ${ver}"

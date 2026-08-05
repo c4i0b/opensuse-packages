@@ -1,0 +1,7 @@
+opencode-linux-x64.tar.gz
+*.rpm
+.osc/
+.oscrc
+.netrc
+.env*
+.DS_Store

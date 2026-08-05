@@ -1,0 +1,35 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "anomalyco/opencode",
+      "fileMatch": ["^tools/opencode-image/VERSION$"],
+      "matchStrings": ["^(?<currentValue>\\S+)\\s*$"]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "anomalyco/opencode",
+      "fileMatch": ["^tools/opencode-image/_service$"],
+      "matchStrings": ["/v(?<currentValue>[^/]+)/opencode-linux-x64"]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "anomalyco/opencode",
+      "fileMatch": ["^tools/opencode/opencode\\.spec$"],
+      "matchStrings": ["^Version:\\s*(?<currentValue>\\S+)"]
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["github-releases"],
+      "matchDepNames": ["anomalyco/opencode"],
+      "commitMessagePrefix": "chore(opencode):",
+      "commitMessageTopic": "bump to {{newVersion}}"
+    }
+  ]
+}
