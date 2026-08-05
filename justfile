@@ -1,4 +1,6 @@
 OBS_USER := "caiobruno"
+OBS_NAME := "Caio Bruno"
+OBS_EMAIL := "cbrunofb@gmail.com"
 OBS_API  := "https://api.opensuse.org"
 REGISTRY := "registry.opensuse.org"
 OSC_WORK := home_directory() / "obs"
@@ -162,8 +164,8 @@ obs-create:
     if ! podman ps -a --format '{{"{{"}}.Names}}' | grep -qx obs; then
       distrobox create --name obs --image {{obs-image}} --home {{obs-home}} --yes
     fi
-    podman exec --user root obs zypper --non-interactive install osc >/dev/null
-    echo "distrobox 'obs' ready (osc installed). Run 'just obs-login' once."
+    podman exec --user root obs zypper --non-interactive install osc git build >/dev/null
+    echo "distrobox 'obs' ready (osc/git/build installed). Run 'just obs-login' once."
 
 obs-login:
     distrobox enter obs -- osc -A {{OBS_API}} ls home:{{OBS_USER}}
@@ -173,3 +175,50 @@ obs-enter:
 
 osc +args:
     distrobox enter obs -- osc -A {{OBS_API}} {{args}}
+
+vc pkg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    name="$(echo {{pkg}} | cut -d/ -f2)"
+    f="{{repo}}/{{pkg}}/${name}.changes"
+    ts="$(date -u +"%a %b %e %H:%M:%S UTC %Y")"
+    tmp="$(mktemp)"
+    {
+      printf -- "-------------------------------------------------------------------\n"
+      printf -- "%s - %s <%s>\n\n" "$ts" "{{OBS_NAME}}" "{{OBS_EMAIL}}"
+      printf -- "- \n\n"
+      cat "$f"
+    } > "$tmp"
+    mv "$tmp" "$f"
+    "${EDITOR:-vi}" "$f"
+
+results pkg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IFS=/ read -r category name <<< "{{pkg}}"
+    distrobox enter obs -- osc -A {{OBS_API}} results "home:{{OBS_USER}}:${category}" "$name"
+
+log pkg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IFS=/ read -r category name <<< "{{pkg}}"
+    distrobox enter obs -- osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}:${category}" "$name" opensuse_tumbleweed x86_64
+
+binaries pkg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IFS=/ read -r category name <<< "{{pkg}}"
+    project="home:{{OBS_USER}}:${category}"
+    out="{{repo}}/.binaries/${name}"
+    mkdir -p "$out"
+    distrobox enter obs -- bash -lc "cd '$out' && osc -A {{OBS_API}} getbinaries '$project' '$name' opensuse_tumbleweed x86_64"
+    echo "binaries -> $out"
+
+obs-build pkg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    IFS=/ read -r category name <<< "{{pkg}}"
+    project="home:{{OBS_USER}}:${category}"
+    dest="{{OSC_WORK}}/${project}/${name}"
+    [ -d "$dest/.osc" ] || just checkout "{{pkg}}"
+    distrobox enter obs -- bash -lc "cd '$dest' && osc -A {{OBS_API}} build opensuse_tumbleweed x86_64"

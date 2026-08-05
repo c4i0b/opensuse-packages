@@ -1,6 +1,8 @@
 opencode-linux-x64.tar.gz
+LICENSE
 *.rpm
 .build/
+.binaries/
 .osc/
 .oscrc
 .netrc

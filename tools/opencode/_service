@@ -1,6 +1,12 @@
 <services>
   <service name="download_url">
     <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/anomalyco/opencode/v1.18.13/LICENSE</param>
+    <param name="filename">LICENSE</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
     <param name="host">github.com</param>
     <param name="path">/anomalyco/opencode/releases/download/v1.18.13/opencode-linux-x64.tar.gz</param>
     <param name="filename">opencode-linux-x64.tar.gz</param>

@@ -21,16 +21,16 @@ repository. Packages that depend on each other must live in the same category.
 
 ## Setup
 
-Set `OBS_USER` (and `OBS_API` if needed) at the top of the `justfile`.
+Set `OBS_USER`, `OBS_NAME`, `OBS_EMAIL` (and `OBS_API` if needed) at the top of
+the `justfile`.
 
     just bootstrap
-    just osc-config
 
-OBS credentials live in `~/.oscrc` (in your home, never in this repo). Create
-it by running any `osc` command once, e.g.
-`osc -A https://api.opensuse.org ls home:<USER>`, which prompts for your
-user/password and writes `~/.oscrc` (mode 0600). The gitignore also blocks any
-credential-like file as a safety net.
+OBS access runs from a disposable openSUSE distrobox (keeps the host clean,
+credentials isolated under `~/Distrobox/obs`):
+
+    just obs-create            create the 'obs' distrobox (osc/git/build)
+    just obs-login             one-time: enter OBS user/password (writes ~/.oscrc)
 
 ## Workflow
 
@@ -53,6 +53,16 @@ before pushing:
 `<pkg>` is `<category>/<name>`. Builds run inside `registry.opensuse.org/opensuse/tumbleweed`
 with `HOME=/tmp`. Pass flags directly, e.g. `just run <pkg> --version`.
 
+Inspect and manage OBS from the distrobox:
+
+    just vc       <pkg>             add a `.changes` entry (openSUSE format, opens $EDITOR)
+    just results  <pkg>             build status
+    just log      <pkg>             build log
+    just binaries <pkg>             download published RPMs to .binaries/
+    just obs-build <pkg>            local `osc build` (faithful to OBS; heavier)
+    just osc      <osc args...>     run any osc command in the distrobox
+    just obs-enter                  shell into the distrobox
+
 Version bump (if the package ships a `bump.sh`):
 
     just bump <pkg> <version>
@@ -71,10 +81,10 @@ New upstream releases are picked up automatically:
 
 The workflow needs two repository secrets:
 
-| secret         | value                                  |
-|----------------|----------------------------------------|
-| `OBS_USER`     | OBS login (e.g. `caiobruno`)           |
-| `OBS_PASSWORD` | an OBS app password (not your main one)|
+| secret         | value                          |
+|----------------|--------------------------------|
+| `OBS_USER`     | OBS login (e.g. `caiobruno`)   |
+| `OBS_PASSWORD` | OBS password                   |
 
 `push` skips its interactive confirmation when `CI=true` (set by GitHub Actions).
 
@@ -87,5 +97,8 @@ The workflow needs two repository secrets:
   add its own `.obsignore` for extra exclusions.
 - No binaries are committed. Sources are fetched by an OBS `_service`
   (server-side) or by the package `fetch.sh` (local).
+- RPM specs follow openSUSE practice: SPDX `License`, shipped `%license`,
+  shell completions under the standard dirs, `ExclusiveArch` for arch-specific
+  prebuilts, `%global debug_package %{nil}` to avoid stripping them.
 - RPM packages build against `openSUSE:Tumbleweed`; container packages build
   on `registry.opensuse.org/opensuse/tumbleweed`.
