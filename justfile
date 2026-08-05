@@ -132,6 +132,12 @@ bump pkg version:
     dir="{{repo}}/{{pkg}}"
     if [ -x "$dir/bump.sh" ]; then "$dir/bump.sh" "{{version}}"; else echo "no bump.sh for {{pkg}}"; fi
 
+lint:
+    python3 opensuse-lint.py
+
+lint-all:
+    python3 opensuse-lint.py --all
+
 obs-image := "registry.opensuse.org/opensuse/tumbleweed"
 obs-home  := home_directory() / "Distrobox" / "obs"
 
