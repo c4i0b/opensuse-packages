@@ -1,6 +1,9 @@
 *.tar.gz
 *.zip
 *.rpm
+*.log
+*.pyc
+__pycache__/
 .build/
 .binaries/
 .osc/
