@@ -79,14 +79,6 @@ push pkg msg:
     (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} ci -m "{{msg}}")
     echo "pushed ${name} -> ${project}"
 
-status pkg:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    IFS=/ read -r category name <<< "{{pkg}}"
-    project="home:{{OBS_USER}}:${category}"
-    dest="{{OSC_WORK}}/${project}/${name}"
-    (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} st)
-
 fetch pkg:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -155,9 +147,6 @@ obs-create:
 obs-login:
     distrobox enter obs -- osc -A {{OBS_API}} ls home:{{OBS_USER}}
 
-obs-enter:
-    distrobox enter obs
-
 osc +args:
     {{OSC_RUN}} osc -A {{OBS_API}} {{args}}
 
@@ -188,22 +177,3 @@ log pkg:
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
     {{OSC_RUN}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}:${category}" "$name" {{OBS_REPO}} {{OBS_ARCH}}
-
-binaries pkg:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    IFS=/ read -r category name <<< "{{pkg}}"
-    project="home:{{OBS_USER}}:${category}"
-    out="{{repo}}/.binaries/${name}"
-    mkdir -p "$out"
-    {{OSC_RUN}} osc -A {{OBS_API}} getbinaries "$project" "$name" {{OBS_REPO}} {{OBS_ARCH}} -d "$out"
-    echo "binaries -> $out"
-
-obs-build pkg:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    IFS=/ read -r category name <<< "{{pkg}}"
-    project="home:{{OBS_USER}}:${category}"
-    dest="{{OSC_WORK}}/${project}/${name}"
-    [ -d "$dest/.osc" ] || just checkout "{{pkg}}"
-    (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} build {{OBS_REPO}} {{OBS_ARCH}})

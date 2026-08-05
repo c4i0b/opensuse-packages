@@ -4,20 +4,13 @@ Personal packaging monorepo for [OBS](https://build.opensuse.org).
 
 ## Layout
 
-Each top-level directory is a **category** and maps 1:1 to an OBS subproject.
-Each package lives in `<category>/<name>/` and mirrors one OBS package.
+Each top-level dir is a **category** → OBS subproject `home:<USER>:<category>`.
+Each package is `<category>/<name>/`. Categories are independent OBS projects.
 
-```
-<category>/<name>/            OBS: home:<USER>:<category>/<name>
-```
-
-| category | OBS project             |
-|----------|-------------------------|
-| tools    | home:`<USER>`:tools     |
-| apps     | home:`<USER>`:apps      |
-
-Categories are independent OBS projects, each with its own published
-repository. Packages that depend on each other must live in the same category.
+| category | OBS project          |
+|----------|----------------------|
+| tools    | home:`<USER>`:tools  |
+| apps     | home:`<USER>`:apps   |
 
 ## Install (openSUSE Tumbleweed)
 
@@ -25,97 +18,61 @@ repository. Packages that depend on each other must live in the same category.
     zypper ref
     zypper in opencode
 
-The package is `tools/opencode-bin` (upstream prebuilt binary). It
-`Provides: opencode` and `Obsoletes: opencode`, so `zypper in opencode` resolves
-to it and upgrades from any older `opencode` cleanly. The command is
-`/usr/bin/opencode`.
+`tools/opencode-bin` ships the upstream prebuilt binary; it `Provides: opencode`,
+so `zypper in opencode` resolves to it. Command: `/usr/bin/opencode`.
 
 ## Setup
 
 Set `OBS_USER`, `OBS_NAME`, `OBS_EMAIL` at the top of the `justfile`.
-`OBS_REPO`/`OBS_ARCH` default to Tumbleweed/x86_64.
 
     just bootstrap
+    just obs-create     create the 'obs' distrobox (osc/git/build)
+    just obs-login      one-time: log in as OBS_USER (writes ~/.oscrc in the distrobox)
 
-All `osc` calls run through the `obs` distrobox by default (host stays clean;
-credentials isolated under `~/Distrobox/obs`). Override with `OSC_RUN=""` to use
-a host `osc` instead (this is what CI does).
-
-    just obs-create            create the 'obs' distrobox (osc/git/build)
-    just obs-login             one-time: log in as OBS_USER (writes ~/.oscrc in the distrobox)
+All `osc` calls go through the distrobox by default; set `OSC_RUN=""` to use a
+host `osc` instead (this is what CI does).
 
 ## Workflow
 
-    just create-project tools                create/Update the OBS project meta
-    just new-pkg    <category>/<name>        create the OBS package + local checkout
-    just checkout   <category>/<name>        refresh the local osc working copy
-    just push       <category>/<name> "msg"  sync files and commit to OBS (asks)
-    just status     <category>/<name>        osc status
+    just create-project <category>            create/Update OBS project meta
+    just push   <category>/<name> "msg"       sync files and commit to OBS (asks)
+    just bump   <category>/<name> <version>   bump version (if the package has bump.sh)
 
-OBS working copies live under `~/obs/` (outside this repo) so the git tree
-stays clean of `.osc/` metadata and credentials.
+OBS working copies live under `~/obs/` (outside this repo).
 
-Packages can be built and tested locally in a container (host stays clean)
-before pushing:
+Build/test locally (in a container, host stays clean):
 
-    just fetch <pkg>            run the package fetch.sh (if present)
-    just build <pkg>            build the package (podman: RPM via rpm-build, or Dockerfile)
-    just run   <pkg> [args...]  smoke-test: install the RPM / run the image
+    just build <pkg>            build (podman: RPM via rpm-build, or Dockerfile)
+    just run   <pkg> [args...]  smoke-test (install the RPM / run the image)
 
-`<pkg>` is `<category>/<name>`. Builds run inside `registry.opensuse.org/opensuse/tumbleweed`
-with `HOME=/tmp`. Pass flags directly, e.g. `just run <pkg> --version`.
+Inspect OBS:
 
-Inspect and manage OBS:
+    just results <pkg>          build status
+    just log    <pkg>           build log
+    just vc     <pkg>           add a .changes entry (openSUSE format, opens $EDITOR)
+    just osc    <osc args...>   run any osc command
 
-    just vc       <pkg>             add a `.changes` entry (openSUSE format, opens $EDITOR)
-    just results  <pkg>             build status
-    just log      <pkg>             build log
-    just binaries <pkg>             download published RPMs to .binaries/
-    just obs-build <pkg>            local `osc build` (faithful to OBS; heavier)
-    just osc      <osc args...>     run any osc command (via OSC_RUN)
-    just obs-enter                  shell into the distrobox
-
-Version bump (if the package ships a `bump.sh`):
-
-    just bump <pkg> <version>
+`<pkg>` is `<category>/<name>`. Pass flags directly, e.g. `just run <pkg> --version`.
 
 ## Automation
 
-New upstream releases are picked up automatically:
-
 1. [Renovate](https://renovatebot.com) (`renovate.json`) opens a PR bumping
-   `VERSION`, `_service`, and the RPM `Version:` atomically.
-2. On merge to `main`, `.github/workflows/push-to-obs.yml` detects which
-   packages changed and runs `just push` for each. OBS then rebuilds and
-   publishes natively. Run manually with a package list:
+   `VERSION`, `_service` and the spec `Version:` atomically; on a green
+   `validate-bump` check it **auto-merges**.
+2. `.github/workflows/push-to-obs.yml` then pushes changed packages to OBS,
+   which rebuilds and publishes.
 
-       gh workflow run push-to-obs.yml -f packages=tools/opencode-bin
-
-The workflow needs two repository secrets:
-
-| secret         | value                          |
-|----------------|--------------------------------|
-| `OBS_USER`     | OBS login (e.g. `caiobruno`)   |
-| `OBS_PASSWORD` | OBS password                   |
-
-`push` skips its interactive confirmation when `CI=true` (set by GitHub Actions,
-which also sets `OSC_RUN=""` to use the runner's host `osc`).
+Manual run: `gh workflow run push-to-obs.yml -f packages=tools/opencode-bin`
+Secrets: `OBS_USER`, `OBS_PASSWORD`.
 
 ## Conventions
 
-- The root `justfile` is generic and package-agnostic. Anything specific to a
-  package lives in that package dir as `fetch.sh`, `bump.sh`, `VERSION`, and
-  optionally `BIN` (the command name when it differs from the package name).
-- `just push` excludes dev-only files (`fetch.sh`, `bump.sh`, `VERSION`, `BIN`,
-  downloaded archives) so only real package sources reach OBS. A package may
-  add its own `.obsignore` for extra exclusions.
-- `just new-pkg` fills the OBS package `<title>`/`<description>` from the spec's
-  `Summary`/`%description`, so it shows up properly in OBS search.
-- No binaries are committed. Sources are fetched by an OBS `_service`
-  (server-side) or by the package `fetch.sh` (local).
-- RPM specs follow openSUSE practice: SPDX `License`, shipped `%license`,
-  shell completions under the standard dirs, `ExclusiveArch` for arch-specific
-  prebuilts, `%global debug_package %{nil}` + `%global __strip /bin/true` so
-  prebuilt binaries are not stripped.
-- RPM packages build against `openSUSE:Tumbleweed`; container packages build
-  on `registry.opensuse.org/opensuse/tumbleweed`.
+- The `justfile` is generic; per-package bits live in `<pkg>/` (`fetch.sh`,
+  `bump.sh`, `VERSION`, optional `BIN` = command name when it differs from the
+  package name).
+- `just push` excludes dev files (`fetch.sh`, `bump.sh`, `VERSION`, `BIN`,
+  archives) from OBS; add `<pkg>/.obsignore` for more.
+- `just new-pkg` fills the OBS package `<title>`/`<description>` from the spec.
+- Sources are fetched by an OBS `_service` (server) or `fetch.sh` (local); RPMs
+  build on `openSUSE:Tumbleweed`. Prebuilt binaries use
+  `%global debug_package %{nil}` + `%global __strip /bin/true`.
