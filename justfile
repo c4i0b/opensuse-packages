@@ -36,9 +36,9 @@ osc-config:
 create-project category="tools":
     #!/usr/bin/env bash
     set -euo pipefail
-    project="home:{{OBS_USER}}:${category}"
+    project="home:{{OBS_USER}}:{{category}}"
     tmp="$(mktemp)"
-    sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@CATEGORY@@|${category}|g" "{{repo}}/_project.meta.xml" > "$tmp"
+    sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@CATEGORY@@|{{category}}|g" "{{repo}}/_project.meta.xml" > "$tmp"
     osc -A {{OBS_API}} meta prj -F "$tmp" "$project"
     rm -f "$tmp"
     echo "project ready: $project"
