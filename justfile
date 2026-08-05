@@ -70,6 +70,7 @@ push pkg msg:
     src="{{repo}}/{{pkg}}"
     dest="{{OSC_WORK}}/${project}/${name}"
     [ -d "$dest/.osc" ] || just new-pkg "{{pkg}}"
+    if [ -x "$src/bump.sh" ]; then ver="$(awk '/^Version:/{print $2; exit}' "$src"/*.spec)"; "$src/bump.sh" "$ver" || true; fi
     ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --exclude='*.tar.gz' --exclude='*.zip')
     [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
     rsync -a --delete "${ex[@]}" "$src/" "$dest/"
