@@ -7,12 +7,11 @@ URL:            https://github.com/peternaame-boop/ytm-player
 Source0:        ytm_player-%{version}.tar.gz
 BuildArch:      noarch
 
-%global _python_unsupported_flavors python314
-
-BuildRequires:  %{python_module base}
-BuildRequires:  %{python_module pip}
-BuildRequires:  %{python_module hatchling}
+BuildRequires:  python3-base
+BuildRequires:  python3-pip
+BuildRequires:  python3-hatchling
 BuildRequires:  python-rpm-macros
+
 Requires:       python3-textual
 Requires:       python3-ytmusicapi
 Requires:       yt-dlp
@@ -30,16 +29,15 @@ A full-featured YouTube Music TUI client for the terminal.
 %autosetup -n ytm_player-%{version}
 
 %build
-%pyproject_wheel
+python3 -m pip wheel --no-deps --no-build-isolation -w dist .
 
 %install
-%pyproject_install
-%python_compileall
+python3 -m pip install --root=%{buildroot} --no-deps --prefix=/usr dist/*.whl
 
 %files
 %license LICENSE
 %{_bindir}/ytm
-%{python_sitelib}/ytm_player/
-%{python_sitelib}/ytm_player-*.dist-info/
+%{python3_sitelib}/ytm_player/
+%{python3_sitelib}/ytm_player-*.dist-info/
 
 %changelog
