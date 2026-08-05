@@ -1,6 +1,6 @@
 <project name="@@PROJECT@@">
-  <title>Personal @@CATEGORY@@ packages</title>
-  <description>RPMs from the opensuse-packages monorepo.</description>
+  <title>Personal openSUSE packages</title>
+  <description>Container images and RPMs from the opensuse-packages monorepo.</description>
   <repository name="@@REPO@@">
     <path project="openSUSE:Tumbleweed" repository="standard"/>
     <arch>@@ARCH@@</arch>

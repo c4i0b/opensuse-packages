@@ -21,9 +21,9 @@ bootstrap:
 create-project category="tools":
     #!/usr/bin/env bash
     set -euo pipefail
-    project="home:{{OBS_USER}}:{{category}}"
+    project="home:{{OBS_USER}}"
     tmp="$(mktemp)"
-    sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@CATEGORY@@|{{category}}|g" -e "s|@@REPO@@|{{OBS_REPO}}|g" -e "s|@@ARCH@@|{{OBS_ARCH}}|g" "{{repo}}/_project.meta.xml" > "$tmp"
+    sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@REPO@@|{{OBS_REPO}}|g" -e "s|@@ARCH@@|{{OBS_ARCH}}|g" "{{repo}}/_project.meta.xml" > "$tmp"
     {{OSC_RUN}} osc -A {{OBS_API}} meta prj -F "$tmp" "$project"
     rm -f "$tmp"
     echo "project ready: $project"
@@ -32,7 +32,7 @@ checkout pkg:
     #!/usr/bin/env bash
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
-    project="home:{{OBS_USER}}:${category}"
+    project="home:{{OBS_USER}}"
     dest="{{OSC_WORK}}/${project}/${name}"
     if [ -d "$dest/.osc" ]; then
       (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} up)
@@ -46,7 +46,7 @@ new-pkg pkg:
     #!/usr/bin/env bash
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
-    project="home:{{OBS_USER}}:${category}"
+    project="home:{{OBS_USER}}"
     spec="$(ls "{{repo}}/{{pkg}}"/*.spec | head -1)"
     summary="$(awk '/^Summary:/ {sub(/^Summary:[ \t]*/,""); print; exit}' "$spec")"
     desc="$(awk '/^%description/{f=1;next}/^%/{f=0}f&&NF{print}' "$spec" | head -8)"
@@ -66,7 +66,7 @@ push pkg msg:
     #!/usr/bin/env bash
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
-    project="home:{{OBS_USER}}:${category}"
+    project="home:{{OBS_USER}}"
     src="{{repo}}/{{pkg}}"
     dest="{{OSC_WORK}}/${project}/${name}"
     [ -d "$dest/.osc" ] || just new-pkg "{{pkg}}"
@@ -177,10 +177,10 @@ results pkg:
     #!/usr/bin/env bash
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
-    {{OSC_RUN}} osc -A {{OBS_API}} results "home:{{OBS_USER}}:${category}" "$name"
+    {{OSC_RUN}} osc -A {{OBS_API}} results "home:{{OBS_USER}}" "$name"
 
 log pkg:
     #!/usr/bin/env bash
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
-    {{OSC_RUN}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}:${category}" "$name" {{OBS_REPO}} {{OBS_ARCH}}
+    {{OSC_RUN}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}" "$name" {{OBS_REPO}} {{OBS_ARCH}}
