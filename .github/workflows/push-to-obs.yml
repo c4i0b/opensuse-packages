@@ -1,0 +1,102 @@
+name: push-to-obs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Comma-separated <category>/<name> packages to push (blank = auto-detect from push)"
+        required: false
+        default: ""
+
+run-name: "push-to-obs - ${{ github.event.head_commit.message || github.event.inputs.packages || 'manual' }}"
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve packages
+        id: resolve
+        env:
+          INPUT_PACKAGES: ${{ github.event.inputs.packages }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          set -euo pipefail
+          detect() {
+            git diff --name-only "$@" \
+              | grep -E '^[^./][^/]*/[^./][^/]*/' \
+              | grep -vE '/(VERSION|fetch\.sh|bump\.sh|\.obsignore)$' \
+              | grep -vE '\.(tar\.gz|zip)$' \
+              | cut -d/ -f1-2 | sort -u | paste -sd, -
+          }
+          if [ -n "$INPUT_PACKAGES" ]; then
+            pkgs="$INPUT_PACKAGES"
+          elif [ -n "${BEFORE:-}" ] && [ "${BEFORE}" != "0000000000000000000000000000000000000000" ]; then
+            pkgs=$(detect "${BEFORE}" "${AFTER}")
+          else
+            pkgs=$(detect HEAD~1 HEAD)
+          fi
+          pkgs="${pkgs// /}"
+          echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
+          echo "Resolved: ${pkgs:-<none>}"
+
+      - name: Install tooling
+        if: steps.resolve.outputs.packages != ''
+        run: |
+          curl -fsSL https://just.systems/install.sh | sudo bash -s -- --to /usr/local/bin
+          pip install osc
+
+      - name: Configure osc
+        if: steps.resolve.outputs.packages != ''
+        env:
+          OBS_USER: ${{ secrets.OBS_USER }}
+          OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
+        run: |
+          install -m 600 /dev/null ~/.oscrc
+          {
+            echo "[general]"
+            echo "apiurl = https://api.opensuse.org"
+            echo "[https://api.opensuse.org]"
+            echo "user = ${OBS_USER}"
+            echo "pass = ${OBS_PASSWORD}"
+          } > ~/.oscrc
+
+      - name: Push packages to OBS
+        id: doit
+        if: steps.resolve.outputs.packages != ''
+        env:
+          CI: "true"
+          PACKAGES: ${{ steps.resolve.outputs.packages }}
+        run: |
+          set -euo pipefail
+          pushed=()
+          IFS=',' read -ra list <<< "$PACKAGES"
+          for pkg in "${list[@]}"; do
+            [ -n "$pkg" ] || continue
+            category="${pkg%%/*}"
+            just create-project "$category"
+            just push "$pkg" "ci: update ${pkg}"
+            pushed+=("$pkg")
+          done
+          printf 'pushed=%s\n' "$(IFS=,; echo "${pushed[*]}")" >> "$GITHUB_OUTPUT"
+
+      - name: Summary
+        if: always()
+        env:
+          PACKAGES: ${{ steps.resolve.outputs.packages }}
+          PUSHED: ${{ steps.doit.outputs.pushed }}
+        run: |
+          {
+            echo "## push-to-obs"
+            echo "**Detected:** ${PACKAGES:-none}"
+            echo "**Pushed:** ${PUSHED:-none}"
+          } >> "$GITHUB_STEP_SUMMARY"

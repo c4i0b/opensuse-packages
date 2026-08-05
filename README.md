@@ -64,8 +64,11 @@ New upstream releases are picked up automatically:
 
 1. [Renovate](https://renovatebot.com) (`renovate.json`) opens a PR bumping
    `VERSION`, `_service`, and the RPM `Version:` at once.
-2. On merge to `main`, `.github/workflows/bump-to-obs.yml` runs `just push` for
-   the affected packages. OBS then rebuilds and publishes natively.
+2. On merge to `main`, `.github/workflows/push-to-obs.yml` detects which
+   packages changed and runs `just push` for each. OBS then rebuilds and
+   publishes natively. Run manually with a package list:
+
+       gh workflow run push-to-obs.yml -f packages=tools/opencode-image,tools/opencode
 
 The workflow needs two repository secrets:
 
