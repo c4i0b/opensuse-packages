@@ -33,10 +33,12 @@ python3 -m pip wheel --no-deps --no-build-isolation -w dist .
 
 %install
 python3 -m pip install --root=%{buildroot} --no-deps --prefix=/usr dist/*.whl
+ln -s ytm %{buildroot}%{_bindir}/ytm-player
 
 %files
 %license LICENSE
 %{_bindir}/ytm
+%{_bindir}/ytm-player
 %{python3_sitelib}/ytm_player/
 %{python3_sitelib}/ytm_player-*.dist-info/
 
