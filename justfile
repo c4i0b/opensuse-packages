@@ -147,7 +147,8 @@ obs-create:
     if ! podman ps -a --format '{{"{{"}}.Names}}' | grep -qx obs; then
       distrobox create --name obs --image {{obs-image}} --home {{obs-home}} --yes
     fi
-    podman exec --user root obs zypper --non-interactive install osc git build >/dev/null
+    distrobox enter obs -- true >/dev/null
+    podman exec --user root obs zypper --non-interactive install osc git build opi >/dev/null
     echo "distrobox 'obs' ready. Run 'just obs-login' once as {{OBS_USER}}."
 
 obs-login:
