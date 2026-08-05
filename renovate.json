@@ -29,12 +29,16 @@
   ],
   "packageRules": [
     {
-      "description": "opencode versioning and commit style",
+      "description": "opencode versioning, commit style and automerge",
       "matchDatasources": ["github-releases"],
       "matchDepNames": ["anomalyco/opencode"],
       "versioning": "semver",
       "extractVersion": "^v?(?<version>.+)$",
-      "commitMessage": "chore(opencode): bump to {{newVersion}}"
+      "commitMessage": "chore(opencode): bump to {{newVersion}}",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "requiredStatusChecks": ["validate-bump"]
     }
   ]
 }

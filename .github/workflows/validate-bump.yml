@@ -1,0 +1,39 @@
+name: validate-bump
+
+on:
+  pull_request:
+    paths:
+      - 'tools/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Read bumped version
+        id: v
+        run: |
+          set -euo pipefail
+          ver="$(awk '/^Version:/ {print $2; exit}' tools/opencode/opencode.spec)"
+          [ -n "$ver" ] || { echo "no Version in tools/opencode/opencode.spec"; exit 1; }
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          echo "Bumped version: $ver"
+
+      - name: Verify upstream release binary is fetchable and runs
+        env:
+          VER: ${{ steps.v.outputs.version }}
+        run: |
+          set -euo pipefail
+          url="https://github.com/anomalyco/opencode/releases/download/v${VER}/opencode-linux-x64.tar.gz"
+          echo "Fetching $url"
+          curl -fL --retry 3 "$url" -o /tmp/opencode.tar.gz
+          mkdir -p /tmp/x && tar -xzf /tmp/opencode.tar.gz -C /tmp/x
+          got="$(docker run --rm -v /tmp/x:/x:ro registry.opensuse.org/opensuse/tumbleweed /x/opencode --version)"
+          echo "opencode --version => $got"
+          [ "$got" = "$VER" ] || { echo "ERROR: expected '$VER', got '$got'"; exit 1; }
+          echo "OK: release $VER is fetchable and the binary reports the right version"
