@@ -1,1 +1,0 @@
-../projects-ai-agents/opensuse-packages/AGENTS.md

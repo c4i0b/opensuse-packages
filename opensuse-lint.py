@@ -1,1 +1,0 @@
-../projects-ai-agents/opensuse-packages/opensuse-lint.py
