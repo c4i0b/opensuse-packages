@@ -6,7 +6,7 @@ Version:        1.18.13
 Release:        0
 Summary:        The open source AI coding agent
 License:        MIT
-URL:            https://opencode.ai
+URL:            https://github.com/anomalyco/opencode
 Vendor:         home:caiobruno:tools
 Source0:        opencode-linux-x64.tar.gz
 Source1:        LICENSE

@@ -1,83 +1,29 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "description": "Track upstream releases for openSUSE packages",
+  "description": "Generic upstream tracking — derives depName + datasource from each spec's URL: line",
   "schedule": ["at any time"],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate dashboard — opensuse-packages",
   "labels": ["dependencies"],
   "branchPrefix": "renovate/",
-  "prConcurrentLimit": 1,
   "lockFileMaintenance": { "enabled": false },
   "customManagers": [
     {
       "customType": "regex",
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "anomalyco/opencode",
-      "managerFilePatterns": ["^packages/opencode-bin/VERSION$", "^packages/opencode-bin/_service$", "^packages/opencode-bin/opencode-bin\\.spec$"],
-      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/v(?<currentValue>[^/]+)/", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
-    },
-    {
-      "customType": "regex",
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "jorgebucaran/fisher",
-      "managerFilePatterns": ["^packages/fisher/VERSION$", "^packages/fisher/_service$", "^packages/fisher/fisher\\.spec$"],
-      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/fisher/archive/(?<currentValue>[^/]+)/", "fisher-(?<currentValue>[^/]+)\\.tar\\.gz", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
-    },
-    {
-      "customType": "regex",
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "pear-devs/pear-desktop",
-      "managerFilePatterns": ["^packages/pear-desktop-bin/VERSION$", "^packages/pear-desktop-bin/_service$", "^packages/pear-desktop-bin/pear-desktop-bin\\.spec$"],
-      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/v(?<currentValue>[^/]+)/", "youtube-music-(?<currentValue>[^/]+)\\.tar\\.gz", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
-    },
-    {
-      "customType": "regex",
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "peternaame-boop/ytm-player",
-      "managerFilePatterns": ["^packages/ytm-player/VERSION$", "^packages/ytm-player/_service$", "^packages/ytm-player/ytm-player\\.spec$"],
-      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/v(?<currentValue>[^/]+)/", "ytm_player-(?<currentValue>[^/]+)\\.tar\\.gz", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
+      "datasourceTemplate": "{{datasource}}-releases",
+      "managerFilePatterns": ["packages/*/*.spec$"],
+      "matchStrings": [
+        "Version:\\s*(?<currentValue>\\S+)[\\s\\S]*?(?<datasource>github|gitlab)\\.(?:com|io|org)/(?<depName>[^/]+/[^/\\s\"]+)"
+      ]
     }
   ],
   "packageRules": [
     {
-      "matchDatasources": ["github-releases"],
-      "matchDepNames": ["anomalyco/opencode"],
+      "matchDatasources": ["github-releases", "gitlab-releases"],
       "versioning": "semver",
       "extractVersion": "^v?(?<version>.+)$",
-      "commitMessage": "chore(opencode): bump to {{newVersion}}",
-      "automerge": true,
-      "automergeType": "pr",
-      "automergeStrategy": "squash",
-      "requiredStatusChecks": ["validate-bump"]
-    },
-    {
-      "matchDatasources": ["github-releases"],
-      "matchDepNames": ["jorgebucaran/fisher"],
-      "versioning": "semver",
-      "commitMessage": "chore(fisher): bump to {{newVersion}}",
-      "automerge": true,
-      "automergeType": "pr",
-      "automergeStrategy": "squash",
-      "requiredStatusChecks": ["validate-bump"]
-    },
-    {
-      "matchDatasources": ["github-releases"],
-      "matchDepNames": ["pear-devs/pear-desktop"],
-      "versioning": "semver",
-      "extractVersion": "^v?(?<version>.+)$",
-      "commitMessage": "chore(pear-desktop): bump to {{newVersion}}",
-      "automerge": true,
-      "automergeType": "pr",
-      "automergeStrategy": "squash",
-      "requiredStatusChecks": ["validate-bump"]
-    },
-    {
-      "matchDatasources": ["github-releases"],
-      "matchDepNames": ["peternaame-boop/ytm-player"],
-      "versioning": "semver",
-      "extractVersion": "^v?(?<version>.+)$",
-      "commitMessage": "chore(ytm-player): bump to {{newVersion}}",
+      "commitMessage": "chore: bump {{depName}} to {{newVersion}}",
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
