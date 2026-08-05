@@ -7,6 +7,8 @@ URL:            https://github.com/peternaame-boop/ytm-player
 Source0:        ytm_player-%{version}.tar.gz
 BuildArch:      noarch
 
+%global _python_unsupported_flavors python314
+
 BuildRequires:  %{python_module base}
 BuildRequires:  %{python_module pip}
 BuildRequires:  %{python_module hatchling}
