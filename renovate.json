@@ -11,42 +11,36 @@
   "lockFileMaintenance": { "enabled": false },
   "customManagers": [
     {
-      "description": "Bump opencode version atomically across VERSION, _service and .spec",
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "anomalyco/opencode",
-      "managerFilePatterns": [
-        "^tools/opencode-bin/VERSION$",
-        "^tools/opencode-bin/_service$",
-        "^tools/opencode-bin/opencode-bin\\.spec$"
-      ],
-      "matchStrings": [
-        "^(?<currentValue>\\S+)\\s*$",
-        "/v(?<currentValue>[^/]+)/",
-        "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"
-      ]
+      "managerFilePatterns": ["^packages/opencode-bin/VERSION$", "^packages/opencode-bin/_service$", "^packages/opencode-bin/opencode-bin\\.spec$"],
+      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/v(?<currentValue>[^/]+)/", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
     },
     {
-      "description": "Bump fisher version atomically across VERSION, _service and .spec",
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "jorgebucaran/fisher",
-      "managerFilePatterns": [
-        "^tools/fisher/VERSION$",
-        "^tools/fisher/_service$",
-        "^tools/fisher/fisher\\.spec$"
-      ],
-      "matchStrings": [
-        "^(?<currentValue>\\S+)\\s*$",
-        "/fisher/archive/(?<currentValue>[^/]+)/",
-        "fisher-(?<currentValue>[^/]+)\\.tar\\.gz",
-        "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"
-      ]
+      "managerFilePatterns": ["^packages/fisher/VERSION$", "^packages/fisher/_service$", "^packages/fisher/fisher\\.spec$"],
+      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/fisher/archive/(?<currentValue>[^/]+)/", "fisher-(?<currentValue>[^/]+)\\.tar\\.gz", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "pear-devs/pear-desktop",
+      "managerFilePatterns": ["^packages/pear-desktop-bin/VERSION$", "^packages/pear-desktop-bin/_service$", "^packages/pear-desktop-bin/pear-desktop-bin\\.spec$"],
+      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/v(?<currentValue>[^/]+)/", "youtube-music-(?<currentValue>[^/]+)\\.tar\\.gz", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "peternaame-boop/ytm-player",
+      "managerFilePatterns": ["^packages/ytm-player/VERSION$", "^packages/ytm-player/_service$", "^packages/ytm-player/ytm-player\\.spec$"],
+      "matchStrings": ["^(?<currentValue>\\S+)\\s*$", "/v(?<currentValue>[^/]+)/", "ytm_player-(?<currentValue>[^/]+)\\.tar\\.gz", "(?:^|\\r\\n|\\r|\\n)Version:\\s*(?<currentValue>\\S+)"]
     }
   ],
   "packageRules": [
     {
-      "description": "opencode versioning, commit style and automerge",
       "matchDatasources": ["github-releases"],
       "matchDepNames": ["anomalyco/opencode"],
       "versioning": "semver",
@@ -58,11 +52,32 @@
       "requiredStatusChecks": ["validate-bump"]
     },
     {
-      "description": "fisher versioning, commit style and automerge",
       "matchDatasources": ["github-releases"],
       "matchDepNames": ["jorgebucaran/fisher"],
       "versioning": "semver",
       "commitMessage": "chore(fisher): bump to {{newVersion}}",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "requiredStatusChecks": ["validate-bump"]
+    },
+    {
+      "matchDatasources": ["github-releases"],
+      "matchDepNames": ["pear-devs/pear-desktop"],
+      "versioning": "semver",
+      "extractVersion": "^v?(?<version>.+)$",
+      "commitMessage": "chore(pear-desktop): bump to {{newVersion}}",
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "requiredStatusChecks": ["validate-bump"]
+    },
+    {
+      "matchDatasources": ["github-releases"],
+      "matchDepNames": ["peternaame-boop/ytm-player"],
+      "versioning": "semver",
+      "extractVersion": "^v?(?<version>.+)$",
+      "commitMessage": "chore(ytm-player): bump to {{newVersion}}",
       "automerge": true,
       "automergeType": "pr",
       "automergeStrategy": "squash",
