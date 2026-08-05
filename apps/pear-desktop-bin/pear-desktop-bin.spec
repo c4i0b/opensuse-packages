@@ -31,6 +31,9 @@ install -Dpm 0644 "$src/resources/app.asar.unpacked/assets/icon.svg" "%{buildroo
 %{_libdir}/pear-desktop
 %{_bindir}/pear-desktop
 %{_datadir}/applications/pear-desktop.desktop
+%dir %{_datadir}/icons/hicolor
+%dir %{_datadir}/icons/hicolor/scalable
+%dir %{_datadir}/icons/hicolor/scalable/apps
 %{_datadir}/icons/hicolor/scalable/apps/pear-desktop.svg
 
 %changelog
