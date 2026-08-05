@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'tools/**'
+      - 'apps/**'
 
 permissions:
   contents: read

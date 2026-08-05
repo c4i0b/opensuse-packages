@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/jorgebucaran/fisher/archive/4.4.8.tar.gz</param>
+    <param name="filename">fisher-4.4.8.tar.gz</param>
+  </service>
+</services>
