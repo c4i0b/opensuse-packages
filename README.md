@@ -12,6 +12,18 @@ Each package is `<category>/<name>/`. Categories are independent OBS projects.
 | tools    | home:`<USER>`:tools  |
 | apps     | home:`<USER>`:apps   |
 
+## Add a package
+
+1. Create `<category>/<name>/` with a `.spec` — use `tools/opencode-bin/` as a
+   template (`VERSION`, `fetch.sh`, `bump.sh` optional; `BIN` only if the command
+   name differs from the package name).
+2. `just create-project <category>`
+3. `just push <category>/<name> "initial package"`
+
+Track upstream releases by adding an entry to `renovate.json` (mirror the
+`opencode-bin` block). New packages are discovered/installed via OBS the same
+way as `opencode-bin`.
+
 ## Install (openSUSE Tumbleweed)
 
     zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno:/tools/opensuse_tumbleweed/home:caiobruno:tools.repo
