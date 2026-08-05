@@ -4,20 +4,20 @@ Personal packaging monorepo for [OBS](https://build.opensuse.org).
 
 ## Layout
 
-Each top-level dir is a **category** → OBS subproject `home:<USER>:<category>`.
-Each package is `<category>/<name>/`. Categories are independent OBS projects.
+Each top-level dir is a **category** (local organization only). All packages
+go to one OBS project `home:<USER>`.
 
-| category | OBS project          |
-|----------|----------------------|
-| tools    | home:`<USER>`:tools  |
-| apps     | home:`<USER>`:apps   |
+| category | local dir  |
+|----------|------------|
+| tools    | tools/     |
+| apps     | apps/      |
 
 ## Add a package
 
 1. Create `<category>/<name>/` with a `.spec` — use `tools/opencode-bin/` as a
    template (`VERSION`, `fetch.sh`, `bump.sh` optional; `BIN` only if the command
    name differs from the package name).
-2. `just create-project <category>`
+2. `just create-project`
 3. `just push <category>/<name> "initial package"`
 
 Track upstream releases by adding an entry to `renovate.json` (mirror the
@@ -26,7 +26,7 @@ way as `opencode-bin`.
 
 ## Install (openSUSE Tumbleweed)
 
-    zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno:/tools/opensuse_tumbleweed/home:caiobruno:tools.repo
+    zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno/openSUSE_Tumbleweed/home:caiobruno.repo
     zypper ref
     zypper in opencode
 
