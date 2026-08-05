@@ -21,8 +21,8 @@ repository. Packages that depend on each other must live in the same category.
 
 ## Setup
 
-Set `OBS_USER` (OBS namespace), `OBS_AUTH_USER` (login), `OBS_NAME`, `OBS_EMAIL`
-at the top of the `justfile`. `OBS_REPO`/`OBS_ARCH` default to Tumbleweed/x86_64.
+Set `OBS_USER`, `OBS_NAME`, `OBS_EMAIL` at the top of the `justfile`.
+`OBS_REPO`/`OBS_ARCH` default to Tumbleweed/x86_64.
 
     just bootstrap
 
@@ -31,12 +31,7 @@ credentials isolated under `~/Distrobox/obs`). Override with `OSC_RUN=""` to use
 a host `osc` instead (this is what CI does).
 
     just obs-create            create the 'obs' distrobox (osc/git/build)
-    just obs-login             one-time: log in as OBS_AUTH_USER (writes ~/.oscrc in the distrobox)
-
-Recommended: use a **dedicated OBS bot account** (e.g. `caiobruno-bot`) as
-`OBS_AUTH_USER`, added as maintainer of your namespace project
-(`osc maintainer -a caiobruno-bot home:<USER>:<category>`). This keeps your
-personal password out of CI.
+    just obs-login             one-time: log in as OBS_USER (writes ~/.oscrc in the distrobox)
 
 ## Workflow
 
@@ -85,12 +80,12 @@ New upstream releases are picked up automatically:
 
        gh workflow run push-to-obs.yml -f packages=tools/opencode
 
-The workflow needs two repository secrets (use the **bot** account):
+The workflow needs two repository secrets:
 
-| secret           | value                              |
-|------------------|------------------------------------|
-| `OBS_AUTH_USER`  | OBS login, e.g. `caiobruno-bot`    |
-| `OBS_PASSWORD`   | that account's password            |
+| secret         | value                          |
+|----------------|--------------------------------|
+| `OBS_USER`     | OBS login (e.g. `caiobruno`)   |
+| `OBS_PASSWORD` | OBS password                   |
 
 `push` skips its interactive confirmation when `CI=true` (set by GitHub Actions,
 which also sets `OSC_RUN=""` to use the runner's host `osc`).

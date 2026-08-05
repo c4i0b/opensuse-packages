@@ -1,5 +1,4 @@
 OBS_USER      := "caiobruno"
-OBS_AUTH_USER := "caiobruno-bot"
 OBS_NAME      := "Caio Bruno"
 OBS_EMAIL     := "cbrunofb@gmail.com"
 OBS_API       := "https://api.opensuse.org"
@@ -141,7 +140,7 @@ obs-create:
       distrobox create --name obs --image {{obs-image}} --home {{obs-home}} --yes
     fi
     podman exec --user root obs zypper --non-interactive install osc git build >/dev/null
-    echo "distrobox 'obs' ready. Run 'just obs-login' once as {{OBS_AUTH_USER}}."
+    echo "distrobox 'obs' ready. Run 'just obs-login' once as {{OBS_USER}}."
 
 obs-login:
     distrobox enter obs -- osc -A {{OBS_API}} ls home:{{OBS_USER}}

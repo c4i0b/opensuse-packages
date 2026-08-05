@@ -93,7 +93,7 @@ jobs:
       - name: Configure osc
         if: steps.resolve.outputs.packages != ''
         env:
-          OBS_AUTH_USER: ${{ secrets.OBS_AUTH_USER }}
+          OBS_USER: ${{ secrets.OBS_USER }}
           OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
         run: |
           set -euo pipefail
@@ -102,7 +102,7 @@ jobs:
             echo "[general]"
             echo "apiurl = https://api.opensuse.org"
             echo "[https://api.opensuse.org]"
-            echo "user = ${OBS_AUTH_USER}"
+            echo "user = ${OBS_USER}"
             echo "pass = ${OBS_PASSWORD}"
           } > ~/.oscrc
 
