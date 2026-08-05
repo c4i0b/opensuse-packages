@@ -152,3 +152,24 @@ bump pkg version:
     else
       echo "no bump.sh for {{pkg}}"
     fi
+
+obs-image := "registry.opensuse.org/opensuse/tumbleweed"
+obs-home  := home_directory() / "Distrobox" / "obs"
+
+obs-create:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if ! podman ps -a --format '{{"{{"}}.Names}}' | grep -qx obs; then
+      distrobox create --name obs --image {{obs-image}} --home {{obs-home}} --yes
+    fi
+    podman exec --user root obs zypper --non-interactive install osc >/dev/null
+    echo "distrobox 'obs' ready (osc installed). Run 'just obs-login' once."
+
+obs-login:
+    distrobox enter obs -- osc -A {{OBS_API}} ls home:{{OBS_USER}}
+
+obs-enter:
+    distrobox enter obs
+
+osc +args:
+    distrobox enter obs -- osc -A {{OBS_API}} {{args}}
