@@ -62,7 +62,10 @@ new-pkg pkg:
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
     project="home:{{OBS_USER}}:${category}"
-    osc -A {{OBS_API}} meta pkg --create "$project" "$name"
+    tmp="$(mktemp)"
+    echo "<package name=\"${name}\"><title/><description/></package>" > "$tmp"
+    osc -A {{OBS_API}} meta pkg -F "$tmp" "$project" "$name"
+    rm -f "$tmp"
     just checkout "{{pkg}}"
 
 push pkg msg:
