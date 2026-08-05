@@ -1,6 +1,5 @@
 *.tar.gz
 *.zip
-/tools/opencode-bin/LICENSE
 *.rpm
 .build/
 .binaries/
