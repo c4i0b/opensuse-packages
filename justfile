@@ -47,8 +47,17 @@ new-pkg pkg:
     set -euo pipefail
     IFS=/ read -r category name <<< "{{pkg}}"
     project="home:{{OBS_USER}}:${category}"
+    spec="$(ls "{{repo}}/{{pkg}}"/*.spec | head -1)"
+    summary="$(awk '/^Summary:/ {sub(/^Summary:[ \t]*/,""); print; exit}' "$spec")"
+    desc="$(awk '/^%description/{f=1;next}/^%/{f=0}f&&NF{print}' "$spec" | head -8)"
+    esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
     tmp="$(mktemp)"
-    echo "<package name=\"${name}\"><title/><description/></package>" > "$tmp"
+    {
+      echo "<package name=\"${name}\" project=\"${project}\">"
+      printf '  <title>%s</title>\n' "$(printf '%s' "$summary" | esc)"
+      printf '  <description>%s</description>\n' "$(printf '%s' "$desc" | esc)"
+      echo "</package>"
+    } > "$tmp"
     {{OSC_RUN}} osc -A {{OBS_API}} meta pkg -F "$tmp" "$project" "$name"
     rm -f "$tmp"
     just checkout "{{pkg}}"
@@ -61,7 +70,7 @@ push pkg msg:
     src="{{repo}}/{{pkg}}"
     dest="{{OSC_WORK}}/${project}/${name}"
     [ -d "$dest/.osc" ] || just new-pkg "{{pkg}}"
-    ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='*.tar.gz' --exclude='*.zip')
+    ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --exclude='*.tar.gz' --exclude='*.zip')
     [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
     rsync -a --delete "${ex[@]}" "$src/" "$dest/"
     (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} addremove && {{OSC_RUN}} osc -A {{OBS_API}} st)
@@ -108,6 +117,7 @@ run pkg +args:
     set -euo pipefail
     dir="{{repo}}/{{pkg}}"
     name="$(echo {{pkg}} | cut -d/ -f2)"
+    if [ -f "$dir/BIN" ]; then bin="$(cat "$dir/BIN")"; else bin="$name"; fi
     if [ -f "$dir/Dockerfile" ]; then
       if [ -t 0 ] && [ -t 1 ]; then tty=(-it); else tty=(-i); fi
       podman run --rm "${tty[@]}" --network host --userns=keep-id \
@@ -117,7 +127,7 @@ run pkg +args:
       rpm="$(ls "$out"/*/*.rpm 2>/dev/null | head -1 || true)"
       [ -n "$rpm" ] || { echo "no RPM in $out -- run 'just build {{pkg}}' first" >&2; exit 1; }
       if [ -t 0 ] && [ -t 1 ]; then tty=(-it); else tty=(-i); fi
-      podman run --rm "${tty[@]}" -e HOME=/tmp -e BIN="${name}" -v "$out:/rpms:Z" \
+      podman run --rm "${tty[@]}" -e HOME=/tmp -e BIN="${bin}" -v "$out:/rpms:Z" \
         registry.opensuse.org/opensuse/tumbleweed \
         bash -lc 'set -e; rpm -Uvh --nodeps /rpms/*/*.rpm; exec "$BIN" "$@"' _ {{args}}
     else

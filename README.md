@@ -19,6 +19,17 @@ Each package lives in `<category>/<name>/` and mirrors one OBS package.
 Categories are independent OBS projects, each with its own published
 repository. Packages that depend on each other must live in the same category.
 
+## Install (openSUSE Tumbleweed)
+
+    zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno:/tools/opensuse_tumbleweed/home:caiobruno:tools.repo
+    zypper ref
+    zypper in opencode
+
+The package is `tools/opencode-bin` (upstream prebuilt binary). It
+`Provides: opencode` and `Obsoletes: opencode`, so `zypper in opencode` resolves
+to it and upgrades from any older `opencode` cleanly. The command is
+`/usr/bin/opencode`.
+
 ## Setup
 
 Set `OBS_USER`, `OBS_NAME`, `OBS_EMAIL` at the top of the `justfile`.
@@ -78,7 +89,7 @@ New upstream releases are picked up automatically:
    packages changed and runs `just push` for each. OBS then rebuilds and
    publishes natively. Run manually with a package list:
 
-       gh workflow run push-to-obs.yml -f packages=tools/opencode
+       gh workflow run push-to-obs.yml -f packages=tools/opencode-bin
 
 The workflow needs two repository secrets:
 
@@ -93,10 +104,13 @@ which also sets `OSC_RUN=""` to use the runner's host `osc`).
 ## Conventions
 
 - The root `justfile` is generic and package-agnostic. Anything specific to a
-  package lives in that package dir as `fetch.sh`, `bump.sh`, and `VERSION`.
-- `just push` excludes dev-only files (`fetch.sh`, `bump.sh`, `VERSION`,
+  package lives in that package dir as `fetch.sh`, `bump.sh`, `VERSION`, and
+  optionally `BIN` (the command name when it differs from the package name).
+- `just push` excludes dev-only files (`fetch.sh`, `bump.sh`, `VERSION`, `BIN`,
   downloaded archives) so only real package sources reach OBS. A package may
   add its own `.obsignore` for extra exclusions.
+- `just new-pkg` fills the OBS package `<title>`/`<description>` from the spec's
+  `Summary`/`%description`, so it shows up properly in OBS search.
 - No binaries are committed. Sources are fetched by an OBS `_service`
   (server-side) or by the package `fetch.sh` (local).
 - RPM specs follow openSUSE practice: SPDX `License`, shipped `%license`,

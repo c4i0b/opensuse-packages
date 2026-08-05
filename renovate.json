@@ -16,9 +16,9 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "anomalyco/opencode",
       "managerFilePatterns": [
-        "^tools/opencode/VERSION$",
-        "^tools/opencode/_service$",
-        "^tools/opencode/opencode\\.spec$"
+        "^tools/opencode-bin/VERSION$",
+        "^tools/opencode-bin/_service$",
+        "^tools/opencode-bin/opencode-bin\\.spec$"
       ],
       "matchStrings": [
         "^(?<currentValue>\\S+)\\s*$",

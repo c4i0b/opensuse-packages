@@ -1,22 +1,24 @@
 %global debug_package %{nil}
 %global __strip       /bin/true
 
-Name:           opencode
+Name:           opencode-bin
 Version:        1.18.13
 Release:        0
-Summary:        Open source AI coding agent
+Summary:        The open source AI coding agent
 License:        MIT
 URL:            https://opencode.ai
+Vendor:         home:caiobruno:tools
 Source0:        opencode-linux-x64.tar.gz
 Source1:        LICENSE
 ExclusiveArch:  x86_64
 
 BuildRequires:  tar
+Provides:       opencode = %{version}-%{release}
+Obsoletes:      opencode < %{version}-%{release}
 Recommends:     bash-completion
 
 %description
-OpenCode is the open source AI coding agent. This package ships the upstream
-prebuilt x86_64 binary together with shell completions.
+OpenCode is the open source AI coding agent.
 
 %prep
 %setup -T -c -D

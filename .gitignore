@@ -1,5 +1,5 @@
-/tools/opencode/opencode-linux-x64.tar.gz
-/tools/opencode/LICENSE
+/tools/opencode-bin/opencode-linux-x64.tar.gz
+/tools/opencode-bin/LICENSE
 *.rpm
 .build/
 .binaries/
