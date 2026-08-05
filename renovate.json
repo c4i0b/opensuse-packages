@@ -6,14 +6,14 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "anomalyco/opencode",
-      "fileMatch": ["^tools/opencode-image/VERSION$"],
+      "fileMatch": ["^tools/opencode/VERSION$"],
       "matchStrings": ["^(?<currentValue>\\S+)\\s*$"]
     },
     {
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "anomalyco/opencode",
-      "fileMatch": ["^tools/opencode-image/_service$"],
+      "fileMatch": ["^tools/opencode/_service$"],
       "matchStrings": ["/v(?<currentValue>[^/]+)/opencode-linux-x64"]
     },
     {

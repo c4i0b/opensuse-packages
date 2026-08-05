@@ -43,16 +43,15 @@ credential-like file as a safety net.
 OBS working copies live under `~/obs/` (outside this repo) so the git tree
 stays clean of `.osc/` metadata and credentials.
 
-Container packages (those with a `Dockerfile`) can be built and tested
-locally before pushing:
+Packages can be built and tested locally in a container (host stays clean)
+before pushing:
 
     just fetch <pkg>            run the package fetch.sh (if present)
-    just build <pkg>            podman build
-    just run   <pkg> [args...]  run the image
+    just build <pkg>            build the package (podman: RPM via rpm-build, or Dockerfile)
+    just run   <pkg> [args...]  smoke-test: install the RPM / run the image
 
-`<pkg>` is `<category>/<name>`. `run` keeps the host clean: the container home
-is under `/tmp`, only the current directory is mounted. Pass flags to the image
-with `--`, e.g. `just run <pkg> -- --version` (otherwise `just` may consume them).
+`<pkg>` is `<category>/<name>`. Builds run inside `registry.opensuse.org/opensuse/tumbleweed`
+with `HOME=/tmp`. Pass flags directly, e.g. `just run <pkg> --version`.
 
 Version bump (if the package ships a `bump.sh`):
 
@@ -68,7 +67,7 @@ New upstream releases are picked up automatically:
    packages changed and runs `just push` for each. OBS then rebuilds and
    publishes natively. Run manually with a package list:
 
-       gh workflow run push-to-obs.yml -f packages=tools/opencode-image,tools/opencode
+       gh workflow run push-to-obs.yml -f packages=tools/opencode
 
 The workflow needs two repository secrets:
 
@@ -88,6 +87,5 @@ The workflow needs two repository secrets:
   add its own `.obsignore` for extra exclusions.
 - No binaries are committed. Sources are fetched by an OBS `_service`
   (server-side) or by the package `fetch.sh` (local).
-- Container builds are `Dockerfile` packages built on
-  `registry.opensuse.org/opensuse/tumbleweed`.
-- RPM packages that wrap a container install a launcher under `/usr/bin`.
+- RPM packages build against `openSUSE:Tumbleweed`; container packages build
+  on `registry.opensuse.org/opensuse/tumbleweed`.

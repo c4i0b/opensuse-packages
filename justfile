@@ -107,20 +107,41 @@ build pkg:
     #!/usr/bin/env bash
     set -euo pipefail
     dir="{{repo}}/{{pkg}}"
-    [ -f "$dir/Dockerfile" ] || { echo "no Dockerfile in {{pkg}}"; exit 1; }
-    [ -x "$dir/fetch.sh" ] && "$dir/fetch.sh" || true
     name="$(echo {{pkg}} | cut -d/ -f2)"
-    podman build -t "$name:dev" "$dir"
+    [ -x "$dir/fetch.sh" ] && "$dir/fetch.sh" || true
+    if [ -f "$dir/Dockerfile" ]; then
+      podman build -t "$name:dev" "$dir"
+    elif ls "$dir"/*.spec >/dev/null 2>&1; then
+      out="{{repo}}/.build/${name}"
+      mkdir -p "$out"
+      podman run --rm -e HOME=/tmp -v "$dir:/src:Z" -v "$out:/out:Z" \
+        registry.opensuse.org/opensuse/tumbleweed \
+        bash -lc 'set -e; zypper --non-interactive install --no-recommends rpm-build tar gzip; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" *.spec'
+      echo "RPMs -> $out"
+    else
+      echo "no Dockerfile or .spec in {{pkg}}" >&2; exit 1
+    fi
 
 run pkg +args:
     #!/usr/bin/env bash
     set -euo pipefail
+    dir="{{repo}}/{{pkg}}"
     name="$(echo {{pkg}} | cut -d/ -f2)"
-    if [ -t 0 ] && [ -t 1 ]; then tty=(-it); else tty=(-i); fi
-    podman run --rm "${tty[@]}" --network host --userns=keep-id \
-      -e HOME=/tmp -e TERM \
-      -v "$PWD:$PWD" -w "$PWD" \
-      "$name:dev" "$@"
+    if [ -f "$dir/Dockerfile" ]; then
+      if [ -t 0 ] && [ -t 1 ]; then tty=(-it); else tty=(-i); fi
+      podman run --rm "${tty[@]}" --network host --userns=keep-id \
+        -e HOME=/tmp -e TERM -v "$PWD:$PWD" -w "$PWD" "$name:dev" {{args}}
+    elif ls "$dir"/*.spec >/dev/null 2>&1; then
+      out="{{repo}}/.build/${name}"
+      rpm="$(ls "$out"/*/*.rpm 2>/dev/null | head -1 || true)"
+      [ -n "$rpm" ] || { echo "no RPM in $out -- run 'just build {{pkg}}' first" >&2; exit 1; }
+      if [ -t 0 ] && [ -t 1 ]; then tty=(-it); else tty=(-i); fi
+      podman run --rm "${tty[@]}" -e HOME=/tmp -v "$out:/rpms:Z" \
+        registry.opensuse.org/opensuse/tumbleweed \
+        bash -lc 'set -e; rpm -Uvh --nodeps /rpms/*/*.rpm; exec opencode "$@"' bash {{args}}
+    else
+      echo "no Dockerfile or .spec in {{pkg}}" >&2; exit 1
+    fi
 
 bump pkg version:
     #!/usr/bin/env bash

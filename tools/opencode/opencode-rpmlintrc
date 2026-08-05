@@ -1,1 +1,3 @@
 addFilter("no-changelogname-tag")
+addFilter("unstripped-binary-or-object")
+addFilter("binary-or-shlib-defines-rpath")
