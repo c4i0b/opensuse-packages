@@ -37,7 +37,11 @@ cp -a %{SOURCE1} LICENSE
 %license LICENSE
 %{_bindir}/opencode
 %{_datadir}/bash-completion/completions/opencode
+%dir %{_datadir}/zsh
+%dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/_opencode
+%dir %{_datadir}/fish
+%dir %{_datadir}/fish/vendor_completions.d
 %{_datadir}/fish/vendor_completions.d/opencode.fish
 
 %changelog
