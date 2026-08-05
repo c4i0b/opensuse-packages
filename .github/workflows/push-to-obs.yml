@@ -36,7 +36,7 @@ jobs:
               | grep -E '^[^./][^/]*/[^./][^/]*/' \
               | grep -vE '/(VERSION|fetch\.sh|bump\.sh|\.obsignore)$' \
               | grep -vE '\.(tar\.gz|zip)$' \
-              | cut -d/ -f1-2 | sort -u | paste -sd, -
+              | cut -d/ -f1-2 | sort -u | paste -sd, - || true
           }
           if [ -n "$INPUT_PACKAGES" ]; then
             pkgs="$INPUT_PACKAGES"
