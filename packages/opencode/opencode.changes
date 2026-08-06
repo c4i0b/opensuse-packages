@@ -1,0 +1,7 @@
+-------------------------------------------------------------------
+Thu Aug  6 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of opencode 1.18.14 (source build: recompiles the
+  CLI from the monorepo with the vendored Bun toolchain + npm deps;
+  x86_64).
+

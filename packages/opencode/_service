@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/anomalyco/opencode/archive/refs/tags/v1.18.14.tar.gz</param>
+    <param name="filename">opencode-1.18.14.tar.gz</param>
+  </service>
+</services>
