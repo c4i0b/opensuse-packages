@@ -1,14 +1,14 @@
 Name:           television-bin
 Version:        0.15.9
 Release:        0
-Summary:        A very fast, portable and hackable fuzzy finder
+Summary:        A fast, portable fuzzy finder for the terminal
 License:        MIT
 URL:            https://github.com/alexpasmantier/television
 Source0:        tv-%{version}-x86_64-unknown-linux-gnu.tar.gz
 ExclusiveArch:  x86_64
 
 %description
-A very fast, portable and hackable fuzzy finder for the terminal.
+A fast, portable and flexible fuzzy finder for the terminal.
 
 %prep
 %setup -T -c -D
