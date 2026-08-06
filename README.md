@@ -29,9 +29,3 @@ Personal packaging monorepo for [OBS](https://build.opensuse.org).
   (self-contained, no external tooling).
 - Dependabot keeps Actions updated (auto-merged after a YAML gate).
 - Secrets: `OBS_USER`, `OBS_PASSWORD`.
-
-## Development
-
-Dev tooling (`justfile`, `opensuse-lint.py`, `AGENTS.md`) is symlinked from the
-central `projects-ai-agents` repo (gitignored, not tracked here). CI is
-self-contained and does not need it.
