@@ -2,9 +2,9 @@ name: validate-bump
 
 on:
   pull_request:
+    branches: [main]
     paths:
-      - 'tools/**'
-      - 'apps/**'
+      - 'packages/**'
 
 permissions:
   contents: read
@@ -15,26 +15,89 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
 
-      - name: Read bumped version
-        id: v
+      - name: Detect changed packages
+        id: resolve
         run: |
           set -euo pipefail
-          ver="$(awk '/^Version:/ {print $2; exit}' tools/opencode/opencode.spec)"
-          [ -n "$ver" ] || { echo "no Version in tools/opencode/opencode.spec"; exit 1; }
-          echo "version=$ver" >> "$GITHUB_OUTPUT"
-          echo "Bumped version: $ver"
+          base="${{ github.event.pull_request.base.sha }}"
+          pkgs="$(git diff --name-only --diff-filter=ACMR "$base" "HEAD" \
+            | grep -E '^[^./][^/]*/[^./][^/]*/' \
+            | grep -vE '/(fetch\.sh|bump\.sh|BIN|\.obsignore)$' \
+            | grep -vE '\.(tar\.gz|tar\.zst|zip)$' \
+            | cut -d/ -f1-2 | sort -u \
+            | while IFS= read -r p; do [ -d "$p" ] && echo "$p"; done \
+            | paste -sd, - || true)"
+          echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
+          echo "Detected: ${pkgs:-<none>}"
 
-      - name: Verify upstream release binary is fetchable and runs
+      - name: Validate version + upstream asset for each package
+        if: steps.resolve.outputs.packages != ''
         env:
-          VER: ${{ steps.v.outputs.version }}
+          PACKAGES: ${{ steps.resolve.outputs.packages }}
         run: |
-          set -euo pipefail
-          url="https://github.com/anomalyco/opencode/releases/download/v${VER}/opencode-linux-x64.tar.gz"
-          echo "Fetching $url"
-          curl -fL --retry 3 "$url" -o /tmp/opencode.tar.gz
-          mkdir -p /tmp/x && tar -xzf /tmp/opencode.tar.gz -C /tmp/x
-          got="$(docker run --rm -v /tmp/x:/x:ro registry.opensuse.org/opensuse/tumbleweed /x/opencode --version)"
-          echo "opencode --version => $got"
-          [ "$got" = "$VER" ] || { echo "ERROR: expected '$VER', got '$got'"; exit 1; }
-          echo "OK: release $VER is fetchable and the binary reports the right version"
+          python3 - <<'PY'
+          import glob
+          import os
+          import re
+          import sys
+          import urllib.error
+          import urllib.request
+
+          pkgs = [p for p in os.environ["PACKAGES"].split(",") if p]
+          failures = []
+
+          for pkg in pkgs:
+              specs = glob.glob(os.path.join(pkg, "*.spec"))
+              svc = os.path.join(pkg, "_service")
+              if not specs:
+                  failures.append(f"{pkg}: no spec")
+                  continue
+              if not os.path.isfile(svc):
+                  failures.append(f"{pkg}: no _service (a bump must update it)")
+                  continue
+
+              ver = None
+              for line in open(specs[0]):
+                  m = re.match(r"^Version:\s*(\S+)", line)
+                  if m:
+                      ver = m.group(1)
+                      break
+              if not ver:
+                  failures.append(f"{pkg}: no Version in {specs[0]}")
+                  continue
+
+              xml = open(svc).read()
+              def param(name):
+                  m = re.search(r'<param name="%s">([^<]*)</param>' % name, xml)
+                  return m.group(1) if m else None
+              url = "".join(x for x in [param("protocol"), "://", param("host"), param("path")] if x)
+              if not url.startswith(("http://", "https://")):
+                  failures.append(f"{pkg}: could not parse _service download URL")
+                  continue
+
+              if not re.search(r"(^|[/_.-])v?" + re.escape(ver) + r"([/_.-]|$)", url):
+                  failures.append(f"{pkg}: _service URL ({url}) does not reference version {ver}")
+
+              try:
+                  req = urllib.request.Request(url, method="HEAD")
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      code = r.status
+              except urllib.error.HTTPError as e:
+                  code = e.code
+              except Exception as e:
+                  failures.append(f"{pkg}: could not HEAD {url}: {e}")
+                  continue
+              if not (200 <= code < 400):
+                  failures.append(f"{pkg}: HEAD {url} -> HTTP {code}")
+              print(f"{pkg}: Version {ver}, upstream asset HTTP {code}")
+
+          if failures:
+              print("FAILURES:")
+              for f in failures:
+                  print(" -", f)
+              sys.exit(1)
+          print(f"OK: {len(pkgs)} package(s) validated")
+          PY
