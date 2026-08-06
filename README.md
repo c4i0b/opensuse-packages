@@ -4,7 +4,7 @@ Personal packaging monorepo for [OBS](https://build.opensuse.org).
 
 ## Install (openSUSE Tumbleweed)
 
-    zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno/openSUSE_Tumbleweed/home:caiobruno.repo
+    zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno/opensuse_tumbleweed/home:caiobruno.repo
     zypper ref
     zypper in <package>
 
@@ -12,8 +12,10 @@ Personal packaging monorepo for [OBS](https://build.opensuse.org).
 
 `just --list` for all. Key ones:
 
-- `just build packages/<name>` — RPM build in a container
-- `just push packages/<name> "msg"` — sync to OBS
+- `just build packages/<name>` — RPM build in the local Tumbleweed build image
+- `just build-image` — (re)build `opensuse-packaging:dev` from `tools/build.Dockerfile`
+- `just gen-rust <crate>` / `just gen-go <importpath>` — generate a spec into `.build/gen/`
+- `just push packages/<name> "msg"` — sync to OBS (runs lint first)
 - `just lint` — catch CI mistakes
 - `just bump packages/<name> <ver>` — bump version
 

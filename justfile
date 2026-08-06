@@ -83,6 +83,7 @@ push pkg msg:
     project="home:{{OBS_USER}}"
     src="{{repo}}/{{pkg}}"
     dest="{{OSC_WORK}}/${project}/${name}"
+    python3 "{{repo}}/opensuse-lint.py" "$src"/*.spec || { echo "lint FAILED — fix before push" >&2; exit 1; }
     [ -d "$dest/.osc" ] || just new-pkg "{{pkg}}"
     if [ -x "$src/bump.sh" ]; then ver="$(awk '/^Version:/{print $2; exit}' "$src"/*.spec)"; "$src/bump.sh" "$ver" || true; fi
     ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --exclude='*.tar.gz' --exclude='*.zip')
@@ -100,6 +101,10 @@ fetch pkg:
     dir="{{repo}}/{{pkg}}"
     if [ -x "$dir/fetch.sh" ]; then "$dir/fetch.sh"; else echo "no fetch.sh for {{pkg}}"; fi
 
+build-image:
+    docker build -f "{{repo}}/tools/build.Dockerfile" -t opensuse-packaging:dev "{{repo}}/tools"
+    echo "image 'opensuse-packaging:dev' ready"
+
 build pkg:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -111,14 +116,33 @@ build pkg:
     elif ls "$dir"/*.spec >/dev/null 2>&1; then
       out="{{repo}}/.build/${name}"
       mkdir -p "$out"
+      docker image inspect opensuse-packaging:dev >/dev/null 2>&1 || just build-image
       buildreqs=$(grep '^BuildRequires:' "$dir"/*.spec | sed 's/BuildRequires:\s*//;s/\s*$//' | tr '\n' ' ' || true)
       docker run --rm -e HOME=/tmp -v "$dir:/src" -v "$out:/out" -v "{{repo}}/tools/rpmlintrc:/rpmlintrc.local:ro" \
-        registry.opensuse.org/opensuse/tumbleweed \
-        bash -lc 'set -e; zypper --non-interactive install --no-recommends rpm-build rpmlint tar gzip '"$buildreqs"' >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" -D "debug_package %{nil}" *.spec; echo "--- rpmlint ---"; rint=(); for f in /src/*.rpmlintrc; do [ -f "$f" ] && rint+=(-r "$f"); done; rint+=(-r /rpmlintrc.local); rpmlint "${rint[@]}" /out/*/*.rpm 2>&1 | tail -20 || true'
+        opensuse-packaging:dev \
+        bash -lc 'set -e; reqs="'"$buildreqs"'"; [ -n "$reqs" ] && zypper --non-interactive install --no-recommends $reqs >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" -D "debug_package %{nil}" *.spec; echo "--- rpmlint ---"; rint=(); for f in /src/*.rpmlintrc; do [ -f "$f" ] && rint+=(-r "$f"); done; rint+=(-r /rpmlintrc.local); rpmlint "${rint[@]}" /out/*/*.rpm 2>&1 | tee /tmp/rpmlint.out; if grep -qE ": E: " /tmp/rpmlint.out; then echo "rpmlint ERRORS -> fix before push" >&2; exit 1; fi'
       echo "RPMs -> $out"
     else
       echo "no Dockerfile or .spec in {{pkg}}" >&2; exit 1
     fi
+
+gen-rust crate:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    docker image inspect opensuse-packaging:dev >/dev/null 2>&1 || just build-image
+    mkdir -p "{{repo}}/.build/gen"
+    docker run --rm -e HOME=/tmp -v "{{repo}}/.build/gen:/gen" opensuse-packaging:dev \
+      bash -lc "rust2rpm -t opensuse -o /gen '{{crate}}'"
+    echo "generated spec -> {{repo}}/.build/gen"
+
+gen-go pkg:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    docker image inspect opensuse-packaging:dev >/dev/null 2>&1 || just build-image
+    mkdir -p "{{repo}}/.build/gen"
+    docker run --rm -e HOME=/tmp -v "{{repo}}/.build/gen:/gen" -w /gen opensuse-packaging:dev \
+      bash -lc "go2rpm '{{pkg}}'"
+    echo "generated spec -> {{repo}}/.build/gen"
 
 run pkg +args:
     #!/usr/bin/env bash
@@ -164,7 +188,8 @@ obs-create:
       distrobox create --name obs --image {{obs-image}} --home {{obs-home}} --yes
     fi
     distrobox enter obs -- true >/dev/null
-    docker exec --user root obs zypper --non-interactive install osc git build opi >/dev/null
+    docker exec --user root obs zypper --non-interactive install osc git build opi \
+      cargo-packaging golang-packaging go cargo python-rpm-macros systemd-rpm-macros cmake >/dev/null
     echo "distrobox 'obs' ready. Run 'just obs-login' once as {{OBS_USER}}."
 
 obs-login:

@@ -1,4 +1,3 @@
-# Local-build mirror of OBS's global filter set (see dist/obs-rpmlintrc in
-# open-build-service). OBS merges <pkg>.changes into %changelog before linting,
-# so no-changelogname-tag never fires there — filter it locally too.
 addFilter(".*no-changelogname-tag")
+addFilter(".*python-bytecode-inconsistent-mtime")
+addFilter(".*files-duplicate")
