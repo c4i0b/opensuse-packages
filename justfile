@@ -86,7 +86,7 @@ push pkg msg:
     python3 "{{repo}}/opensuse-lint.py" "$src"/*.spec || { echo "lint FAILED — fix before push" >&2; exit 1; }
     [ -d "$dest/.osc" ] || just new-pkg "{{pkg}}"
     if [ -x "$src/bump.sh" ]; then ver="$(awk '/^Version:/{print $2; exit}' "$src"/*.spec)"; "$src/bump.sh" "$ver" || true; fi
-    ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --include='vendor.*' --exclude='*.tar.gz' --exclude='*.zip')
+    ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='BIN' --include='vendor.*' --exclude='*.tar.gz' --exclude='*.zip')
     [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
     rsync -a --delete "${ex[@]}" "$src/" "$dest/"
     (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} addremove </dev/null && {{OSC_RUN}} osc -A {{OBS_API}} st </dev/null)

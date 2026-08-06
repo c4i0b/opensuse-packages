@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ver="$(cat "$dir/VERSION")"
+ver="$(awk '/^Version:/{print $2}' "$dir"/*.spec | head -1)"
 crate="television"
 curl -fL "https://static.crates.io/crates/${crate}/${crate}-${ver}.crate" -o "$dir/${crate}-${ver}.tar.gz"
 rm -f "$dir/vendor.tar.zst"

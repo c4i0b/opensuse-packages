@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ver="$(cat "$dir/VERSION")"
+ver="$(awk '/^Version:/{print $2}' "$dir"/*.spec | head -1)"
 curl -fL "https://github.com/yorukot/superfile/archive/refs/tags/v${ver}.tar.gz" -o "$dir/superfile-${ver}.tar.gz"
 rm -f "$dir/vendor.tar.gz"
 docker run --rm -e HOME=/tmp -v "$dir:/work" opensuse-packaging:dev bash -lc "
