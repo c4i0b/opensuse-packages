@@ -19,12 +19,25 @@ bootstrap:
     @command -v just && just --version
     @echo "osc runs inside the 'obs' distrobox (just obs-create); set OSC_RUN='' to use a host osc instead"
 
-create-project category="tools":
+create-project category="tools" force="0":
     #!/usr/bin/env bash
     set -euo pipefail
     project="home:{{OBS_USER}}"
     tmp="$(mktemp)"
-    sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@REPO@@|{{OBS_REPO}}|g" -e "s|@@ARCH@@|{{OBS_ARCH}}|g" "{{repo}}/_project.meta.xml" > "$tmp"
+    if {{OSC_RUN}} osc -A {{OBS_API}} meta prj "$project" >/dev/null 2>&1; then
+      if [ "{{force}}" != "1" ]; then
+        echo "project $project already exists (force=1 to re-apply _project.meta.xml)"
+        rm -f "$tmp"
+        exit 0
+      fi
+    fi
+    arches=""
+    for a in {{OBS_ARCHES}}; do
+      [ -n "$arches" ] && arches+="\\n"
+      arches+="    <arch>$a</arch>"
+    done
+    sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@REPO@@|{{OBS_REPO}}|g" -e "s|@@ARCHES@@|${arches}|g" \
+      "{{repo}}/_project.meta.xml" > "$tmp"
     {{OSC_RUN}} osc -A {{OBS_API}} meta prj -F "$tmp" "$project"
     rm -f "$tmp"
     echo "project ready: $project"
@@ -99,9 +112,9 @@ build pkg:
       out="{{repo}}/.build/${name}"
       mkdir -p "$out"
       buildreqs=$(grep '^BuildRequires:' "$dir"/*.spec | sed 's/BuildRequires:\s*//;s/\s*$//' | tr '\n' ' ' || true)
-      docker run --rm -e HOME=/tmp -v "$dir:/src" -v "$out:/out" \
+      docker run --rm -e HOME=/tmp -v "$dir:/src" -v "$out:/out" -v "{{repo}}/tools/rpmlintrc:/rpmlintrc.local:ro" \
         registry.opensuse.org/opensuse/tumbleweed \
-        bash -lc 'set -e; zypper --non-interactive install --no-recommends rpm-build rpmlint tar gzip '"$buildreqs"' >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" -D "debug_package %{nil}" *.spec; echo "--- rpmlint ---"; rpmlint /out/*/*.rpm 2>&1 | tail -20 || true'
+        bash -lc 'set -e; zypper --non-interactive install --no-recommends rpm-build rpmlint tar gzip '"$buildreqs"' >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" -D "debug_package %{nil}" *.spec; echo "--- rpmlint ---"; rint=(); for f in /src/*.rpmlintrc; do [ -f "$f" ] && rint+=(-r "$f"); done; rint+=(-r /rpmlintrc.local); rpmlint "${rint[@]}" /out/*/*.rpm 2>&1 | tail -20 || true'
       echo "RPMs -> $out"
     else
       echo "no Dockerfile or .spec in {{pkg}}" >&2; exit 1
