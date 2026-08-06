@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "description": "Generic upstream tracking — derives depName + datasource from each spec's URL: line",
+  "description": "Generic upstream tracking — bumps spec Version: and the _service download URL in one PR per package",
   "schedule": ["at any time"],
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate dashboard — opensuse-packages",
@@ -14,7 +14,15 @@
       "datasourceTemplate": "{{datasource}}-releases",
       "managerFilePatterns": ["packages/*/*.spec$"],
       "matchStrings": [
-        "Version:\\s*(?<currentValue>\\S+)[\\s\\S]*?(?<datasource>github|gitlab)\\.(?:com|io|org)/(?<depName>[^/]+/[^/\\s\"]+)"
+        "Version:\\s*(?<currentValue>\\S+)[\\s\\S]*?(?<datasource>github|gitlab)\\.(?:com|io|org)/(?<depName>[^/]+/[^/\\s\"<]+)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "{{datasource}}-releases",
+      "managerFilePatterns": ["packages/*/_service$"],
+      "matchStrings": [
+        "<param name=\"host\">(?<datasource>github|gitlab)\\.com</param>\\s*<param name=\"path\">/(?<depName>[^/]+/[^/\"]+)/(?:releases/download/|archive/(?:refs/tags/)?)v?(?<currentValue>[0-9]+(?:\\.[0-9]+)*)[/\\.\"-]"
       ]
     }
   ],
@@ -28,6 +36,11 @@
       "automergeType": "pr",
       "automergeStrategy": "squash",
       "requiredStatusChecks": ["validate-bump"]
+    },
+    {
+      "matchFileNames": ["packages/superfile/**", "packages/television/**"],
+      "enabled": false,
+      "description": "Source builds with vendored deps are bumped manually via bump.sh + fetch.sh (Renovate cannot regenerate vendor.tar.gz/.zst)"
     }
   ]
 }

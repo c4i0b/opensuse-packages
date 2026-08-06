@@ -106,6 +106,10 @@ jobs:
             echo "pass = ${OBS_PASSWORD}"
           } > ~/.oscrc
 
+      - name: Fetch shared lint tooling
+        if: steps.resolve.outputs.packages != ''
+        run: curl -fsSL "https://raw.githubusercontent.com/c4i0b/projects-ai-agents/main/opensuse-packages/opensuse-lint.py" -o opensuse-lint.py
+
       - name: Push packages to OBS
         id: doit
         if: steps.resolve.outputs.packages != ''
