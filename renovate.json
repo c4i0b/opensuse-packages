@@ -36,11 +36,6 @@
       "automergeType": "pr",
       "automergeStrategy": "squash",
       "requiredStatusChecks": ["validate-bump"]
-    },
-    {
-      "matchFileNames": ["packages/opencode/**", "packages/superfile/**", "packages/television/**"],
-      "enabled": false,
-      "description": "Source builds with vendored deps are bumped manually via bump.sh + fetch.sh (Renovate cannot regenerate the gitignored vendor tarball; push-to-obs auto-skips these via the missing vendor Source)"
     }
   ]
 }

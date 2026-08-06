@@ -1,8 +1,0 @@
-<services>
-  <service name="download_url">
-    <param name="protocol">https</param>
-    <param name="host">static.crates.io</param>
-    <param name="path">/crates/television/television-0.15.9.crate</param>
-    <param name="filename">television-0.15.9.tar.gz</param>
-  </service>
-</services>
