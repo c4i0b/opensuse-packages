@@ -86,7 +86,7 @@ push pkg msg:
     python3 "{{repo}}/opensuse-lint.py" "$src"/*.spec || { echo "lint FAILED — fix before push" >&2; exit 1; }
     [ -d "$dest/.osc" ] || just new-pkg "{{pkg}}"
     if [ -x "$src/bump.sh" ]; then ver="$(awk '/^Version:/{print $2; exit}' "$src"/*.spec)"; "$src/bump.sh" "$ver" || true; fi
-    ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --exclude='*.tar.gz' --exclude='*.zip')
+    ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --include='vendor.*' --exclude='*.tar.gz' --exclude='*.zip')
     [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
     rsync -a --delete "${ex[@]}" "$src/" "$dest/"
     (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} addremove && {{OSC_RUN}} osc -A {{OBS_API}} st)
@@ -120,7 +120,7 @@ build pkg:
       buildreqs=$(grep '^BuildRequires:' "$dir"/*.spec | sed 's/BuildRequires:\s*//;s/\s*$//' | tr '\n' ' ' || true)
       docker run --rm -e HOME=/tmp -v "$dir:/src" -v "$out:/out" -v "{{repo}}/tools/rpmlintrc:/rpmlintrc.local:ro" \
         opensuse-packaging:dev \
-        bash -lc 'set -e; reqs="'"$buildreqs"'"; [ -n "$reqs" ] && zypper --non-interactive install --no-recommends $reqs >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" -D "debug_package %{nil}" *.spec; echo "--- rpmlint ---"; rint=(); for f in /src/*.rpmlintrc; do [ -f "$f" ] && rint+=(-r "$f"); done; rint+=(-r /rpmlintrc.local); rpmlint "${rint[@]}" /out/*/*.rpm 2>&1 | tee /tmp/rpmlint.out; if grep -qE ": E: " /tmp/rpmlint.out; then echo "rpmlint ERRORS -> fix before push" >&2; exit 1; fi'
+        bash -lc 'set -e; reqs="'"$buildreqs"'"; [ -n "$reqs" ] && zypper --non-interactive install --no-recommends $reqs >/dev/null 2>&1; cd /src; rpmbuild -bb -D "_topdir /tmp/rpmbuild" -D "_sourcedir /src" -D "_rpmdir /out" -D "debug_package %{nil}" *.spec; echo "--- rpmlint ---"; rint=(); for f in /src/*.rpmlintrc; do [ -f "$f" ] && rint+=(-r "$f"); done; rint+=(-r /rpmlintrc.local); rpmlint "${rint[@]}" /out/*/*.rpm 2>&1 | tee /tmp/rpmlint.out; pkgs=""; for f in /src/*.rpmlintrc; do [ -f "$f" ] && pkgs+="$(sed -n "s/^addFilter(\"\(.*\)\")$/\1/p" "$f")"$'"'"'\n'"'"'; done; fail=0; while IFS= read -r line; do [ -z "$line" ] && continue; pat=$(printf "%s" "$line" | sed -n "s/.*unused-rpmlintrc-filter \"\([^\"]*\)\".*/\1/p"); if [ -n "$pat" ]; then if grep -Fxq "$pat" <<< "$pkgs"; then fail=1; echo "stale per-package rpmlintrc filter: $pat"; fi; else fail=1; echo "$line"; fi; done <<< "$(grep -E ": E: " /tmp/rpmlint.out || true)"; if [ "$fail" = 1 ]; then echo "rpmlint ERRORS -> fix before push" >&2; exit 1; fi'
       echo "RPMs -> $out"
     else
       echo "no Dockerfile or .spec in {{pkg}}" >&2; exit 1
