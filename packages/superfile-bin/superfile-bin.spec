@@ -7,6 +7,11 @@ URL:            https://github.com/yorukot/superfile
 Source0:        superfile-linux-v%{version}-amd64.tar.gz
 ExclusiveArch:  x86_64
 
+%global debug_package %{nil}
+
+
+
+
 %description
 A pretty fancy and modern terminal file manager written in Go.
 
