@@ -38,7 +38,7 @@ create-project category="tools" force="0":
     done
     sed -e "s|@@PROJECT@@|${project}|g" -e "s|@@REPO@@|{{OBS_REPO}}|g" -e "s|@@ARCHES@@|${arches}|g" \
       "{{repo}}/_project.meta.xml" > "$tmp"
-    {{OSC_RUN}} osc -A {{OBS_API}} meta prj -F "$tmp" "$project"
+    {{OSC_RUN}} osc -A {{OBS_API}} meta prj -F "$tmp" "$project" </dev/null
     rm -f "$tmp"
     echo "project ready: $project"
 
@@ -49,10 +49,10 @@ checkout pkg:
     project="home:{{OBS_USER}}"
     dest="{{OSC_WORK}}/${project}/${name}"
     if [ -d "$dest/.osc" ]; then
-      (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} up)
+      (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} up </dev/null)
     else
       mkdir -p "{{OSC_WORK}}/${project}"
-      {{OSC_RUN}} osc -A {{OBS_API}} co "$project" "$name" -o "$dest"
+      {{OSC_RUN}} osc -A {{OBS_API}} co "$project" "$name" -o "$dest" </dev/null
     fi
     echo "working copy: $dest"
 
@@ -72,7 +72,7 @@ new-pkg pkg:
       printf '  <description>%s</description>\n' "$(printf '%s' "$desc" | esc)"
       echo "</package>"
     } > "$tmp"
-    {{OSC_RUN}} osc -A {{OBS_API}} meta pkg -F "$tmp" "$project" "$name"
+    {{OSC_RUN}} osc -A {{OBS_API}} meta pkg -F "$tmp" "$project" "$name" </dev/null
     rm -f "$tmp"
     just checkout "{{pkg}}"
 
@@ -89,10 +89,10 @@ push pkg msg:
     ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='VERSION' --exclude='BIN' --include='vendor.*' --exclude='*.tar.gz' --exclude='*.zip')
     [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
     rsync -a --delete "${ex[@]}" "$src/" "$dest/"
-    (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} addremove && {{OSC_RUN}} osc -A {{OBS_API}} st)
+    (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} addremove </dev/null && {{OSC_RUN}} osc -A {{OBS_API}} st </dev/null)
     if [ "${CI:-}" = "true" ]; then ok=y; else read -r -p "Commit ${name} to ${project}? [y/N] " ok; fi
     [ "$ok" = "y" ] || { echo aborted; exit 1; }
-    (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} ci -m "{{msg}}")
+    (cd "$dest" && {{OSC_RUN}} osc -A {{OBS_API}} ci -m "{{msg}}" </dev/null)
     echo "pushed ${name} -> ${project}"
 
 fetch pkg:
