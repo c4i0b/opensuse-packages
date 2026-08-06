@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-x86_64-unknown-linux-gnu.tar.gz</param>
+    <param name="filename">tv-0.15.9-x86_64-unknown-linux-gnu.tar.gz</param>
+  </service>
+</services>
