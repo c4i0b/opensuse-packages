@@ -71,6 +71,25 @@ jobs:
             fi
           fi
           pkgs="${pkgs// /}"
+          # Drop source builds (superfile/television): their vendor tarball is
+          # gitignored and only exists locally — a CI push would rsync without it
+          # and osc ci would delete it from OBS, breaking the build. They are
+          # bumped + pushed manually via bump.sh/fetch.sh/just push (mirrors the
+          # Renovate exclusion).
+          kept=""
+          IFS=',' read -ra arr <<< "$pkgs"
+          for p in "${arr[@]}"; do
+            [ -n "$p" ] || continue
+            case "$p" in
+              packages/superfile|packages/television)
+                echo "skip $p (source build — vendor tarball is local-only; push with just push)"
+                ;;
+              *)
+                kept+="${kept:+,}$p"
+                ;;
+            esac
+          done
+          pkgs="$kept"
           echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
           echo "Resolved: ${pkgs:-<none>}"
 
