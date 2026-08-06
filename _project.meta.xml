@@ -3,6 +3,6 @@
   <description>RPMs for openSUSE Tumbleweed.</description>
   <repository name="@@REPO@@">
     <path project="openSUSE:Tumbleweed" repository="standard"/>
-    <arch>@@ARCH@@</arch>
+@@ARCHES@@
   </repository>
 </project>
