@@ -4,7 +4,7 @@ Release:        0
 Summary:        Pretty fancy and modern terminal file manager
 License:        MIT
 URL:            https://github.com/yorukot/superfile
-Source0:        superfile-linux-v1.6.0-amd64.tar.gz
+Source0:        superfile-linux-v%{version}-amd64.tar.gz
 ExclusiveArch:  x86_64
 
 %description
@@ -17,7 +17,7 @@ tar -xzf %{SOURCE0}
 %build
 
 %install
-install -Dpm 0755 dist/superfile-linux-v1.6.0-amd64/spf %{buildroot}%{_bindir}/spf
+install -Dpm 0755 dist/superfile-linux-v%{version}-amd64/spf %{buildroot}%{_bindir}/spf
 
 %files
 %{_bindir}/spf
