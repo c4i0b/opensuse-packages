@@ -74,10 +74,6 @@ jobs:
           echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
           echo "Resolved: ${pkgs:-<none>}"
 
-      - name: Setup just
-        if: steps.resolve.outputs.packages != ''
-        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3
-
       - name: Setup Python
         if: steps.resolve.outputs.packages != ''
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
@@ -106,26 +102,87 @@ jobs:
             echo "pass = ${OBS_PASSWORD}"
           } > ~/.oscrc
 
-      - name: Fetch shared lint tooling
-        if: steps.resolve.outputs.packages != ''
-        run: curl -fsSL "https://raw.githubusercontent.com/c4i0b/projects-ai-agents/main/opensuse-packages/opensuse-lint.py" -o opensuse-lint.py
-
       - name: Push packages to OBS
         id: doit
         if: steps.resolve.outputs.packages != ''
         env:
-          CI: "true"
-          OSC_RUN: ""
+          OBS_API: "https://api.opensuse.org"
+          OBS_PROJECT: "home:${{ secrets.OBS_USER }}"
+          OBS_REPO: "opensuse_tumbleweed"
           PACKAGES: ${{ steps.resolve.outputs.packages }}
         run: |
           set -euo pipefail
+
+          osc_meta() { osc -A "$OBS_API" "$@"; }
+
+          ensure_project() {
+            if ! osc_meta meta prj "$OBS_PROJECT" >/dev/null 2>&1; then
+              arches=""
+              for a in x86_64 aarch64; do
+                [ -n "$arches" ] && arches+="\n"
+                arches+="    <arch>$a</arch>"
+              done
+              tmp="$(mktemp)"
+              sed -e "s|@@PROJECT@@|${OBS_PROJECT}|g" \
+                  -e "s|@@REPO@@|${OBS_REPO}|g" \
+                  -e "s|@@ARCHES@@|${arches}|g" \
+                  "$GITHUB_WORKSPACE/_project.meta.xml" > "$tmp"
+              osc_meta meta prj -F "$tmp" "$OBS_PROJECT"
+              rm -f "$tmp"
+            fi
+          }
+
+          ensure_package() {
+            local name="$1" spec="$2"
+            if ! osc_meta meta pkg "$OBS_PROJECT" "$name" >/dev/null 2>&1; then
+              summary="$(awk '/^Summary:/ {sub(/^Summary:[ \t]*/,""); print; exit}' "$spec")"
+              desc="$(awk '/^%description/{f=1;next}/^%/{f=0}f&&NF{print}' "$spec" | head -8)"
+              esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
+              tmp="$(mktemp)"
+              {
+                echo "<package name=\"${name}\" project=\"${OBS_PROJECT}\">"
+                printf '  <title>%s</title>\n' "$(printf '%s' "$summary" | esc)"
+                printf '  <description>%s</description>\n' "$(printf '%s' "$desc" | esc)"
+                echo "</package>"
+              } > "$tmp"
+              osc_meta meta pkg -F "$tmp" "$OBS_PROJECT" "$name"
+              rm -f "$tmp"
+            fi
+          }
+
           pushed=()
           IFS=',' read -ra list <<< "$PACKAGES"
           for pkg in "${list[@]}"; do
             [ -n "$pkg" ] || continue
-            category="${pkg%%/*}"
-            just create-project "$category"
-            just push "$pkg" "ci: update ${pkg}"
+            name="${pkg##*/}"
+            src="$GITHUB_WORKSPACE/$pkg"
+            dest="$GITHUB_WORKSPACE/.osc-work/$name"
+
+            spec="$(ls "$src"/*.spec 2>/dev/null | head -1)"
+            [ -n "$spec" ] || { echo "no .spec in $pkg" >&2; exit 1; }
+            awk '/^Version:/{ok=1} END{exit ok?0:1}' "$spec" \
+              || { echo "missing Version: in $spec" >&2; exit 1; }
+
+            ensure_project
+            ensure_package "$name" "$spec"
+
+            mkdir -p "$dest"
+            if [ -d "$dest/.osc" ]; then
+              (cd "$dest" && osc_meta up)
+            else
+              osc_meta co "$OBS_PROJECT" "$name" -o "$dest"
+            fi
+
+            if [ -x "$src/bump.sh" ]; then
+              ver="$(awk '/^Version:/{print $2; exit}' "$spec")"
+              "$src/bump.sh" "$ver" || true
+            fi
+
+            ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='BIN' --include='vendor.*' --exclude='*.tar.gz' --exclude='*.zip')
+            [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
+            rsync -a --delete "${ex[@]}" "$src/" "$dest/"
+            (cd "$dest" && osc_meta addremove && osc_meta st)
+            (cd "$dest" && osc_meta ci -m "ci: update $pkg")
             pushed+=("$pkg")
           done
           printf 'pushed=%s\n' "$(IFS=,; echo "${pushed[*]}")" >> "$GITHUB_OUTPUT"

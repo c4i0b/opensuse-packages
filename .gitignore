@@ -12,3 +12,8 @@ __pycache__/
 .netrc
 .env*
 .DS_Store
+
+# dev tooling symlinks (canonical copies in projects-ai-agents/opensuse-packages)
+AGENTS.md
+justfile
+opensuse-lint.py
