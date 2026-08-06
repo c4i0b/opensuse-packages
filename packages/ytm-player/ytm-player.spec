@@ -18,21 +18,24 @@ Requires:       yt-dlp
 Requires:       python3-python-mpv
 Requires:       python3-aiosqlite
 Requires:       python3-click
+Requires:       python3-dbus_fast
 Requires:       python3-packaging
 Requires:       python3-Pillow
 Requires:       mpv
 
 %description
-A full-featured YouTube Music TUI client for the terminal.
+A full-featured YouTube Music TUI client with vim keybindings and synced
+lyrics, built on a terminal-first interface. On Linux, media keys and
+desktop now-playing integrate out of the box.
 
 %prep
 %autosetup -n ytm_player-%{version}
 
 %build
-python3 -m pip wheel --no-deps --no-build-isolation -w dist .
+%python3_pyproject_wheel
 
 %install
-python3 -m pip install --root=%{buildroot} --no-deps --prefix=/usr dist/*.whl
+%python3_pyproject_install
 
 %files
 %license LICENSE
