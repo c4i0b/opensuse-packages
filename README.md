@@ -8,29 +8,30 @@ Personal packaging monorepo for [OBS](https://build.opensuse.org).
     zypper ref
     zypper in <package>
 
-## Commands
+## Layout
 
-`just --list` for all. Key ones:
-
-- `just build packages/<name>` — RPM build in the local Tumbleweed build image
-- `just build-image` — (re)build `opensuse-packaging:dev` from `tools/build.Dockerfile`
-- `just gen-rust <crate>` / `just gen-go <importpath>` — generate a spec into `.build/gen/`
-- `just push packages/<name> "msg"` — sync to OBS (runs lint first)
-- `just lint` — catch CI mistakes
-- `just bump packages/<name> <ver>` — bump version
+- `packages/<name>/` — one OBS package. Required: `*.spec`. Optional:
+  `_service`, `fetch.sh`, `bump.sh`, `BIN`, `.obsignore`.
+- `_project.meta.xml` — OBS project template (repos/arches).
+- `renovate.json` — dependency bump configuration.
+- `.github/workflows/` — `validate-bump` (PR gate), `push-to-obs` (syncs on merge), `dependabot-automerge`.
 
 ## Add a package
 
 1. Create `packages/<name>/` with a `.spec` — use `packages/opencode-bin/` as a template.
-2. `just create-project`
-3. `just push packages/<name> "initial package"`
-
-Track upstream releases via `renovate.json`.
+2. Add a `_service` so OBS fetches upstream sources, plus `bump.sh`/`fetch.sh` for version updates.
+3. `push-to-obs` syncs it to OBS on merge.
 
 ## Automation
 
-Renovate opens bump PRs (auto-merged after `validate-bump` passes); `push-to-obs`
-syncs to OBS on merge. Dependabot keeps Actions updated (auto-merged after a
-YAML+justfile gate). Secrets: `OBS_USER`, `OBS_PASSWORD`.
+- Renovate opens bump PRs (auto-merged after `validate-bump` passes).
+- `push-to-obs` syncs changed packages to OBS on merge; it drives `osc` directly
+  (self-contained, no external tooling).
+- Dependabot keeps Actions updated (auto-merged after a YAML gate).
+- Secrets: `OBS_USER`, `OBS_PASSWORD`.
 
-osc runs via distrobox (`just obs-create`); CI sets `OSC_RUN=""` for host osc.
+## Development
+
+Dev tooling (`justfile`, `opensuse-lint.py`, `AGENTS.md`) is symlinked from the
+central `projects-ai-agents` repo (gitignored, not tracked here). CI is
+self-contained and does not need it.
