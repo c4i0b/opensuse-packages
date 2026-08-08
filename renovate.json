@@ -22,7 +22,7 @@
       "datasourceTemplate": "{{datasource}}-releases",
       "managerFilePatterns": ["packages/*/_service$"],
       "matchStrings": [
-        "<param name=\"host\">(?<datasource>github|gitlab)\\.com</param>\\s*<param name=\"path\">/(?<depName>[^/]+/[^/\"]+)/(?:releases/download/|archive/(?:refs/tags/)?)v?(?<currentValue>[0-9]+(?:\\.[0-9]+)*)[/\\.\"-]"
+        "<param name=\"host\">(?<datasource>github|gitlab)\\.com</param>\\s*<param name=\"path\">/(?<depName>[^/]+/[^/\"]+)/(?:releases/download/|archive/(?:refs/tags/)?)[vV]?(?<currentValue>[0-9]+(?:\\.[0-9]+)*)[/\\.\"-]"
       ]
     }
   ],
@@ -30,7 +30,7 @@
     {
       "matchDatasources": ["github-releases", "gitlab-releases"],
       "versioning": "semver",
-      "extractVersion": "^v?(?<version>.+)$",
+      "extractVersion": "^[vV]?(?<version>.+)$",
       "commitMessage": "chore: bump {{depName}} to {{newVersion}}",
       "automerge": true,
       "automergeType": "pr",
