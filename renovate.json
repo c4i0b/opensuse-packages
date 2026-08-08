@@ -12,7 +12,7 @@
     {
       "customType": "regex",
       "datasourceTemplate": "{{datasource}}-releases",
-      "managerFilePatterns": ["packages/*/*.spec$"],
+      "managerFilePatterns": ["packages/**/*.spec"],
       "matchStrings": [
         "Version:\\s*(?<currentValue>\\S+)[\\s\\S]*?(?<datasource>github|gitlab)\\.(?:com|io|org)/(?<depName>[^/]+/[^/\\s\"<]+)"
       ]
@@ -20,7 +20,7 @@
     {
       "customType": "regex",
       "datasourceTemplate": "{{datasource}}-releases",
-      "managerFilePatterns": ["packages/*/_service$"],
+      "managerFilePatterns": ["packages/**/_service"],
       "matchStrings": [
         "<param name=\"host\">(?<datasource>github|gitlab)\\.com</param>\\s*<param name=\"path\">/(?<depName>[^/]+/[^/\"]+)/(?:releases/download/|archive/(?:refs/tags/)?)[vV]?(?<currentValue>[0-9]+(?:\\.[0-9]+)*)[/\\.\"-]"
       ]
@@ -31,11 +31,11 @@
       "matchDatasources": ["github-releases", "gitlab-releases"],
       "versioning": "semver",
       "extractVersion": "^[vV]?(?<version>.+)$",
-      "commitMessage": "chore: bump {{depName}} to {{newVersion}}",
+      "commitMessagePrefix": "chore:",
+      "commitMessageAction": "bump {{depName}} to {{newVersion}}",
       "automerge": true,
       "automergeType": "pr",
-      "automergeStrategy": "squash",
-      "requiredStatusChecks": ["validate-bump"]
+      "automergeStrategy": "squash"
     }
   ]
 }
