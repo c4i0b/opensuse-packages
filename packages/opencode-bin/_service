@@ -2,7 +2,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/anomalyco/opencode/releases/download/v1.18.26/opencode-linux-x64.tar.gz</param>
+    <param name="path">/anomalyco/opencode/releases/download/v1.18.27/opencode-linux-x64.tar.gz</param>
     <param name="filename">opencode-linux-x64.tar.gz</param>
   </service>
 </services>
