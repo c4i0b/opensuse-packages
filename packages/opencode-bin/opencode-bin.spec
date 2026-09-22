@@ -1,7 +1,7 @@
 %global __os_install_post %{nil}
 
 Name:           opencode-bin
-Version:        1.18.31
+Version:        1.18.32
 Release:        0
 Summary:        The open source AI coding agent
 License:        MIT
