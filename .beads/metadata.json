@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "opensuse_packages",
+  "project_id": "65a659ee-66bb-4a2f-98b7-07fd0bd81bce"
+}
