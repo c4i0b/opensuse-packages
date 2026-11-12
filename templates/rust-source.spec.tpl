@@ -52,6 +52,12 @@ URL:            __URL__
 Source0:        __NAME__-%{version}.tar.zst
 Source1:        vendor.tar.zst
 BuildRequires:  cargo-packaging
+#   - aarch64 OOM mitigation when a single rustc exceeds worker RAM
+#     (see docs/packaging/rust.md): build_rustflags with
+#     -C codegen-units=16 -C debuginfo=0 + CARGO_PROFILE_RELEASE_LTO=false.
+#   - rpm expands macros inside comments — never write a literal macro
+#     call in a comment; unbraced `%cargo_build -p` parses -p as a macro
+#     option (use the braced %{cargo_build} form to forward flags).
 
 %description
 __DESCRIPTION__

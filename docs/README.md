@@ -16,4 +16,5 @@ maintained truth, `reference` stable background.
   parallel orchestration of the bd task graph
 - packaging quirks by ecosystem — reference:
   [general](packaging/general.md) ·
-  [python](packaging/python.md)
+  [python](packaging/python.md) ·
+  [rust](packaging/rust.md)

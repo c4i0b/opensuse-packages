@@ -37,10 +37,11 @@ doc over growing this file.
 - Environment, container, credentials: [docs/environment.md](docs/environment.md)
 - Automatic updates (autoupdate bot, validate-bump, Dependabot):
   [docs/autoupdate.md](docs/autoupdate.md)
-- Conventions (`-bin`-only policy, layout, versioning, hygiene):
+- Conventions (build models, layout, versioning, hygiene):
   [docs/conventions.md](docs/conventions.md)
 - Packaging quirks: [general](docs/packaging/general.md) ·
-  [python](docs/packaging/python.md)
+  [python](docs/packaging/python.md) ·
+  [rust](docs/packaging/rust.md)
 - Failure diagnosis: [skills/diagnose-obs-failure/SKILL.md](skills/diagnose-obs-failure/SKILL.md)
 - Package templates: [templates/](templates/) (`*.spec.tpl`)
 - Planned work: [BACKLOG.md](BACKLOG.md)
