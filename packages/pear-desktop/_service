@@ -1,0 +1,20 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/pear-devs/pear-desktop/releases/download/v3.12.0/youtube-music-3.12.0.x86_64.rpm</param>
+    <param name="filename">youtube-music-3.12.0.x86_64.rpm</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/pear-devs/pear-desktop/releases/download/v3.12.0/youtube-music-3.12.0.aarch64.rpm</param>
+    <param name="filename">youtube-music-3.12.0.aarch64.rpm</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/pear-devs/pear-desktop/v3.12.0/license</param>
+    <param name="filename">license</param>
+  </service>
+</services>
