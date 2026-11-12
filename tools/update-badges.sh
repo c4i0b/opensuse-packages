@@ -97,6 +97,7 @@ def upstream_link(pkg_dir):
     return f"https://build.opensuse.org/package/show/{project}/{pkg_dir.name}"
 
 pkg_lines = []
+written = set()
 for pkg_dir in sorted(Path(root, "packages").iterdir()):
     if not pkg_dir.is_dir() or not list(pkg_dir.glob("*.spec")):
         continue
@@ -111,10 +112,17 @@ for pkg_dir in sorted(Path(root, "packages").iterdir()):
     else:
         color, msg = "brightgreen", f"v{ver}"
     write_badge(pkg_dir.name, pkg_dir.name, msg, color)
+    written.add(pkg_dir.name)
     link = upstream_link(pkg_dir)
     pkg_lines.append(
         f'[![{pkg_dir.name}](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com'
         f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{pkg_dir.name}.json%3Fv%3D{ver}r{BADGE_REV})]({link})')
+
+# prune badges of packages that no longer exist (kept one refresh after a
+# package is removed, the next run drops the stale json)
+for old in badges.glob("*.json"):
+    if old.stem not in written and not old.stem.startswith("opensuse-tumbleweed"):
+        old.unlink()
 
 # ---- README blocks ---------------------------------------------------------
 readme = Path(root, "README.md")

@@ -23,7 +23,6 @@ OBS, where they are built.
 
 <!-- package-badges begin -->
 [![fisher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffisher.json%3Fv%3D4.4.8r2)](https://github.com/jorgebucaran/fisher/)
-[![opencode-bin](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopencode-bin.json%3Fv%3D2.2.7r2)](https://github.com/anomalyco/opencode/)
 [![pear-desktop-bin](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpear-desktop-bin.json%3Fv%3D3.12.0r2)](https://github.com/pear-devs/pear-desktop/)
 [![superfile-bin](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsuperfile-bin.json%3Fv%3D1.6.0r2)](https://github.com/yorukot/superfile/)
 [![television-bin](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftelevision-bin.json%3Fv%3D0.15.9r2)](https://github.com/alexpasmantier/television/)
