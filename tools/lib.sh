@@ -2,7 +2,11 @@
 # Shared helpers for the opensuse-packages recipes.
 set -euo pipefail
 
-repo_root() { git rev-parse --show-toplevel; }
+# All scripts live in tools/: the repo root is one level up. git rev-parse
+# fails inside the container when run from a git WORKTREE (the .git gitfile
+# points at the unmounted main checkout), which used to collapse the osc
+# workspace to an ephemeral /work — so derive from the script path instead.
+repo_root() { (cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd); }
 
 # osc checkout workspace: work/ inside the repo (gitignored, persists via the
 # repo bind mount). Override with OSC_WORK for a different location.

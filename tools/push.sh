@@ -22,11 +22,13 @@ python3 "$repo/opensuse-lint.py" "$src"/*.spec \
 # then sync: dev files and local archives never reach OBS (_service fetches
 # the real sources server-side)
 [ -x "$src/bump.sh" ] && "$src/bump.sh" "$(spec_version "$src"/*.spec)" || true
-# *.tar.zst is never deleted server-side: the television vendor archive is
-# generated client-side (cargo_vendor is not in the OBS service allowlist)
-# and lives outside git, so a checkout-based rsync --delete would wipe it
+# Rust vendor archives are generated client-side (cargo_vendor is not in
+# the OBS service allowlist) and live outside git. --filter=P uploads them
+# when present locally but protects them from --delete when a checkout
+# lacks them (a CI checkout never has one) — plain --exclude would never
+# upload and a bare transfer would wipe them server-side.
 ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='BIN'
-    --exclude='*.tar.gz' --exclude='*.zip' --exclude='*.tar.zst')
+    --exclude='*.tar.gz' --exclude='*.zip' --filter='P *.tar.zst')
 [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
 rsync -a --delete "${ex[@]}" "$src/" "$dest/"
 

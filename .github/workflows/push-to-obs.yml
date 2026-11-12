@@ -189,7 +189,7 @@ jobs:
               "$src/bump.sh" "$ver" || true
             fi
 
-            ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='BIN' --exclude='*.tar.gz' --exclude='*.zip' --exclude='*.tar.zst')
+            ex=(--exclude='.osc' --exclude='fetch.sh' --exclude='bump.sh' --exclude='BIN' --exclude='*.tar.gz' --exclude='*.zip' --filter='P *.tar.zst')
             [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")
             rsync -a --delete "${ex[@]}" "$src/" "$dest/"
             (cd "$dest" && osc_meta addremove && osc_meta st)

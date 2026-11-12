@@ -10,7 +10,9 @@ BuildArch:      noarch
 Requires:       fish
 
 %description
-A plugin manager for the Fish shell.
+Fisher is a plugin manager for the Fish shell. It installs, updates and
+removes fish plugins, managing functions, completions and key bindings
+with a minimal footprint.
 
 %prep
 %setup -q

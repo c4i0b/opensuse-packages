@@ -1,4 +1,10 @@
 -------------------------------------------------------------------
+ - Caio Bruno <cbrunofb@gmail.com>
+
+- Align Summary and description with the upstream project's official
+  wording (package.json / README).
+
+-------------------------------------------------------------------
 Wed Nov 11 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
 
 - Initial package of pear-desktop 3.12.0: repackage of the upstream
