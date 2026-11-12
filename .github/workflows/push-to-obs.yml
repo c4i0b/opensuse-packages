@@ -9,6 +9,13 @@ on:
       - 'LICENSE*'
       - '.gitignore'
       - 'renovate.json'
+  # bot merges are done by the auto-merge workflow with GITHUB_TOKEN, and
+  # pushes created with GITHUB_TOKEN fire no `push` events — so bumps merged
+  # since 2026-08 never reached OBS. workflow_run is the documented escape
+  # hatch: it fires even for GITHUB_TOKEN-driven completions.
+  workflow_run:
+    workflows: [auto-merge, autoupdate]
+    types: [completed]
   workflow_dispatch:
     inputs:
       packages:
@@ -27,6 +34,9 @@ concurrency:
 
 jobs:
   push:
+    # workflow_run also fires on skipped/failed auto-merge runs — only a
+    # successful completion means a PR was actually merged
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
