@@ -9,18 +9,21 @@ BuildArch:      noarch
 
 BuildRequires:  python3-base
 BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 BuildRequires:  python3-hatchling
-BuildRequires:  python-rpm-macros
+BuildRequires:  python3-rpm-macros
 
 Requires:       python3-textual
 Requires:       python3-ytmusicapi
 Requires:       yt-dlp
+Requires:       python3-pycryptodomex
+Requires:       python3-SecretStorage
 Requires:       python3-python-mpv
 Requires:       python3-aiosqlite
 Requires:       python3-click
-Requires:       python3-dbus_fast
 Requires:       python3-packaging
 Requires:       python3-Pillow
+Requires:       python3-dbus_fast
 Requires:       mpv
 
 %description
