@@ -76,6 +76,16 @@ jobs:
                   return m.group(1) if m else None
               url = "".join(x for x in [param("protocol"), "://", param("host"), param("path")] if x)
               if not url.startswith(("http://", "https://")):
+                  # git-tag packages (tar_scm/obs_scm): the version comes from
+                  # the tag, validated against the revision param instead of a
+                  # download URL
+                  if re.search(r'<service name="(tar_scm|obs_scm)"', xml):
+                      rev = param("revision") or ""
+                      if not re.search(r"(^|[/_.-])v?" + re.escape(ver) + r"([/_.-]|$)", rev):
+                          failures.append(f"{pkg}: tar_scm revision ({rev!r}) does not reference version {ver}")
+                      else:
+                          print(f"{pkg}: Version {ver}, tar_scm tag {rev} matches")
+                      continue
                   failures.append(f"{pkg}: could not parse _service download URL")
                   continue
 

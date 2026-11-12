@@ -8,8 +8,11 @@ Hard-won lessons for RPM specs in this repo, not specific to Python.
   Without it, OBS brp strips the ELF and the binary falls back to the Bun
   CLI (Bun single-file executables append their payload after the ELF
   section that strip removes).
-- Go, Rust and Electron prebuilts are **strip-safe** and must NOT add the
-  macro.
+- **Electron bundles must disable strip too** (`%define debug_package
+  %{nil}` + `%global __strip /bin/true`): stripping corrupts the embedded
+  snapshot (fedora-packages red — this corrects the earlier "electron is
+  strip-safe" claim).
+- Go and Rust prebuilts are **strip-safe** and must NOT add the macro.
 
 ## PREBUILT_ORIGIN registry
 
