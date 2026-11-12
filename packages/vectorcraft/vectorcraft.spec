@@ -1,6 +1,11 @@
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
 
+# rustc OOMs (8+ GB RSS) on the engine crate at codegen-units=1 with the
+# distro debuginfo RUSTFLAGS: parallelize codegen and drop DWARF (no debug
+# package is shipped anyway) — overrides the prjconf build_rustflags
+%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
+
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
