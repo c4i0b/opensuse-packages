@@ -28,9 +28,10 @@ tar -xzf %{SOURCE0}
 install -Ddm755 %{buildroot}%{_bindir}
 install -pm 0755 opencode %{buildroot}%{_bindir}/opencode
 
-./opencode completion bash > opencode.bash
-./opencode completion zsh  > _opencode
-./opencode completion fish > opencode.fish
+# 2.2.7 renamed the completion subcommand to a global --completions flag
+./opencode --completions bash > opencode.bash
+./opencode --completions zsh  > _opencode
+./opencode --completions fish > opencode.fish
 install -Dpm 0644 opencode.bash %{buildroot}%{_datadir}/bash-completion/completions/opencode
 install -Dpm 0644 _opencode     %{buildroot}%{_datadir}/zsh/site-functions/_opencode
 install -Dpm 0644 opencode.fish %{buildroot}%{_datadir}/fish/vendor_completions.d/opencode.fish
