@@ -14,7 +14,7 @@ on:
   # since 2026-08 never reached OBS. workflow_run is the documented escape
   # hatch: it fires even for GITHUB_TOKEN-driven completions.
   workflow_run:
-    workflows: [auto-merge]
+    workflows: [auto-merge, autoupdate]
     types: [completed]
   workflow_dispatch:
     inputs:
