@@ -40,6 +40,12 @@ line or by an AI agent.
 
 %prep
 %autosetup -p1 -a1
+# [patch.crates-io] pins the whole egui fork workspace, but cargo vendor only
+# emits crates that are actually depended on: patch locations for the rest
+# fail to resolve offline, so drop the entries with no vendored crate
+while read -r crate; do
+    ls vendor | grep -q "^${crate}" || sed -i "/^${crate} = { git =/d" Cargo.toml
+done < <(awk '/^\[patch.crates-io\]/{f=1;next} /^\[/{f=0} f && /=/ {print $1}' Cargo.toml)
 
 %build
 # zbus-lockstep's validate macro resolves ../xml relative to the compiled
