@@ -2,9 +2,9 @@
 # Smoke-test a built package: install its RPMs into the (ephemeral, Tumbleweed)
 # tooling container and exec the binary. Runs INSIDE the container.
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 [ $# -ge 1 ] || { echo "usage: run.sh <pkg-dir> [args...]" >&2; exit 2; }
 pkg="$1"; shift

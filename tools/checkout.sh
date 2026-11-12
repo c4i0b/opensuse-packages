@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Ensure an up-to-date osc working copy of one OBS package.
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 [ $# -ge 1 ] || { echo "usage: checkout.sh <pkg-dir>" >&2; exit 2; }
 name="$(pkg_name "$1")"

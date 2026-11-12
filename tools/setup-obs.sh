@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Create (or re-apply) the OBS project from _project.meta.xml.
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 project="home:${OBS_USER:?OBS_USER unset}"
 force="${1:-0}"

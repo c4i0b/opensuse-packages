@@ -3,9 +3,9 @@
 # gated on rpmlint errors (mirrors what OBS would reject). Runs INSIDE the
 # tooling container (repo at /app).
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 [ $# -ge 1 ] || { echo "usage: build.sh <pkg-dir-relative-to-repo>" >&2; exit 2; }
 dir="$repo/$1"

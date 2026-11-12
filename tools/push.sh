@@ -2,9 +2,9 @@
 # Sync one package to OBS: lint gate, ensure the OBS package exists, rsync the
 # sources (dev files excluded) into the osc checkout, osc addremove + commit.
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 [ $# -ge 2 ] || { echo 'usage: push.sh <pkg-dir> "commit message"' >&2; exit 2; }
 pkg="$1"; msg="$2"
