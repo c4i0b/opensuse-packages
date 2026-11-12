@@ -58,7 +58,7 @@ jobs:
 
           detect() {
             git diff --name-only --diff-filter=ACMR "$1" "$2" \
-              | grep -E '^[^./][^/]*/[^./][^/]*/' \
+              | grep -E '^packages/[^/]+/' \
               | grep -vE '/(VERSION|fetch\.sh|bump\.sh|BIN|\.obsignore)$' \
               | grep -vE '\.(tar\.gz|zip)$' \
               | cut -d/ -f1-2 | sort -u \
