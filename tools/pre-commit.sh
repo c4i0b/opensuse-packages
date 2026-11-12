@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Pre-commit gate: lint the specs of every staged package.
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 fail=0
 pkgs=""

@@ -2,9 +2,9 @@
 # Create the OBS package metadata (title/description) from the spec, then
 # check out a working copy into the osc workspace.
 set -euo pipefail
-repo="$(repo_root 2>/dev/null || pwd)"
 # shellcheck source=lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+repo="$(repo_root 2>/dev/null || pwd)"
 
 [ $# -ge 1 ] || { echo "usage: new-pkg.sh <pkg-dir>" >&2; exit 2; }
 pkg="$1"
