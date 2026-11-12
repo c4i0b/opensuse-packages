@@ -46,8 +46,11 @@ pure-Rust codecs and reads Lottie, SVG, PSD and PDF assets.
 for d in vendor/atspi-common-*/xml; do
     [ -d "$d" ] && export LOCKSTEP_XML_PATH="$PWD/$d"
 done
-# %cargo_build forwards extra args: -p picks the app out of the workspace
-%cargo_build -p %{name}
+# %cargo_build is parametric: -p would parse as an unknown macro option,
+# so select the workspace member by cwd instead
+cd apps/%{name}
+%cargo_build
+cd - >/dev/null
 
 %install
 install -Dpm 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
