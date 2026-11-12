@@ -20,13 +20,22 @@ password = os.environ["OBS_PASSWORD"]
 
 BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
 
-def get(url):
-    req = urllib.request.Request(url)
-    import base64
-    tok = base64.b64encode(f"{user}:{password}".encode()).decode()
-    req.add_header("Authorization", f"Basic {tok}")
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.read()
+def get(url, tries=3):
+    # OBS API hiccups must not fail the whole refresh (fedora-packages
+    # pattern: retry with growing backoff)
+    import time
+    for attempt in range(tries):
+        try:
+            req = urllib.request.Request(url)
+            import base64
+            tok = base64.b64encode(f"{user}:{password}".encode()).decode()
+            req.add_header("Authorization", f"Basic {tok}")
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return r.read()
+        except Exception:
+            if attempt == tries - 1:
+                raise
+            time.sleep(2 * (attempt + 1))
 
 tree = ET.fromstring(get(f"{api}/build/{project}/_result"))
 

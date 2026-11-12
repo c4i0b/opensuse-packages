@@ -15,7 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - run: tools/update-badges.sh
+      # `bash <script>` instead of direct exec: immune to a lost +x bit
+      # (red: both scheduled runs died with exit 126 on mode 644)
+      - run: bash tools/update-badges.sh
         env:
           OBS_USER: ${{ secrets.OBS_USER }}
           OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
