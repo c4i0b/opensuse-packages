@@ -39,6 +39,15 @@ AI agents (through MCP) can drive.
 
 %prep
 %autosetup -p1 -a1
+# egui_demo_lib/egui_inspection/egui_system_font_provider are
+# [[patch.unused]] in Cargo.lock: cargo vendor skips them, but offline
+# cargo still resolves every [patch.crates-io] entry and fails on the
+# missing vendored dirs — drop the unused patch entries
+sed -i \
+  -e '/^egui_demo_lib = { git =/d' \
+  -e '/^egui_inspection = { git =/d' \
+  -e '/^egui_system_font_provider = { git =/d' \
+  Cargo.toml
 
 %build
 # zbus-lockstep's validate macro looks for ../xml relative to the crate
