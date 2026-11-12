@@ -10,7 +10,8 @@ ExclusiveArch:  x86_64 aarch64
 BuildRequires:  golang(API) >= 1.25
 
 %description
-A pretty fancy and modern terminal file manager written in Go.
+A pretty fancy and modern terminal file manager written in Go, with vim-like
+keybindings, tabs, panels, themes, and an extensible plugin system.
 
 %prep
 %autosetup -a 1

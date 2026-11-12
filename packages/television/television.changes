@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Nov 12 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Align summary and description with fedora-packages.
+
+-------------------------------------------------------------------
 Wed Nov 11 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
 
 - Convert to source build: television 0.15.9 built from the upstream
