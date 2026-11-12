@@ -74,11 +74,11 @@ osc +args:
 
 # Show OBS build results of one package
 results pkg:
-    {{runner}} osc -A {{OBS_API}} results "home:{{OBS_USER}}" "{{pkg}}"
+    {{runner}} osc -A {{OBS_API}} results "home:{{OBS_USER}}" "$(basename {{pkg}})"
 
 # Show the OBS buildlog of one package (opensuse_tumbleweed x86_64)
 log pkg:
-    {{runner}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}" "{{pkg}}" {{OBS_REPO}} {{OBS_ARCH}}
+    {{runner}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}" "$(basename {{pkg}})" {{OBS_REPO}} {{OBS_ARCH}}
 
 # Prepend a dated entry to <pkg>/<name>.changes (host-side: opens $EDITOR)
 vc pkg:
