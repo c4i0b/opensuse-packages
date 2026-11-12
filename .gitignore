@@ -7,18 +7,15 @@
 __pycache__/
 .build/
 .binaries/
+work/
 .osc/
 .oscrc
 .netrc
 .env*
 .DS_Store
 
-# dev tooling symlinks (canonical copies in projects-ai-agents/opensuse-packages)
-AGENTS.md
-justfile
-opensuse-lint.py
-
 # Beads / Dolt files (added by bd init)
+.beads/
 .dolt/
 *.db
 .beads-credential-key
