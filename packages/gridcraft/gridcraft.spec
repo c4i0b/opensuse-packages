@@ -38,6 +38,11 @@ tables.
 
 %prep
 %autosetup -p1 -a1
+# [patch.crates-io] lists egui_demo_lib from the egui fork, but nothing in
+# the tree depends on it, so cargo vendor leaves it out of vendor/ and the
+# offline build then fails patch validation ("does not contain packages
+# matching `egui_demo_lib`"); the unused patch entry is safe to drop
+sed -i '/^egui_demo_lib = /d' Cargo.toml
 
 %build
 # zbus-lockstep's validate macro looks for ../xml relative to the crate being
