@@ -38,6 +38,12 @@ effects, lay out artboards and type, and open and save SVG and PDF.
 
 %prep
 %autosetup -p1 -a1
+# cargo eagerly validates every [patch.crates-io] git entry against its
+# source: crates outside the dependency graph are never vendored and the
+# offline build dies on them — drop patch lines with no vendor/ crate dir
+for name in $(awk '/^\[patch.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/{print $1}' Cargo.toml); do
+    ls -d vendor/"$name"-* >/dev/null 2>&1 || sed -i "/^$name = { git = /d" Cargo.toml
+done
 
 %build
 # zbus-lockstep's validate macro looks for ../xml relative to the crate
