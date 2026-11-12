@@ -1,7 +1,7 @@
 Name:           television
 Version:        0.15.9
 Release:        0
-Summary:        A fast, portable fuzzy finder for the terminal
+Summary:        A very fast and hackable fuzzy finder for the terminal
 License:        MIT
 URL:            https://github.com/alexpasmantier/television
 Source0:        television-%{version}.tar.zst
@@ -9,7 +9,9 @@ Source1:        vendor.tar.zst
 BuildRequires:  cargo-packaging
 
 %description
-A fast, portable and flexible fuzzy finder for the terminal.
+Television is a fast and portable fuzzy finder with a channel system: canned
+selections (files, git, env, emojis, ...) each with their own source command,
+preview command and keybindings.
 
 %prep
 %autosetup -p1 -a1
