@@ -22,7 +22,7 @@ services:
       # checkout workspace lives at work/ (gitignored): state on the host via
       # the same mount, no extra wiring.
       - .:/app:z
-      # OBS credentials stay in the HOST home, mounted read-only. Point OSCRC
-      # at your oscrc when using osc locally (see docs/environment.md);
-      # /dev/null keeps lint/build working without credentials.
-      - ${OSCRC:-/dev/null}:/tmp/.oscrc:ro
+      # OBS credentials stay in the HOST home, mounted read-only at the
+      # container's ~/.oscrc (HOME is /tmp). Keep the file at ~/.oscrc
+      # (chmod 600); OSCRC overrides the host path for unusual setups.
+      - ${OSCRC:-${HOME}/.oscrc}:/tmp/.oscrc:ro,Z

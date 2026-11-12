@@ -20,10 +20,11 @@ host instead (escape hatch for CI or hosts without podman).
 
 ## Credentials and state
 
-- `osc` runs **inside** the container. The host `~/.oscrc` (OBS credentials)
-  is mounted read-only into it: point the `OSCRC` env var at your oscrc file
-  (e.g. in your shell profile: `export OSCRC=$HOME/.oscrc`). Without it the
-  mount is an empty placeholder: lint and build work, osc commands fail auth.
+- `osc` runs **inside** the container. The host `~/.oscrc` (OBS
+  credentials, `chmod 600`) is mounted read-only into it, landing exactly
+  at the container's `~/.oscrc` — no host-side env or shell config needed.
+  Without the file, `podman compose run` fails to mount; only
+  `OPENSUSE_PACKAGES_DIRECT=1` recipes would work without it.
 - The OBS checkout workspace is `work/` in the repo (gitignored): it persists
   on the host through the repo bind mount. `just checkout <name>`
   materializes a package there; `just osc`, `just results`, `just log`
