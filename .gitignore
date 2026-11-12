@@ -30,3 +30,4 @@ CLAUDE.md
 # beads state is local, never committed (docs/workflow.md)
 .beads/
 *.gate.lock*
+.worktrees/

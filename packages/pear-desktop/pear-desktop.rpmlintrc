@@ -1,0 +1,5 @@
+# The bundled Electron tree must not be stripped (embedded snapshot) and its
+# ELFs live under %_libdir, so their system-library deps are declared
+# explicitly on the package — rpmlint cannot see that intent.
+addFilter("pear-desktop.*unstripped-binary-or-object")
+addFilter("pear-desktop.*explicit-lib-dependency")

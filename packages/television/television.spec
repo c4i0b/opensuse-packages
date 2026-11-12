@@ -1,35 +1,35 @@
-Name:           television-bin
+Name:           television
 Version:        0.15.9
 Release:        0
 Summary:        A fast, portable fuzzy finder for the terminal
 License:        MIT
 URL:            https://github.com/alexpasmantier/television
-Source0:        tv-%{version}-x86_64-unknown-linux-gnu.tar.gz
-ExclusiveArch:  x86_64
+Source0:        television-%{version}.tar.zst
+Source1:        vendor.tar.zst
+BuildRequires:  cargo-packaging
 
 %description
 A fast, portable and flexible fuzzy finder for the terminal.
 
 %prep
-%setup -T -c -D
-tar -xzf %{SOURCE0}
+%autosetup -p1 -a1
 
 %build
+%{cargo_build}
 
 %install
-src="tv-%{version}-x86_64-unknown-linux-gnu"
-install -Dpm 0755 "$src/tv" %{buildroot}%{_bindir}/tv
-install -Dpm 0644 "$src/LICENSE" LICENSE
-install -Dpm 0644 "$src/doc/tv.1" %{buildroot}%{_mandir}/man1/tv.1.gz
+install -Dpm 0755 target/release/tv %{buildroot}%{_bindir}/tv
+install -Dpm 0644 man/tv.1 %{buildroot}%{_mandir}/man1/tv.1
 mkdir -p %{buildroot}%{_datadir}/bash-completion/completions %{buildroot}%{_datadir}/zsh/site-functions %{buildroot}%{_datadir}/fish/vendor_completions.d
-"$src/tv" init bash > %{buildroot}%{_datadir}/bash-completion/completions/tv
-"$src/tv" init zsh  > %{buildroot}%{_datadir}/zsh/site-functions/_tv
-"$src/tv" init fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/tv.fish
+target/release/tv init bash > %{buildroot}%{_datadir}/bash-completion/completions/tv
+target/release/tv init zsh  > %{buildroot}%{_datadir}/zsh/site-functions/_tv
+target/release/tv init fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/tv.fish
 
 %files
 %license LICENSE
+%doc CHANGELOG.md README.md
 %{_bindir}/tv
-%{_mandir}/man1/tv.1.gz
+%{_mandir}/man1/tv.1%{?ext_man}
 %{_datadir}/bash-completion/completions/tv
 %dir %{_datadir}/zsh
 %dir %{_datadir}/zsh/site-functions

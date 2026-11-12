@@ -224,10 +224,11 @@ _SECTION_RE = re.compile(r"^%([a-zA-Z]+)\b")
 # NOT be flagged. Register new prebuilt packages here so the lint knows what to
 # check for; unknown prebuilts get a WARN asking to be classified.
 PREBUILT_ORIGIN = {
-    "opencode-bin": "bun",          # Bun single-file exe: strip would corrupt
-    "pear-desktop-bin": "electron", # Electron asar app under %{_libdir}: strip-safe
-    "superfile-bin": "go",          # goreleaser ELF: strip-safe
-    "television-bin": "rust",       # static Rust ELF: strip-safe
+    # upstream-RPM repackage (fedora-packages model): Electron bundle under
+    # %{_libdir}, strip disabled in the spec itself (stripping corrupts the
+    # embedded snapshot). superfile/television/ytm-player build from source
+    # since 2026-11 — no prebuilt registry entries left.
+    "pear-desktop": "electron",
 }
 
 _STRIP_GUARD = re.compile(
@@ -283,6 +284,13 @@ def check_prebuilt_strip(spec: SpecModel) -> list[Finding]:
 
 
 def check_exclusivearch(spec: SpecModel) -> list[Finding]:
+    if re.search(r"^ExclusiveArch:\s*%\{go_arches\}", spec.text, re.M):
+        # red: superfile excluded on every arch — %{go_arches} is no longer
+        # defined in the Tumbleweed prjconf, so the macro expands empty
+        return [Finding(FAIL, "go-arches-undefined",
+            "`ExclusiveArch: %{go_arches}` — the macro is not defined in the "
+            "Tumbleweed prjconf and expands empty (excludes every arch); "
+            "list arches explicitly")]
     if re.search(r"^BuildArch:\s*noarch\s*$", spec.text, re.M):
         return []
     if _real_build(spec.lines):

@@ -1,3 +1,0 @@
-addFilter("pear-desktop-bin.*unstripped-binary-or-object")
-addFilter("pear-desktop-bin.*missing-call-to-setgroups-before-setuid")
-addFilter("pear-desktop-bin.*desktopfile-without-binary")
