@@ -21,6 +21,12 @@ jobs:
           set -euo pipefail
           python3 -c "import glob,yaml; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"
 
+      - name: Wait for required checks (validate-bump)
+        # red: ytm-player 2.2.0 merged with validate-bump red (404 asset)
+        run: gh pr checks ${{ github.event.pull_request.number }} --watch --fail-fast
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Auto-merge
         run: gh pr merge ${{ github.event.pull_request.number }} --squash --delete-branch
         env:
