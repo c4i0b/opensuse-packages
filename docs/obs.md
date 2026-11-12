@@ -1,0 +1,42 @@
+# OBS integration
+
+OBS (Build Service) is the build system: packages live in the
+`home:caiobruno` project and this repo is their source of truth. A package
+only exists on OBS after `just push` — a commit alone changes nothing
+server-side.
+
+## Source fetching
+
+- `_service` describes how OBS fetches real sources **server-side** (release
+  tarballs, ELFs, verification). OBS builds offline, so everything the build
+  needs must be reachable through `_service`.
+- Never commit archives (`*.tar.gz`, `*.tar.zst`, `*.rpm` are gitignored).
+  Local builds fetch sources via the package's `fetch.sh`.
+- `.changes` files are merged by OBS into the spec's `%changelog` at build
+  time (`just vc <name>` maintains them).
+
+## Push contract
+
+- `just push packages/<name> "msg"` runs the linter first (aborts on FAIL),
+  then syncs `packages/<name>/` to `home:caiobruno/<name>` via rsync and
+  commits with `osc addremove` + `osc ci`.
+- The rsync excludes dev-only files OBS must not see: `fetch.sh`, `bump.sh`,
+  `BIN`, archives, `.obsignore`.
+- `_project.meta.xml` is the project template (repos, arches);
+  `just create-project` applies it.
+- `just new-pkg <name>` creates a package from the templates and fills the
+  OBS `<title>`/`<description>` from the spec automatically.
+
+## Build validation policy
+
+- `just build packages/<name>` is a **pre-flight**: a local rpmbuild gated on
+  rpmlint errors (fails on `E:`). OBS is the real validator — a green local
+  build does not guarantee a green OBS build.
+- After pushing, watch the result with `just results <name>` and read
+  failures with `just log <name>`.
+- On an OBS failure, follow the `diagnose-obs-failure` skill
+  (`skills/diagnose-obs-failure/SKILL.md`). If the same class of failure
+  bites twice, encode it in the linter (`opensuse-lint.py`) — fix the class,
+  not the instance.
+- Do not block waiting for OBS builds. Continue working and check
+  `just results` when finishing if builds are pending.

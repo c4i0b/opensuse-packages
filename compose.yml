@@ -1,0 +1,37 @@
+# opensuse-packages tooling — Compose Spec (same model as fedora-packages:
+# the host provides only `just` + `podman`, every command runs in an ephemeral
+# container via `podman compose run --rm tooling`).
+name: opensuse-packages
+
+services:
+  tooling:
+    build: .
+    image: opensuse-packages/tooling:dev
+    # Container uid 0 — in rootless podman this maps to the unprivileged host
+    # user (no host privilege gained) and is the only uid that can WRITE the
+    # bind-mounted source. Ephemeral runs: no state survives a command.
+    user: "0:0"
+    working_dir: /app
+    environment:
+      # Ephemeral HOME: the osc cookie jar / caches die with each run, and the
+      # read-only ~/.oscrc lands at /tmp/.oscrc where osc finds it.
+      HOME: /tmp
+      # podman compose run does NOT forward the host environment; the values
+      # the justfile exports must be interpolated here explicitly (host env
+      # overrides, repo defaults otherwise). Red: PUSH_YES never reached
+      # push.sh and its tty read hung forever.
+      OBS_USER: ${OBS_USER:-caiobruno}
+      OBS_API: ${OBS_API:-https://api.opensuse.org}
+      OBS_REPO: ${OBS_REPO:-opensuse_tumbleweed}
+      PUSH_YES: ${PUSH_YES:-}
+      CI: ${CI:-}
+    volumes:
+      # :z (lowercase) — SHARED SELinux label, so concurrent runs (lint +
+      # build + a `just shell`) all keep access to the bind mount. The osc
+      # checkout workspace lives at work/ (gitignored): state on the host via
+      # the same mount, no extra wiring.
+      - .:/app:z
+      # OBS credentials stay in the HOST home, mounted read-only at the
+      # container's ~/.oscrc (HOME is /tmp). Keep the file at ~/.oscrc
+      # (chmod 600); OSCRC overrides the host path for unusual setups.
+      - ${OSCRC:-${HOME}/.oscrc}:/tmp/.oscrc:ro,Z
