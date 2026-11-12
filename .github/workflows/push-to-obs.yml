@@ -8,7 +8,6 @@ on:
       - 'README*'
       - 'LICENSE*'
       - '.gitignore'
-      - 'renovate.json'
   # bot merges are done by the auto-merge workflow with GITHUB_TOKEN, and
   # pushes created with GITHUB_TOKEN fire no `push` events — so bumps merged
   # since 2026-08 never reached OBS. workflow_run is the documented escape

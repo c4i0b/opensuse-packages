@@ -33,19 +33,15 @@ To skip or downgrade a release: push a commit whose message is
 `autoupdate: override <version>` touching the package dir; the bot
 respects the latest override.
 
-## Why not Renovate (rejected 2026-11)
+## Why not Renovate (rejected 2026-11, app uninstalled)
 
 Renovate + regex managers + an auto-merge workflow ran this repo from
 2026-08 to 2026-11 and produced three real failures: the asset-filename
 freeze above; bot merges done with GITHUB_TOKEN whose pushes fire no
 `push` events (no bump reached OBS in three months); and a PR merged
 while validate-bump was red. fedora-packages had rejected Renovate for
-the same class of problems.
-
-**Rollback plan**: removing `renovate.json` disables Renovate at the app
-level — restoring that file (its removal is its own revertable commit)
-re-enables it. validate-bump and the auto-merge workflow stay in place
-either way; they gate manual PRs.
+the same class of problems. Reintroducing it needs a NEW observed
+failure of autoupdate, not a better argument.
 
 ## validate-bump (manual PR gate)
 

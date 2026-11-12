@@ -25,7 +25,7 @@ history below.
 Source builds (superfile, television, opencode) were attempted and reverted
 in 2026-08. They compile from upstream, but need vendored dependencies
 (`cargo vendor` / `go mod vendor` / `bun install`) that are gitignored and
-must be regenerated on a dev machine. Renovate and push-to-obs can only
+must be regenerated on a dev machine. The automation can only
 automate what is in git, and OBS builds offline, so every update required a
 manual `bump.sh` + `fetch.sh` + `just push`. Automation is the priority, so
 all packages stay `-bin`: OBS fetches the official release ELF via
@@ -36,8 +36,8 @@ were removed from git and OBS.
 
 Single source of truth: the spec's `Version:` tag. There is no `VERSION`
 file — `bump.sh`/`fetch.sh` read the current version straight from the spec
-(`awk '/^Version:/{print $2}'`). This keeps Renovate bumps (spec + `_service`
-only) from drifting out of sync with anything else.
+(`awk '/^Version:/{print $2}'`). This keeps autoupdate bumps (spec +
+`_service` only) from drifting out of sync with anything else.
 
 ## Repo hygiene
 
