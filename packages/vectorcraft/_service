@@ -3,7 +3,9 @@
     <param name="url">https://github.com/storytold/vectorcraft.git</param>
     <param name="scm">git</param>
     <param name="revision">v0.24.1</param>
-    <param name="versionformat">@PARENT_TAG@</param>
+    <!-- literal version: the gateway tar_scm has no version rewrite params and
+         @PARENT_TAG@ keeps the v prefix, which breaks set_version -->
+    <param name="versionformat">0.24.1</param>
     <param name="exclude">.git</param>
   </service>
   <service name="recompress" mode="serveronly">
