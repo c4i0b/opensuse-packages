@@ -17,6 +17,11 @@ manual dispatch), ported from the fedora-packages model. Per package,
   zero API quota)
 - `npm:<package>` → npm dist-tag `latest`
 
+A package without an `upstream` file is opt-out: `television` has none —
+its Rust vendor archive is regenerated client-side (see
+[conventions.md](conventions.md)), so its bumps are manual until vendor
+regeneration is automated.
+
 The bot commits each bump straight to `main` (`chore(<pkg>): update to
 <ver>`). Commits made with GITHUB_TOKEN fire no `push` events, so
 push-to-obs picks them up through its `workflow_run` trigger on the

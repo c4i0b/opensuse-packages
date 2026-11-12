@@ -21,8 +21,8 @@ doc over growing this file.
   rpmbuild, never a substitute. Push, then watch `just results`/`just log`.
 - Never commit archives — OBS fetches sources via `_service`.
 - Register every prebuilt package's origin in `PREBUILT_ORIGIN`
-  (`opensuse-lint.py`): `bun` needs `%global __os_install_post %{nil}`,
-  `go`/`rust`/`electron` are strip-safe and must not add it.
+  (`opensuse-lint.py`): `bun` and Electron bundles must disable strip,
+  `go`/`rust` prebuilts are strip-safe and must not.
 - Never add a spec rule without its red: encode the failure class in the
   linter or a template, not just the instance.
 - On an OBS failure, follow `skills/diagnose-obs-failure/SKILL.md`; if the
