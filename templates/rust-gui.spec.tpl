@@ -68,6 +68,18 @@
 #     (whose extensionless LICENSE panics the macro) instead of atspi-common's
 #     D-Bus XML dir — export LOCKSTEP_XML_PATH before %cargo_build.
 #   - wgpu has no 32-bit/ppc story: ExclusiveArch x86_64 aarch64 explicitly
+#   - Unbraced `%cargo_build -p name` makes the macro parse -p as its own
+#     option (red: "Unknown option p in cargo_build()"); the braced form
+#     above forwards flags to cargo. rpm also expands macros INSIDE
+#     COMMENTS — never write a literal macro call in a comment.
+#   - aarch64 OOM: distro RUSTFLAGS add -C debuginfo=2 and release
+#     profiles use thin-LTO + codegen-units=1; a single rustc can need
+#     >4 GB and the worker kills it (boa_engine is the usual victim).
+#     Proven fix (vectorcraft/pdfcraft/solidcraft/effectcraft):
+#       %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now \
+#         -C codegen-units=16 -C debuginfo=0
+#       export CARGO_PROFILE_RELEASE_LTO=false
+#       export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 #     (never %{go_arches}-style macros — see opensuse-lint check).
 #   - Icons under icons/hicolor/<size>/apps need %dir ownership of the hicolor
 #     tree or OBS check-filelist FAILs (linter rule "icon").
