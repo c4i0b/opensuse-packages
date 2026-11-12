@@ -16,6 +16,15 @@ services:
       # Ephemeral HOME: the osc cookie jar / caches die with each run, and the
       # read-only ~/.oscrc lands at /tmp/.oscrc where osc finds it.
       HOME: /tmp
+      # podman compose run does NOT forward the host environment; the values
+      # the justfile exports must be interpolated here explicitly (host env
+      # overrides, repo defaults otherwise). Red: PUSH_YES never reached
+      # push.sh and its tty read hung forever.
+      OBS_USER: ${OBS_USER:-caiobruno}
+      OBS_API: ${OBS_API:-https://api.opensuse.org}
+      OBS_REPO: ${OBS_REPO:-opensuse_tumbleweed}
+      PUSH_YES: ${PUSH_YES:-}
+      CI: ${CI:-}
     volumes:
       # :z (lowercase) — SHARED SELinux label, so concurrent runs (lint +
       # build + a `just shell`) all keep access to the bind mount. The osc
