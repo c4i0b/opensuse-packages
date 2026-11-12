@@ -15,7 +15,7 @@ OBS, where they are built.
 ## Build status
 
 <!-- repo-badges begin -->
-[![tumbleweed aarch64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-aarch64.json%3Fv%3D18r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![tumbleweed aarch64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-aarch64.json%3Fv%3D6r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 [![tumbleweed x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-x86_64.json%3Fv%3D19r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 <!-- repo-badges end -->
 
