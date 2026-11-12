@@ -8,7 +8,7 @@ maintained truth, `reference` stable background.
   credentials, the `just` runner, hooks
 - [obs.md](obs.md) — live: the OBS contract, `_service` source fetch, push
   and build validation policy
-- [autoupdate.md](autoupdate.md) — live: Renovate regex managers, the
+- [autoupdate.md](autoupdate.md) — live: the autoupdate bot, trackers,
   validate-bump gate, Dependabot
 - [conventions.md](conventions.md) — live: package layout, `-bin`-only
   policy, versioning, repo hygiene
