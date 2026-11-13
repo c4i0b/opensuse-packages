@@ -1,0 +1,14 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.tar.xz</param>
+    <param name="filename">JetBrainsMono.tar.xz</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/ryanoasis/nerd-fonts/v3.5.1/patched-fonts/JetBrainsMono/Ligatures/OFL.txt</param>
+    <param name="filename">OFL.txt</param>
+  </service>
+</services>

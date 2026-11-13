@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/vinceliuice/Qogir-icon-theme/archive/refs/tags/2025-02-15.tar.gz</param>
+    <param name="filename">qogir-icon-theme-2025.02.15.tar.gz</param>
+  </service>
+</services>

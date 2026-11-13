@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/vinceliuice/Fluent-icon-theme/archive/refs/tags/2026-07-27.tar.gz</param>
+    <param name="filename">fluent-icon-theme-2026.07.27.tar.gz</param>
+  </service>
+</services>

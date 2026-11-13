@@ -1,0 +1,14 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/ryanoasis/nerd-fonts/releases/download/v3.5.1/Meslo.tar.xz</param>
+    <param name="filename">Meslo.tar.xz</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/ryanoasis/nerd-fonts/v3.5.1/patched-fonts/Meslo/L/LICENSE.txt</param>
+    <param name="filename">LICENSE.txt</param>
+  </service>
+</services>

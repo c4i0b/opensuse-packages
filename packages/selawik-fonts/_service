@@ -1,0 +1,14 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/microsoft/Selawik/releases/download/1.01/Selawik_Release.zip</param>
+    <param name="filename">Selawik_Release.zip</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/microsoft/Selawik/1.01/LICENSE.txt</param>
+    <param name="filename">LICENSE.txt</param>
+  </service>
+</services>

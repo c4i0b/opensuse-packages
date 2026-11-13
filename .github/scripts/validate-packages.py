@@ -51,8 +51,13 @@ for pkg in pkgs:
         failures.append(f"{pkg}: could not parse _service download URL")
         continue
 
-    if not re.search(r"(^|[/_.-])v?" + re.escape(ver) + r"([/_.-]|$)", url):
-        failures.append(f"{pkg}: _service URL ({url}) does not reference version {ver}")
+    # Date-tagged upstreams (vinceliuice icon themes): the git tag in the
+    # download path carries '-' while Version is the dot-sanitized form,
+    # so the version reference may live in the renamed filename param.
+    fn = param("filename") or ""
+    if not (re.search(r"(^|[/_.-])v?" + re.escape(ver) + r"([/_.-]|$)", url)
+            or re.search(r"(^|[_.-])v?" + re.escape(ver) + r"([_.-]|$)", fn)):
+        failures.append(f"{pkg}: _service URL ({url}, filename {fn!r}) does not reference version {ver}")
 
     try:
         req = urllib.request.Request(url, method="HEAD")

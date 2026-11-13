@@ -1,0 +1,14 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/oppiliappan/scientifica/releases/download/v2.3/scientifica.tar</param>
+    <param name="filename">scientifica.tar</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/oppiliappan/scientifica/v2.3/LICENSE</param>
+    <param name="filename">LICENSE</param>
+  </service>
+</services>
