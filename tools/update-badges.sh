@@ -18,7 +18,15 @@ root, project, api = sys.argv[1:4]
 user = os.environ["OBS_USER"]
 password = os.environ["OBS_PASSWORD"]
 
-BADGE_REV = 2  # bump to force GitHub camo to re-fetch every badge URL
+BADGE_REV = 2  # kept for format stability; the content hash below is the
+               # real cache-buster — BADGE_REV alone no longer needs bumping
+
+def badge_rev(payload):
+    # cheap state component for the ?v= cache-buster: a badge JSON change
+    # without a version change (color flip failed→passing at the same
+    # version) changes the hash, so GitHub camo re-fetches the URL
+    import hashlib
+    return hashlib.sha256(payload.encode()).hexdigest()[:8]
 
 def get(url, tries=3):
     # OBS API hiccups must not fail the whole refresh (fedora-packages
@@ -55,10 +63,11 @@ badges.mkdir(exist_ok=True)
 
 def write_badge(fname, label, message, color):
     import json
+    payload = json.dumps({"schemaVersion": 1, "label": label,
+                          "message": message, "color": color}) + "\n"
     with open(badges / f"{fname}.json", "w") as f:
-        json.dump({"schemaVersion": 1, "label": label,
-                   "message": message, "color": color}, f)
-        f.write("\n")
+        f.write(payload)
+    return badge_rev(payload)
 
 # ---- repo-arch semaphores --------------------------------------------------
 repo_lines = []
@@ -70,10 +79,10 @@ for (repo, arch), pkgs in sorted(cells.items()):
     state = "failed" if bad else ("building" if inflight else "passing")
     fname = f"{repo.replace('_', '-')}-{arch}"
     label = f"{repo.replace('_', ' ').replace('opensuse tumbleweed', 'tumbleweed')} {arch}"
-    write_badge(fname, label, f"{ok}/{len(pkgs)} {state}", color)
+    rev = write_badge(fname, label, f"{ok}/{len(pkgs)} {state}", color)
     repo_lines.append(
         f'[![{label}](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com'
-        f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{fname}.json%3Fv%3D{ok}r{BADGE_REV})]'
+        f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{fname}.json%3Fv%3D{rev}r{BADGE_REV})]'
         f'(https://build.opensuse.org/project/monitor?project={project.replace(":", "%3A")})')
 
 # ---- per-package state at the repo's current version ----------------------
@@ -120,12 +129,12 @@ for pkg_dir in sorted(Path(root, "packages").iterdir()):
         color, msg = "yellow", "building"
     else:
         color, msg = "brightgreen", f"v{ver}"
-    write_badge(pkg_dir.name, pkg_dir.name, msg, color)
+    rev = write_badge(pkg_dir.name, pkg_dir.name, msg, color)
     written.add(pkg_dir.name)
     link = upstream_link(pkg_dir)
     pkg_lines.append(
         f'[![{pkg_dir.name}](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com'
-        f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{pkg_dir.name}.json%3Fv%3D{ver}r{BADGE_REV})]({link})')
+        f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{pkg_dir.name}.json%3Fv%3D{rev}r{BADGE_REV})]({link})')
 
 # prune badges of packages that no longer exist (kept one refresh after a
 # package is removed, the next run drops the stale json)

@@ -37,6 +37,8 @@ no longer `-bin`-only:
   the embedded snapshot (fedora-packages red).
 - `-bin` suffix is gone; the only prebuilt registry entry left is
   `pear-desktop` (`PREBUILT_ORIGIN` in `opensuse-lint.py`).
+- Toolchains (`rustc`/`go`/`python`) come from the distro; never pin a
+  compiler version in a spec.
 
 ### Source builds: rejected 2026-08, un-rejected 2026-11
 
@@ -54,6 +56,27 @@ Single source of truth: the spec's `Version:` tag. There is no `VERSION`
 file — `bump.sh`/`fetch.sh` read the current version straight from the spec
 (`awk '/^Version:/{print $2}'`). This keeps autoupdate bumps (spec +
 `_service` only) from drifting out of sync with anything else.
+
+## Fix for the long term
+
+A fix that only repairs the current instance dies at the next bump.
+
+1. **Single definition** — one `%global` (or spec field) per repeated
+   constant; every other occurrence derives from it. (Red: the desktop
+   id `ai.storyteller.<name>` was pasted 4× per craft spec — a rename
+   meant chasing every line in every sibling.)
+2. **Derive from upstream metadata/globs** — never hardcode what
+   upstream controls (versions, asset names, file lists); expand from
+   `Version:` or globs so a bump needs no spec edits.
+3. **Seds/selectors carry a grep guard** — any bump script that seds or
+   selects a value must grep the result back and fail loud, not freeze
+   silently (red: ytm-player's asset name stuck at 2.0.0 while the
+   directory said 2.2.0).
+4. **Class knowledge lives in docs/templates, not spec-local
+   comments** — and check the sibling packages: one member's fix
+   usually applies to the family (red: the aarch64 rustc OOM
+   mitigation lives in only 5 of the 14 craft siblings; the rest are
+   one bad link away from the same OOM kill).
 
 ## Repo hygiene
 

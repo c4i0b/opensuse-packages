@@ -38,6 +38,25 @@ To skip or downgrade a release: push a commit whose message is
 `autoupdate: override <version>` touching the package dir; the bot
 respects the latest override.
 
+## Manual bumps: vendored Rust packages
+
+Rust packages with a client-side vendor archive carry no `upstream`
+file, so the bot skips them (see the note on `television` above). A
+manual bump must touch all four, in one commit:
+
+1. spec `Version:` (`bump.sh` covers the spec + `_service` + `.changes`
+   part),
+2. `_service` — **every** old-version occurrence,
+3. regenerate `vendor.tar.zst` (the `cargo_vendor` command lives in
+   `templates/rust-source.spec.tpl`; the archive is gitignored and
+   rsynced to OBS by `push`),
+4. prepend the `.changes` entry (`just vc packages/<name>`).
+
+The drift to avoid: bumping only the spec leaves a stale `vendor.tar.zst`
+— `%cargo_build` runs offline against the old crates, so the build
+passes silently with outdated dependencies. Verify the vendored crates
+match the new spec `Version:` before pushing.
+
 ## Why not Renovate (rejected 2026-11, app uninstalled)
 
 Renovate + regex managers + an auto-merge workflow ran this repo from

@@ -25,6 +25,10 @@ doc over growing this file.
   `go`/`rust` prebuilts are strip-safe and must not.
 - Never add a spec rule without its red: encode the failure class in the
   linter or a template, not just the instance.
+- Specs and templates are written for the next bump, not the current
+  build: one definition per repeated constant, derive what upstream
+  controls, drift fails loud — see "Fix for the long term" in
+  [conventions](docs/conventions.md).
 - On an OBS failure, follow `skills/diagnose-obs-failure/SKILL.md`; if the
   same class of failure bites twice, encode it in the linter.
 - Recipe logic lives in `tools/*.sh`; the justfile stays a thin dispatcher.

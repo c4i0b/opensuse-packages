@@ -337,6 +337,39 @@ def check_tracked_archives(repo: Path) -> list[Finding]:
     return []
 
 
+# Archives are legitimately absent from a clean checkout by design: the
+# upstream tarball is fetched server-side via _service, and Rust vendor
+# archives (vendor.tar.zst, generated client-side by cargo_vendor) are
+# gitignored and only live on OBS. Based on the check_tracked_archives
+# extension list, plus .tar.zst (the vendor-archive format).
+_ARCHIVE_EXTS = (".tar.gz", ".tgz", ".tar.xz", ".tar.zst", ".zip", ".rpm", ".deb", ".AppImage")
+
+
+def check_local_sources(spec: SpecModel) -> list[Finding]:
+    name_m = re.search(r"^Name:\s*(\S+)", spec.text, re.M)
+    ver_m = re.search(r"^Version:\s*(\S+)", spec.text, re.M)
+    subs = {"name": name_m.group(1) if name_m else spec.path.stem,
+            "version": ver_m.group(1) if ver_m else ""}
+    out = []
+    for i, line in enumerate(spec.lines, 1):
+        m = re.match(r"^Source\d*:\s*(\S+)", line)
+        if not m:
+            continue
+        value = m.group(1)
+        if "://" in value:
+            continue
+        value = re.sub(r"%\{(name|version)\}", lambda mm: subs[mm.group(1)], value)
+        if "%{" in value:
+            continue  # unresolvable macro — cannot check statically
+        if value.endswith(_ARCHIVE_EXTS):
+            continue  # _service fetch / client-side vendor archive, never local
+        if not (spec.pkgdir / value).is_file():
+            out.append(Finding(FAIL, "local-source",
+                f"`{value}` declared as Source but missing from the package dir — "
+                f"rpmbuild fails on a missing source at build time", line=i))
+    return out
+
+
 # --- registry + runner -------------------------------------------------------
 
 def check_source_version_macro(spec: SpecModel) -> list[Finding]:
@@ -366,6 +399,7 @@ _CHECKS = [
     check_prebuilt_strip,
     check_exclusivearch,
     check_duplicate_requires,
+    check_local_sources,
 ]
 
 
