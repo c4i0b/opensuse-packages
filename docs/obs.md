@@ -27,6 +27,22 @@ server-side.
 - `just new-pkg <name>` creates a package from the templates and fills the
   OBS `<title>`/`<description>` from the spec automatically.
 
+## CI workflow roles
+
+The pipeline shape is bump → gate → push to builder → report; workflow
+names follow it (file name always equals `name:`):
+
+- `autoupdate` — scheduled version bumps.
+- `validate` — the git-side gate (PR): version/asset checks.
+- `push-to-obs` — delivery: syncs touched packages to OBS (the builder
+  cannot pull).
+- `badges` — status-artifact refresh.
+- `auto-merge` — Dependabot PR merging, gated on `validate`.
+
+Generic workflow conventions (pinned SHAs, bash-invoked scripts, timeouts,
+concurrency, push-retry, GITHUB_TOKEN semantics) live in the
+gh-actions-conventions skill.
+
 ## Build validation policy
 
 - `just build packages/<name>` is a **pre-flight**: a local rpmbuild gated on
