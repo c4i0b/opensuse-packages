@@ -1,0 +1,27 @@
+<services>
+  <service name="tar_scm" mode="serveronly">
+    <param name="url">https://github.com/Ragnt/AngryOxide.git</param>
+    <param name="scm">git</param>
+    <param name="revision">v0.9.2</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+    <param name="versionrewrite-replacement">\1</param>
+    <!-- upstream repo name is AngryOxide: force the lowercase tar/spec name -->
+    <param name="filename">angryoxide</param>
+    <!-- libs/libwifi is a git submodule without release tags: it must land in the tar -->
+    <param name="submodules">enable</param>
+    <param name="exclude">.git</param>
+  </service>
+  <service name="recompress" mode="serveronly">
+    <param name="file">*.tar</param>
+    <param name="compression">zst</param>
+  </service>
+  <service name="set_version" mode="serveronly"/>
+  <!-- cargo_vendor is not in the server-side allowlist of api.opensuse.org:
+       vendor.tar.zst is regenerated client-side (see rust-source template)
+       and pushed alongside the sources. -->
+  <service name="cargo_vendor" mode="manual">
+    <param name="srcdir">angryoxide</param>
+    <param name="compression">zst</param>
+  </service>
+</services>
