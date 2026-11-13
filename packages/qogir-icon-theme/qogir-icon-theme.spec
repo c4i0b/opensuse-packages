@@ -23,6 +23,9 @@ Qogir icon theme
 sed -i '/gtk-update-icon-cache/d' install.sh
 mkdir -p %{buildroot}%{_datadir}/icons
 ./install.sh -d %{buildroot}%{_datadir}/icons
+# install.sh leaves symlinks whose targets only exist in other theme
+# variants; OBS brp fails the build on dangling links
+find %{buildroot}%{_datadir}/icons -xtype l -delete
 
 %files
 %license COPYING
