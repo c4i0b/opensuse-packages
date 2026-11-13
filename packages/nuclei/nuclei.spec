@@ -20,7 +20,8 @@ community-driven template collaboration.
 
 %build
 export GOFLAGS="-buildmode=pie"
-go build -mod=vendor -o nuclei .
+# upstream main package lives in cmd/nuclei, not the repo root
+go build -mod=vendor -o nuclei ./cmd/nuclei
 
 %install
 install -Dpm 0755 nuclei %{buildroot}%{_bindir}/nuclei
