@@ -1,0 +1,5 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of ctop 0.7.7: Go source build, modules vendored
+  server-side via the OBS go_modules service.
