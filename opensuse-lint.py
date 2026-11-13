@@ -413,6 +413,45 @@ def check_source_version_macro(spec: SpecModel) -> list[Finding]:
     return []
 
 
+# Highest Go the OBS go_modules source-service host runs. A go.mod "go"
+# directive above this breaks the _service stage ("go mod download failed",
+# package broken before rpmbuild, no logfile) — GOTOOLCHAIN is local on the
+# service host, no toolchain auto-download. Bump after confirming on OBS
+# (e.g. re-enable go_modules on a canary package). Red: nexttrace 1.7.6.
+OBS_GO_MODULES_GO = (1, 26)
+
+
+def check_go_modules_toolchain(spec: SpecModel) -> list[Finding]:
+    m = re.search(r"^BuildRequires:\s*golang\(API\)\s*>=\s*(\d+)\.(\d+)",
+                  spec.text, re.M)
+    if not m:
+        return []
+    floor = (int(m.group(1)), int(m.group(2)))
+    if floor <= OBS_GO_MODULES_GO:
+        return []
+    i = spec.lines.index(next(l for l in spec.lines if "golang(API)" in l)) + 1
+    # Above the service ceiling the server-side go_modules cannot run: the
+    # vendor archive must come client-side (vendor.tar.zst + BuildRequires:
+    # zstd, see dnscontrol/nexttrace), not from the service.
+    if "Source1:        vendor.tar.zst" in spec.text:
+        if not re.search(r"^BuildRequires:\s*zstd\s*$", spec.text, re.M):
+            return [Finding(FAIL, "go-modules-toolchain",
+                "client-side vendor.tar.zst needs `BuildRequires: zstd` "
+                "(rpmuncompress), the build fails in %prep without it", line=i)]
+        return []
+    if re.search(r"^Source1:\s*vendor\.tar\.gz\s*$", spec.text, re.M):
+        return [Finding(FAIL, "go-modules-toolchain",
+            f"golang(API) >={floor[0]}.{floor[1]} but Source1 is "
+            "vendor.tar.gz (server-side go_modules): the OBS source-service "
+            f"host runs go {'.'.join(map(str, OBS_GO_MODULES_GO))} with "
+            "GOTOOLCHAIN=local, so `go mod download` fails before rpmbuild "
+            "(package broken, no logfile). Generate vendor.tar.zst "
+            "client-side (`go mod vendor && tar --zstd -cf vendor.tar.zst "
+            "vendor`), drop go_modules from _service and add "
+            "`BuildRequires: zstd`", line=i)]
+    return []
+
+
 _CHECKS = [
     check_summary,
     check_release,
@@ -425,6 +464,7 @@ _CHECKS = [
     check_dir_ownership,
     check_prebuilt_strip,
     check_exclusivearch,
+    check_go_modules_toolchain,
     check_duplicate_requires,
     check_local_sources,
 ]

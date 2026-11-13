@@ -24,6 +24,13 @@
 # tar_scm produces <name>-<version>.tar.gz; go_modules produces vendor.tar.gz.
 # Reference both as Source0/Source1 exactly with those names.
 # Check the upstream go.mod "go" directive and set the golang(API) floor to it.
+# CEILING: go_modules only works while that directive is <= the Go on the OBS
+# source-service host (see OBS_GO_MODULES_GO in opensuse-lint.py — the lint
+# FAILs above it). When upstream needs a newer Go: drop go_modules from
+# _service, generate vendor.tar.zst client-side
+#   go mod vendor && tar --zstd -cf vendor.tar.zst vendor
+# and use Source1: vendor.tar.zst + `BuildRequires: zstd` (reference:
+# dnscontrol, nexttrace).
 # Changelog lives in <name>.changes (OBS merges it into %changelog).
 Name:           __NAME__
 Version:        __VERSION__

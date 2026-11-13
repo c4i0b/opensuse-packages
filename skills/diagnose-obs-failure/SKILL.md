@@ -42,6 +42,13 @@ is long, then work on the file.
   spec `Version:` and the `_service` download URL returns an error page
   instead of a tarball. The validate CI job catches these on PRs, so a
   fetch failure on main means the two files drifted. Fix both together.
+- **go_modules vs a too-new go.mod.** Status `broken` with no logfile and
+  `ERROR:obs-service-go_modules:go mod download failed` means the go.mod
+  `go` directive exceeds the Go on the OBS source-service host
+  (`GOTOOLCHAIN=local`, no toolchain download). The linter's
+  `go-modules-toolchain` FAIL guards this (`OBS_GO_MODULES_GO` ceiling).
+  Fix: client-side `vendor.tar.zst` + `BuildRequires: zstd`, drop
+  go_modules from `_service` (reference: dnscontrol, nexttrace).
 - **BuildRequires present locally but missing on OBS.** Rare for `-bin`
   packages (nothing compiles). The build image installs BuildRequires on
   demand, OBS resolves them itself. Symptom of the gap: the OBS build fails

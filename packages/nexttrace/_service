@@ -16,6 +16,7 @@
     <param name="file">*.tar</param>
     <param name="compression">gz</param>
   </service>
-  <service name="go_modules">
-  </service>
+  <!-- no go_modules: go.mod requires go >= 1.27.3 and the OBS source-service
+       host still runs go 1.26 (GOTOOLCHAIN=local), so the service fails
+       before rpmbuild; vendor.tar.zst is generated client-side instead -->
 </services>

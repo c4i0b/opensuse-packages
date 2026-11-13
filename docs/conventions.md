@@ -25,7 +25,14 @@ no longer `-bin`-only:
   service vendors modules, nothing client-side is needed (reference:
   Factory/lazygit; template `go-source.spec.tpl`). `ExclusiveArch` must
   list arches explicitly — `%{go_arches}` is undefined in the Tumbleweed
-  prjconf (the linter FAILs on it).
+  prjconf (the linter FAILs on it). go_modules only works while go.mod's
+  `go` directive is <= the Go on the OBS source-service host (which lags
+  the distro; `OBS_GO_MODULES_GO` in `opensuse-lint.py` is the ceiling and
+  the lint FAILs above it — red: nexttrace 1.7.6 needed go 1.27.3, the
+  service host ran 1.26, package broken with no logfile). Above the
+  ceiling: client-side `vendor.tar.zst` + `BuildRequires: zstd`, like
+  Rust (reference: dnscontrol, nexttrace); bumps stay manual until the
+  service host catches up.
 - **Rust** — `cargo_vendor` is NOT in the OBS server-side service
   allowlist: the vendor archive is generated client-side (`vendor.tar.zst`,
   gitignored, OBS-only; template `rust-source.spec.tpl` documents the
