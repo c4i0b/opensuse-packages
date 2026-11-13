@@ -21,8 +21,12 @@ if [[ -z "$oldtag" ]]; then
 fi
 tag="$(printf '%s' "$ver" | sed 's/\./-/g')"
 
+# Escape the dots: the version patterns are regexes in sed, and an unescaped
+# "2026.08.10" also matches the dashed tag in the download path, rewriting it
+# to the dot form that 404s server-side (red: the vinceliuice theme fleet).
+esc() { printf '%s' "$1" | sed 's/[.]/\\./g'; }
 sed -i "s|^Version:.*|Version:        ${ver}|; s|^%global tag .*|%global tag    ${tag}|" "$spec"
-sed -i "s|${oldtag}|${tag}|g; s|${old}|${ver}|g" "$dir/_service"
+sed -i "s|$(esc "$oldtag")|${tag}|g; s|$(esc "$old")|${ver}|g" "$dir/_service"
 
 # grep guards: a silent no-op sed here freezes _service at the old tag and
 # the next OBS fetch 404s (conventions.md "Seds carry a grep guard")
