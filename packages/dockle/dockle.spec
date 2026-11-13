@@ -8,6 +8,8 @@ Source0:        dockle-%{version}.tar.gz
 Source1:        vendor.tar.gz
 ExclusiveArch:  x86_64 aarch64
 BuildRequires:  golang(API) >= 1.22
+# vendored containers/storage compiles its btrfs driver (cgo)
+BuildRequires:  libbtrfs-devel
 
 %description
 Dockle scans container images for security issues and Dockerfile best
