@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/patrickf1/fzf.fish/archive/refs/tags/v11.0.tar.gz</param>
+    <param name="filename">fish-fzf-11.0.tar.gz</param>
+  </service>
+</services>

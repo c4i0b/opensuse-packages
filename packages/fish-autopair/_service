@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/jorgebucaran/autopair.fish/archive/refs/tags/1.0.4.tar.gz</param>
+    <param name="filename">fish-autopair-1.0.4.tar.gz</param>
+  </service>
+</services>

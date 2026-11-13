@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/gazorby/fish-abbreviation-tips/archive/refs/tags/v0.7.0.tar.gz</param>
+    <param name="filename">fish-abbreviation-tips-0.7.0.tar.gz</param>
+  </service>
+</services>

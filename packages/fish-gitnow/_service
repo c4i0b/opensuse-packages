@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/joseluisq/gitnow/archive/refs/tags/2.13.0.tar.gz</param>
+    <param name="filename">fish-gitnow-2.13.0.tar.gz</param>
+  </service>
+</services>

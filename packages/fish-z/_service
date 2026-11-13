@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/jethrokuan/z/archive/26a50962bc68f5cb60fc488ee008b3d4d5be75f4.tar.gz</param>
+    <param name="filename">fish-z-2026.04.16.tar.gz</param>
+  </service>
+</services>

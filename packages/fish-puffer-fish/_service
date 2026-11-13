@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/nickeb96/puffer-fish/archive/refs/tags/v1.1.0.tar.gz</param>
+    <param name="filename">fish-puffer-fish-1.1.0.tar.gz</param>
+  </service>
+</services>

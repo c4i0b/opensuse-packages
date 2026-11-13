@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/jorgebucaran/hydro/archive/f130b55ee3eaf099eccf588e2a62e5447068d120.tar.gz</param>
+    <param name="filename">fish-hydro-2026.02.23.tar.gz</param>
+  </service>
+</services>

@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/jorgebucaran/nvm.fish/archive/refs/tags/2.2.17.tar.gz</param>
+    <param name="filename">fish-nvm-2.2.17.tar.gz</param>
+  </service>
+</services>
