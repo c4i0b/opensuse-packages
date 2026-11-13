@@ -37,7 +37,9 @@ jobs:
     # successful completion means a PR was actually merged
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    # full-fleet commits (15+ packages x ~60s each, vendor uploads included)
+    # need ~20 min; sized for that, not for the typical 1-2 package push
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -115,7 +117,8 @@ jobs:
       - name: Push packages to OBS
         id: doit
         if: steps.resolve.outputs.packages != ''
-        timeout-minutes: 5
+        # red: a 15-package fleet commit timed out half-delivered at 5 min
+        timeout-minutes: 30
         env:
           OBS_API: "https://api.opensuse.org"
           OBS_PROJECT: "home:${{ secrets.OBS_USER }}"
