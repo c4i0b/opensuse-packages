@@ -1,0 +1,6 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of lazydocker 0.25.2: source build from the v0.25.2
+  git tag, Go modules vendored server-side via the OBS go_modules
+  service, built with the distro Go toolchain.
