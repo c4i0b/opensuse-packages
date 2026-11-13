@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/derv82/wifite2/archive/refs/tags/2.2.5.tar.gz</param>
+    <param name="filename">wifite-2.2.5.tar.gz</param>
+  </service>
+</services>
