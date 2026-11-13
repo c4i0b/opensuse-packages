@@ -201,7 +201,23 @@ def check_dir_ownership(spec: SpecModel) -> list[Finding]:
         (r"%\{_datadir\}/zsh/site-functions/\S", r"%dir.*zsh", "zsh completion"),
         (r"%\{_datadir\}/fish/vendor_completions\.d/\S", r"%dir.*fish", "fish completion"),
     ]
+    # Dirs under /usr/share owned by the distro (filesystem and friends):
+    # files there don't need %dir ownership. Anything else is package-owned
+    # and OBS check-filelist FAILs on it (red: masscan /usr/share/masscan).
+    SYSTEM_DATADIRS = {
+        "appdata", "applications", "backgrounds", "bash-completion",
+        "color", "dict", "doc", "fish", "fonts", "icons", "licenses",
+        "locale", "man", "metainfo", "mime", "mime-info", "polkit-1",
+        "sounds", "systemd", "themes", "wallpapers", "zsh",
+    }
     out = []
+    files_lines = []
+    in_files = False
+    for line in spec.lines:
+        if _SECTION_RE.match(line):
+            in_files = line.strip().startswith("%files")
+        elif in_files:
+            files_lines.append(line)
     for i, line in enumerate(spec.lines, 1):
         stripped = line.strip()
         if stripped.startswith("%dir") or stripped.startswith("#"):
@@ -213,6 +229,17 @@ def check_dir_ownership(spec: SpecModel) -> list[Finding]:
                         f"{label} file without any %dir ownership — "
                         f"OBS check-filelist will FAIL", line=i))
                 break
+    for line in files_lines:
+        stripped = line.strip()
+        if stripped.startswith(("%dir", "%doc", "%license", "#")):
+            continue
+        m = re.match(r"%\{_datadir\}/([a-zA-Z0-9._+-]+)/\S", stripped)
+        if not m or m.group(1) in SYSTEM_DATADIRS:
+            continue
+        if not re.search(rf"%dir\s+.*%\{{_datadir\}}/?{re.escape(m.group(1))}\b", spec.text):
+            out.append(Finding(FAIL, "dir-ownership",
+                f"%{{_datadir}}/{m.group(1)}/ file without %dir ownership — "
+                f"the dir is package-owned, OBS check-filelist will FAIL"))
     return out
 
 

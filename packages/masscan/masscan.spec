@@ -34,6 +34,7 @@ install -Dpm 0644 data/exclude.conf %{buildroot}%{_datadir}/masscan/exclude.conf
 %license LICENSE
 %{_bindir}/masscan
 %{_mandir}/man8/masscan.8%{?ext_man}
+%dir %{_datadir}/masscan
 %{_datadir}/masscan/exclude.conf
 
 %changelog
