@@ -91,7 +91,7 @@ GITHUB_TOKEN, and pushes created with GITHUB_TOKEN fire no `push` events.
 
 ## auto-merge
 
-`dependabot-automerge.yml` (name: `auto-merge`) merges bot PRs after the
+`auto-merge.yml` (name: `auto-merge`) merges bot PRs after the
 required checks pass: it watches `gh pr checks --watch --fail-fast` before
 merging (red: ytm-player 2.2.0 was merged while validate-bump was red over
 a 404 asset). It no longer handles version bumps (autoupdate does); what
