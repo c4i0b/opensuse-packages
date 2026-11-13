@@ -25,9 +25,9 @@ DoQ transports and cached vs non-cached response measurement.
 export GOFLAGS="-buildmode=pie"
 go build -mod=vendor -ldflags "-X 'github.com/tantalor93/dnspyre/v3/cmd.Version=%{version}'" -o dnspyre .
 
-dnspyre completion bash > dnspyre.bash
-dnspyre completion zsh  > _dnspyre
-dnspyre completion fish > dnspyre.fish
+./dnspyre completion bash > dnspyre.bash
+./dnspyre completion zsh  > _dnspyre
+./dnspyre completion fish > dnspyre.fish
 
 %install
 install -Dpm 0755 dnspyre %{buildroot}%{_bindir}/dnspyre
