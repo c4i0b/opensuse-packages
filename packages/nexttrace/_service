@@ -2,6 +2,9 @@
   <service name="tar_scm">
     <param name="url">https://github.com/nxtrace/NTrace-core.git</param>
     <param name="scm">git</param>
+    <!-- repo basename (NTrace-core) != package name: pin the archive name so
+         go_modules autodetection and Source0 keep matching -->
+    <param name="filename">nexttrace</param>
     <param name="exclude">.git</param>
     <param name="revision">v1.7.6</param>
     <param name="versionformat">@PARENT_TAG@</param>
