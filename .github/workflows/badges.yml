@@ -10,6 +10,12 @@ on:
 permissions:
   contents: write
 
+# six runs a day push to main; serialize instead of racing (the push-retry
+# absorbs races today, but serializing is cheaper than retrying)
+concurrency:
+  group: badges
+  cancel-in-progress: true
+
 jobs:
   badges:
     runs-on: ubuntu-latest
