@@ -10,15 +10,21 @@ interval="${1:-90}"
 
 echo "watching ${project} (polling every ${interval}s)..."
 # poll --csv until every package is terminal: the container's osc rejects
-# `prjresults --watch` without --xml ("Please implement support...")
+# `prjresults --watch` without --xml ("Please implement support...").
+# CSV shape: "<pkg>;<state>;<state>..." — semicolon-separated, one state per
+# repo/arch column (header row starts with "_"). Split on ';' (NOT '|') and
+# inspect every state field, not a fixed column index.
 INFLIGHT='scheduled|building|dispatching|sign|blocked|waiting'
 while :; do
     mapfile -t rows < <(osc -A "${OBS_API:-https://api.opensuse.org}" \
-        results "$project" --csv --show-excluded 2>/dev/null || true)
+        results "$project" --csv 2>/dev/null || true)
     pending=0
     for row in "${rows[@]}"; do
-        state="$(awk -F'|' '{print $4}' <<<"$row")"
-        grep -qxE "$INFLIGHT" <<<"$state" && pending=$((pending + 1))
+        pkg="${row%%;*}"
+        [ "$pkg" = "_" ] && continue
+        while IFS= read -r state; do
+            grep -qxE "$INFLIGHT" <<<"$state" && pending=$((pending + 1))
+        done < <(tr ';' '\n' <<<"$row" | tail -n +2)
     done
     [ "$pending" -eq 0 ] && break
     echo "  ${pending} build(s) still in flight..."
@@ -27,18 +33,20 @@ done
 
 # verdict from the final state
 mapfile -t rows < <(osc -A "${OBS_API:-https://api.opensuse.org}" \
-    results "$project" --csv --show-excluded)
+    results "$project" --csv)
 
 bad=0
 for row in "${rows[@]}"; do
-    state="$(awk -F'|' '{print $4}' <<<"$row")"
-    pkg="$(awk -F'|' '{print $3}' <<<"$row")"
-    case "$state" in
-        failed|broken|unresolvable)
-            echo "FAILED: $pkg ($state)"
-            bad=$((bad + 1))
-            ;;
-    esac
+    pkg="${row%%;*}"
+    [ "$pkg" = "_" ] && continue
+    while IFS= read -r state; do
+        case "$state" in
+            failed|broken|unresolvable)
+                echo "FAILED: $pkg ($state)"
+                bad=$((bad + 1))
+                ;;
+        esac
+    done < <(tr ';' '\n' <<<"$row" | tail -n +2)
 done
 
 if [ "$bad" -gt 0 ]; then
