@@ -15,8 +15,18 @@ import os, re, sys, urllib.request, xml.etree.ElementTree as ET
 from pathlib import Path
 
 root, project, api = sys.argv[1:4]
-user = os.environ["OBS_USER"]
-password = os.environ["OBS_PASSWORD"]
+# CI passes OBS_USER/OBS_PASSWORD; locally the tooling container mounts the
+# host's ~/.oscrc instead — fall back to it so `bash tools/update-badges.sh`
+# runs without exporting anything
+if "OBS_USER" in os.environ and "OBS_PASSWORD" in os.environ:
+    user = os.environ["OBS_USER"]
+    password = os.environ["OBS_PASSWORD"]
+else:
+    import configparser
+    cp = configparser.ConfigParser()
+    cp.read(os.path.expanduser("~/.oscrc"))
+    user = cp.get(api, "user")
+    password = cp.get(api, "pass")
 
 BADGE_REV = 2  # kept for format stability; the content hash below is the
                # real cache-buster — BADGE_REV alone no longer needs bumping
@@ -156,6 +166,48 @@ def replace_block(text, marker, lines):
 
 text = replace_block(text, "repo-badges", repo_lines)
 text = replace_block(text, "package-badges", pkg_lines)
+
+# build-status: failures table + an Updated timestamp that only moves when
+# the status itself changed (last-STATE-CHANGE, the fedora-packages model).
+# The essence compare drops the WHOLE timestamp line: a bare text sub
+# leaves stray '*' making every refresh look like a state change.
+from datetime import datetime, timezone
+
+obs_pkg = f"https://build.opensuse.org/package/show/{project}"
+failing = {}
+for (repo, arch), pkgs in cells.items():
+    for p, code in pkgs.items():
+        if code in BAD and p in tracked_pkgs:
+            failing.setdefault(p, []).append((repo, arch, code))
+
+rows = []
+for p in sorted(failing):
+    archs = "<br>".join(
+        f"{repo.replace('_', ' ').replace('opensuse tumbleweed', 'tumbleweed')}"
+        f" {arch}: {code}"
+        for repo, arch, code in sorted(failing[p]))
+    rows.append(f"| {p} | {archs} | [package]({obs_pkg}/{p}) |")
+body = (("### :x: build failures\n\n"
+         "| package | repos | OBS |\n|---|---|---|\n" + "\n".join(rows) + "\n")
+        if rows else "")
+
+def essence(t):
+    t = re.sub(r"^.*Updated [0-9-]+ [0-9:]+ UTC.*$", "", t, flags=re.M)
+    return "\n".join(l for l in t.split("\n") if l.strip()).strip()
+
+begin, end = "<!-- build-status begin -->", "<!-- build-status end -->"
+if begin not in text or end not in text:
+    sys.exit(f"README.md is missing the {begin}...{end} block")
+pre, rest = text.split(begin, 1)
+current, post = rest.split(end, 1)
+if essence(current) == essence(body):
+    block = current.strip("\n")  # unchanged status keeps its timestamp
+else:
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
+    block = (body.rstrip() + "\n" if body else "") + f"\n*Updated {ts} UTC*"
+text = pre + begin + "\n" + block + "\n" + end + post
+
 readme.write_text(text)
-print(f"badges refreshed: {len(repo_lines)} repo-arch, {len(pkg_lines)} packages")
+print(f"badges refreshed: {len(repo_lines)} repo-arch, {len(pkg_lines)} packages, "
+      f"{len(failing)} failing")
 PY

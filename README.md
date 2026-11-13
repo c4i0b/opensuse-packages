@@ -19,6 +19,10 @@ OBS, where they are built.
 [![tumbleweed x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-x86_64.json%3Fv%3Debe9848er2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 <!-- repo-badges end -->
 
+<!-- build-status begin -->
+*Updated 2026-11-13 13:39 UTC*
+<!-- build-status end -->
+
 ## Per-package build
 
 <!-- package-badges begin -->
@@ -51,10 +55,10 @@ OBS, where they are built.
 
 ## How it works
 
-- `packages/<name>/` — one OBS package. Required: `*.spec`. Optional:
+- Each package lives in `packages/<name>/`. Required: `*.spec`. Optional:
   `_service`, `fetch.sh`, `bump.sh`, `BIN`, `.obsignore`, `<name>.rpmlintrc`,
   `<name>.changes`.
-- `_project.meta.xml` — OBS project template (repos, arches).
+- `_project.meta.xml` holds the OBS project template (repos, arches).
 - Each package's `_service` tells OBS to fetch official upstream release
   artifacts server-side, so no archives are committed.
 - A scheduled workflow (`autoupdate`) checks upstream releases (per
@@ -65,7 +69,7 @@ See [docs/](docs/README.md) for the full picture.
 
 ## Development
 
-The host needs only `just` + `podman` — everything else runs in the
+The host needs only `just` + `podman`; everything else runs in the
 ephemeral tooling container ([docs/environment.md](docs/environment.md)).
 
     just image                      # once: build the tooling container + wire hooks
@@ -75,13 +79,13 @@ ephemeral tooling container ([docs/environment.md](docs/environment.md)).
 
 ## Adding a package
 
-1. `just new-pkg <name>` — scaffold from [templates/](templates/)
-   (`templates/*.spec.tpl`) and fill the OBS title/description from the
+1. `just new-pkg <name>` scaffolds from [templates/](templates/)
+   (`templates/*.spec.tpl`); fill the OBS title/description from the
    spec.
 2. Add a `_service` so OBS fetches upstream sources, plus `bump.sh`/
    `fetch.sh` for version updates.
 3. Add `packages/<name>/upstream` (`owner/repo`, `tags:owner/repo` or
    `npm:<package>`) so autoupdate tracks it.
-4. `just push packages/<name> "initial package"` — the package only exists
+4. `just push packages/<name> "initial package"`: the package only exists
    on OBS after push.
 5. Manual bump, if ever needed: `just bump packages/<name> <version>`.
