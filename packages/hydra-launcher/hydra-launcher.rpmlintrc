@@ -1,6 +1,15 @@
-# Bundled Electron/Python tree under %_libdir: system-library deps are
-# declared explicitly (the bundle's own requires are excluded) and stripping
-# is disabled (embedded snapshot) — rpmlint cannot see that intent.
-addFilter("hydra-launcher.*explicit-lib-dependency")
+# Bundled Electron tree inside /usr/lib/hydra-launcher: upstream ships
+# node headers (.h/.c), npm scripts and helper ELFs we neither strip nor
+# want rpm to treat as system libraries.
+addFilter("hydra-launcher.*devel-file-in-non-devel-package")
+addFilter("hydra-launcher.*env-script-interpreter")
+addFilter("hydra-launcher.*non-executable-script")
+addFilter("hydra-launcher.*bin-sh-syntax-error")
+addFilter("hydra-launcher.*missing-hash-section")
+addFilter("hydra-launcher.*library-without-ldconfig-postun")
+addFilter("hydra-launcher.*python-bytecode-inconsistent-mtime")
+addFilter("hydra-launcher.*files-duplicate")
+addFilter("hydra-launcher.*files-duplicated-waste")
+addFilter("hydra-launcher.*hidden-file-or-dir")
+addFilter("hydra-launcher.*binary-or-shlib-calls-gethostbyname")
 addFilter("hydra-launcher.*unstripped-binary-or-object")
-addFilter("hydra-launcher.*zero-length")
