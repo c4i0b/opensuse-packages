@@ -1,7 +1,15 @@
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
+
+# single definition of the desktop-file id (%install/%check/%files)
+%global desktop_id ai.storyteller.%{name}
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
+
+# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
+# relax both
+%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
 
 # wgpu renders only on these (no 32-bit, no ppc)
 ExclusiveArch:  x86_64 aarch64
@@ -49,11 +57,13 @@ sed -i -e '/^egui_demo_lib = /d' -e '/^egui_inspection = /d' \
 # atspi-common's D-Bus XML dir
 [ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
 # virtual workspace: build only the app member
+export CARGO_PROFILE_RELEASE_LTO=false
+export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 %{cargo_build} -p %{name}
 
 %install
 install -Dpm 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
-install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/ai.storyteller.designcraft.desktop
+install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 # ship whatever sizes upstream provides (they change between releases)
 for icon in assets/app-icon/hicolor/*/apps/*; do
@@ -61,17 +71,17 @@ for icon in assets/app-icon/hicolor/*/apps/*; do
 done
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.designcraft.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 %files
 %license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/designcraft
-%{_datadir}/applications/ai.storyteller.designcraft.desktop
+%{_datadir}/applications/%{desktop_id}.desktop
 # OBS check-filelist FAILs on unowned hicolor dirs
 %dir %{_datadir}/icons/hicolor
 %dir %{_datadir}/icons/hicolor/*
 %dir %{_datadir}/icons/hicolor/*/apps
-%{_datadir}/icons/hicolor/*/apps/ai.storyteller.designcraft.*
+%{_datadir}/icons/hicolor/*/apps/%{desktop_id}.*
 
 %changelog

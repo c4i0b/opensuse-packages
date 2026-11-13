@@ -4,10 +4,10 @@
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
-# truck (the geometry kernel) makes the workspace outgrow build timeouts at
-# single-unit codegen with full debug info: parallelize codegen and skip
-# DWARF (no debug package is shipped anyway). Keeps cargo-packaging's relro.
-%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C strip=none
+# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
+# relax both
+%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -49,6 +49,8 @@ and ships a headless CLI with an MCP server for AI agents.
 # crate: in a vendored tree that lands on the vendored "xml" crate (whose
 # extensionless LICENSE panics the macro) instead of atspi-common's D-Bus XML dir
 [ -d vendor2/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor2/atspi-common/xml"
+export CARGO_PROFILE_RELEASE_LTO=false
+export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 %{cargo_build}
 
 %install

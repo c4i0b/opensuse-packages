@@ -17,8 +17,16 @@ ExclusiveArch:  x86_64 aarch64
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
 
+# single definition of the desktop-file id (%install/%check/%files)
+%global desktop_id ai.storyteller.%{name}
+
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
+
+# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
+# relax both
+%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
 
 # winit/wgpu dlopen these at runtime; Rust binaries declare no auto-deps
 Requires:       libX11
@@ -57,12 +65,14 @@ sed -i \
 # version suffix, hence the glob.
 lockstep_xml="$(echo vendor/atspi-common-*/xml)"
 [ -d "$lockstep_xml" ] && export LOCKSTEP_XML_PATH="$(pwd)/$lockstep_xml"
+export CARGO_PROFILE_RELEASE_LTO=false
+export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 %{cargo_build}
 
 %install
 install -Dpm0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
 
-install -Dpm0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/ai.storyteller.deckcraft.desktop
+install -Dpm0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 # ship whatever sizes upstream provides (they change between releases)
 for icon in assets/app-icon/hicolor/*/apps/*; do
@@ -70,17 +80,17 @@ for icon in assets/app-icon/hicolor/*/apps/*; do
 done
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.deckcraft.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 %files
 %license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/deckcraft
-%{_datadir}/applications/ai.storyteller.deckcraft.desktop
+%{_datadir}/applications/%{desktop_id}.desktop
 # OBS check-filelist FAILs on unowned hicolor dirs
 %dir %{_datadir}/icons/hicolor
 %dir %{_datadir}/icons/hicolor/*
 %dir %{_datadir}/icons/hicolor/*/apps
-%{_datadir}/icons/hicolor/*/apps/ai.storyteller.deckcraft.*
+%{_datadir}/icons/hicolor/*/apps/%{desktop_id}.*
 
 %changelog

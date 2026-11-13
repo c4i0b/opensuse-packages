@@ -7,6 +7,9 @@
 %global __provides_exclude_from ^%{_libdir}/pear-desktop/.*$
 %global __requires_exclude_from ^%{_libdir}/pear-desktop/.*$
 
+# single definition of the upstream desktop-file id
+%global desktop_id com.github.th-ch.youtube-music
+
 ExclusiveArch:  x86_64 aarch64
 
 Name:           pear-desktop
@@ -58,10 +61,14 @@ EOF
 chmod 755 %{buildroot}%{_bindir}/pear-desktop
 
 # Upstream desktop Exec points into the bundle; rewrite to our wrapper
-sed -i 's|^Exec=.*|Exec=pear-desktop %U|' usr/share/applications/com.github.th-ch.youtube-music.desktop
-echo 'Keywords=pear;pear-desktop;music;player;' >> usr/share/applications/com.github.th-ch.youtube-music.desktop
-install -Dpm644 usr/share/applications/com.github.th-ch.youtube-music.desktop \
-  %{buildroot}%{_datadir}/applications/com.github.th-ch.youtube-music.desktop
+sed -i 's|^Exec=.*|Exec=pear-desktop %U|' "usr/share/applications/%{desktop_id}.desktop"
+grep -q '^Exec=pear-desktop' "usr/share/applications/%{desktop_id}.desktop" || {
+    echo "Exec= rewrite failed in %{desktop_id}.desktop" >&2
+    exit 1
+}
+echo 'Keywords=pear;pear-desktop;music;player;' >> "usr/share/applications/%{desktop_id}.desktop"
+install -Dpm644 "usr/share/applications/%{desktop_id}.desktop" \
+  %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 for png in usr/share/icons/hicolor/*/apps/*.png; do
   install -Dpm644 "$png" "%{buildroot}%{_datadir}/icons/hicolor/${png#*hicolor/}"

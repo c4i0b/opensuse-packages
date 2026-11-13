@@ -72,18 +72,27 @@
 #     option (red: "Unknown option p in cargo_build()"); the braced form
 #     above forwards flags to cargo. rpm also expands macros INSIDE
 #     COMMENTS — never write a literal macro call in a comment.
-#   - aarch64 OOM: distro RUSTFLAGS add -C debuginfo=2 and release
+#   - aarch64 OOM red: distro RUSTFLAGS add -C debuginfo=2 and release
 #     profiles use thin-LTO + codegen-units=1; a single rustc can need
-#     >4 GB and the worker kills it (boa_engine is the usual victim).
-#     Proven fix (vectorcraft/pdfcraft/solidcraft/effectcraft):
-#       %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now \
-#         -C codegen-units=16 -C debuginfo=0
-#       export CARGO_PROFILE_RELEASE_LTO=false
-#       export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
-#     (never %{go_arches}-style macros — see opensuse-lint check).
+#     >4 GB and the worker kills it (boa_engine is the usual victim). The
+#     canonical mitigation below (rustflags global + profile env exports)
+#     is the DEFAULT: keep it even if the package builds without it —
+#     the aarch64 workers are the constraint, not x86_64.
+#     (never %{go_arches}-style macros — see opensuse-lint check.)
 #   - Icons under icons/hicolor/<size>/apps need %dir ownership of the hicolor
 #     tree or OBS check-filelist FAILs (linter rule "icon").
 %global cargo_install_lib false
+
+# single definition of the desktop-file id (%install/%check/%files); if
+# upstream renames its app id between releases, derive the installed
+# filename from the tarball glob instead (see solidcraft)
+%global desktop_id ai.storyteller.%{name}
+
+# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
+# relax both
+%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
+
 %global debug_package %{nil}
 
 ExclusiveArch:  x86_64 aarch64
@@ -116,21 +125,27 @@ __DESCRIPTION__
 
 %prep
 %autosetup -p1 -a1
-# drop if the vendored tree has no unused [patch] entries: crates that are
-# patched but absent from the build graph are locked (Cargo.lock) yet NOT
-# vendored, and offline cargo dies with "patch location ... does not contain
-# packages matching X" (red: designcraft, egui_demo_lib et al.)
-sed -i -e '/^__UNUSED_PATCH__ = /d' Cargo.toml
+# canonical unvendored-[patch.crates-io] drop loop: cargo eagerly validates
+# every patch entry against its source, but cargo vendor only emits
+# depended-on crates — unused pins abort the offline build with "patch
+# location ... does not contain packages matching" (red: designcraft,
+# egui_demo_lib et al.). Harmless when every patch entry is vendored.
+for crate in $(awk '/^\[patch\.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/{print $1}' Cargo.toml); do
+    ls -d vendor/"$crate"-* >/dev/null 2>&1 || sed -i "/^$crate = { git = /d" Cargo.toml
+done
 
 %build
 # drop if the vendored tree has no atspi-common (no accessibility stack)
 [ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
+# aarch64 OOM mitigation, second half of the build_rustflags global above
+export CARGO_PROFILE_RELEASE_LTO=false
+export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 # drop -p if the crate is not a virtual-workspace member
 %{cargo_build} -p %{name}
 
 %install
 install -Dpm 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
-install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/__DESKTOPID__.desktop
+install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 # ship whatever sizes upstream provides (they change between releases);
 # adjust the assets/ path to the upstream icon tree
@@ -139,17 +154,17 @@ for icon in assets/app-icon/hicolor/*/apps/*; do
 done
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/__DESKTOPID__.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 %files
 %license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/__NAME__
-%{_datadir}/applications/__DESKTOPID__.desktop
+%{_datadir}/applications/%{desktop_id}.desktop
 # OBS check-filelist FAILs on unowned hicolor dirs
 %dir %{_datadir}/icons/hicolor
 %dir %{_datadir}/icons/hicolor/*
 %dir %{_datadir}/icons/hicolor/*/apps
-%{_datadir}/icons/hicolor/*/apps/__ICON__.*
+%{_datadir}/icons/hicolor/*/apps/%{desktop_id}.*
 
 %changelog

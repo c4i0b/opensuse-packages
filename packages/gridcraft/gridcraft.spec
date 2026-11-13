@@ -1,7 +1,15 @@
 # Bin-only crate: nothing is installed into the cargo registry
 %global cargo_install_lib false
+
+# single definition of the desktop-file id (%install/%check/%files)
+%global desktop_id ai.storyteller.%{name}
 # release build carries no debuginfo; the empty -debuginfo would fail checks
 %global debug_package %{nil}
+
+# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
+# relax both
+%global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -38,13 +46,12 @@ tables.
 
 %prep
 %autosetup -p1 -a1
-# unused [patch.crates-io] entries name packages nothing in the tree
-# depends on, so cargo vendor leaves them out of vendor/ and the offline
-# build then fails patch validation ("does not contain packages matching
-# <crate>"); drop every patch entry whose crate was not vendored
-awk '/^\[patch/{f=1;next} /^\[/{f=0} f && /^[a-zA-Z0-9_-]+ = \{/ {sub(/ =.*/,""); print}' Cargo.toml \
-| while read -r p; do
-    ls -d vendor/"$p"-* >/dev/null 2>&1 || sed -i "/^${p} = /d" Cargo.toml
+
+# cargo eagerly validates every [patch.crates-io] git entry against its
+# source: crates outside the dependency graph are never vendored and the
+# offline build dies on them — drop patch lines with no vendor/ crate dir
+for crate in $(awk '/^\[patch\.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/{print $1}' Cargo.toml); do
+    ls -d vendor/"$crate"-* >/dev/null 2>&1 || sed -i "/^$crate = { git = /d" Cargo.toml
 done
 
 %build
@@ -57,13 +64,15 @@ done
 # the cargo_build macro is parametric, so passing a package selection flag
 # would parse as an unknown macro option; select the workspace member by cwd
 cd apps/%{name}
+export CARGO_PROFILE_RELEASE_LTO=false
+export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 %cargo_build
 cd - >/dev/null
 
 %install
 install -Dpm 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
 
-install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/ai.storyteller.gridcraft.desktop
+install -Dpm 0644 %{SOURCE2} %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 # ship whatever sizes upstream provides (they change between releases)
 for icon in assets/app-icon/hicolor/*/apps/*.png assets/app-icon/hicolor/*/apps/*.svg; do
@@ -72,17 +81,17 @@ for icon in assets/app-icon/hicolor/*/apps/*.png assets/app-icon/hicolor/*/apps/
 done
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/ai.storyteller.gridcraft.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 %files
 %license LICENSE-APACHE LICENSE-MIT NOTICE
 %doc README.md
 %{_bindir}/gridcraft
-%{_datadir}/applications/ai.storyteller.gridcraft.desktop
+%{_datadir}/applications/%{desktop_id}.desktop
 # OBS check-filelist FAILs on unowned hicolor dirs
 %dir %{_datadir}/icons/hicolor
 %dir %{_datadir}/icons/hicolor/*
 %dir %{_datadir}/icons/hicolor/*/apps
-%{_datadir}/icons/hicolor/*/apps/ai.storyteller.gridcraft.*
+%{_datadir}/icons/hicolor/*/apps/%{desktop_id}.*
 
 %changelog
