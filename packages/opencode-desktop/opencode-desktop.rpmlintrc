@@ -1,0 +1,6 @@
+# Bundled Electron tree: system-library deps declared explicitly (bundled
+# ELFs' own requires are excluded), upstream asar ships a zero-length
+# placeholder module stub.
+addFilter("opencode-desktop.*explicit-lib-dependency")
+addFilter("opencode-desktop.*zero-length /usr/lib64/opencode-desktop/")
+addFilter("opencode-desktop.*unstripped-binary-or-object")

@@ -1,0 +1,14 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/hydralauncher/hydra/releases/download/v4.4.1/hydralauncher-4.4.1.x86_64.rpm</param>
+    <param name="filename">hydralauncher-4.4.1.x86_64.rpm</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/hydralauncher/hydra/v4.4.1/LICENSE</param>
+    <param name="filename">LICENSE</param>
+  </service>
+</services>

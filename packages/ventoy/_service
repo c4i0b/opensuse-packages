@@ -1,0 +1,14 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/ventoy/Ventoy/releases/download/v1.1.18/ventoy-1.1.18-linux.tar.gz</param>
+    <param name="filename">ventoy-1.1.18-linux.tar.gz</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/ventoy/Ventoy/v1.1.18/COPYING</param>
+    <param name="filename">COPYING</param>
+  </service>
+</services>

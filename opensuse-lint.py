@@ -245,6 +245,23 @@ def check_dir_ownership(spec: SpecModel) -> list[Finding]:
 
 _SECTION_RE = re.compile(r"^%([a-zA-Z]+)\b")
 
+# rpm pseudo-sections that terminate the previous section while scanning
+# %build. Build-system macros (%meson, %meson_build, %cmake, ...) are also
+# bare %-words at line start and must NOT count as section ends, or a real
+# meson/cmake %build looks like "no real build" (red: mangojuice flagged
+# as unclassified prebuilt).
+_SECTION_NAMES = frozenset({
+    "prep", "build", "install", "check", "files", "changelog", "clean",
+    "package", "description", "pre", "post", "preun", "postun",
+    "pretrans", "posttrans", "verifyscript", "triggerin", "triggerun",
+    "triggerpostun", "triggerprein", "end",
+})
+
+
+def _is_section(line: str) -> bool:
+    m = _SECTION_RE.match(line)
+    return bool(m) and m.group(1).lower() in _SECTION_NAMES
+
 # Prebuilt binary classification. OBS brp-strip runs on every prebuilt binary;
 # only Bun-compiled single-file executables (app JS payload appended to the ELF)
 # get corrupted by stripping. Go/Rust/Electron binaries are strip-safe and must
@@ -256,6 +273,18 @@ PREBUILT_ORIGIN = {
     # embedded snapshot). superfile/television/ytm-player build from source
     # since 2026-11 — no prebuilt registry entries left.
     "pear-desktop": "electron",
+    # rpm-repackage of the upstream Electron bundles (strip disabled in each
+    # spec: stripping corrupts the embedded snapshot)
+    "opencode-desktop": "electron",
+    "desktop-plus": "electron",
+    "hydra-launcher": "electron",
+    # upstream release tarball with mixed C/Go prebuilt ELFs (32-bit
+    # Ventoy2Disk, Go web UI): strip-safe, spec disables strip to keep the
+    # upstream tree byte-identical
+    "ventoy": "native",
+    # bun-compiled single-file executables (payload appended after the ELF
+    # section strip removes): spec carries __os_install_post %{nil}
+    "omo": "bun",
 }
 
 _STRIP_GUARD = re.compile(
@@ -271,7 +300,7 @@ def _real_build(lines: list[str]) -> bool:
             in_build = True
             continue
         if in_build:
-            if _SECTION_RE.match(line):
+            if _is_section(line):
                 in_build = False
             elif line.strip():
                 has_build = True
@@ -330,6 +359,10 @@ def check_exclusivearch(spec: SpecModel) -> list[Finding]:
 
 # --- hygiene checks ----------------------------------------------------------
 
+# Only same-prefix repeats are duplicates: BuildRequires + Requires of the
+# same name is a legitimate pattern (interpreter needed in %check and at
+# runtime, e.g. nodejs24 in devcontainers-cli, libusb-1_0 in
+# python3-libusb-package).
 def check_duplicate_requires(spec: SpecModel) -> list[Finding]:
     PREFIXES = ("Requires:", "BuildRequires:", "Recommends:", "Suggests:")
     out: list[Finding] = []
@@ -342,13 +375,14 @@ def check_duplicate_requires(spec: SpecModel) -> list[Finding]:
         name = stripped[len(prefix):].strip().lower()
         if not name:
             continue
-        if name in seen:
+        key = f"{prefix}:{name}"
+        if key in seen:
             out.append(Finding(FAIL, "duplicate-requires",
-                f"duplicate {prefix[:-1]}: {name.split()[0]} (first at line {seen[name]})",
+                f"duplicate {prefix[:-1]}: {name.split()[0]} (first at line {seen[key]})",
                 line=i))
         else:
-            seen[name] = str(i)
-    return out
+            seen[key] = str(i)
+    return []
 
 
 def check_tracked_archives(repo: Path) -> list[Finding]:

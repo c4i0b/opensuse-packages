@@ -1,0 +1,20 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/anomalyco/opencode/releases/download/v1.19.5/opencode-desktop-linux-x86_64.rpm</param>
+    <param name="filename">opencode-desktop-linux-x86_64.rpm</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/anomalyco/opencode/releases/download/v1.19.5/opencode-desktop-linux-aarch64.rpm</param>
+    <param name="filename">opencode-desktop-linux-aarch64.rpm</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/anomalyco/opencode/v1.19.5/LICENSE</param>
+    <param name="filename">LICENSE</param>
+  </service>
+</services>

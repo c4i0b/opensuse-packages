@@ -1,0 +1,5 @@
+# Rust/wgpu binaries declare no automatic deps on the libs winit/wgpu
+# dlopen, so the X11/Wayland set is declared explicitly (see the rust-gui
+# template); "wgpu" is the graphics library's name.
+addFilter("rio.*explicit-lib-dependency")
+addFilter("rio.*spelling-error.*wgpu")

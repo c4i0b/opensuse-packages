@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/will8211/unimatrix/archive/dff519f972103f91384f360f270614184de8aa92/unimatrix-dff519f972103f91384f360f270614184de8aa92.tar.gz</param>
+    <param name="filename">unimatrix-dff519f972103f91384f360f270614184de8aa92.tar.gz</param>
+  </service>
+</services>

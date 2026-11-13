@@ -1,0 +1,7 @@
+# Bundled Electron/Node tree under /usr/lib: its ELFs' system-library deps
+# are declared explicitly on the package, and the tree ships upstream's
+# static helpers (git-lfs) and non-script text files (NOTICE) as-is.
+addFilter("desktop-plus.*explicit-lib-dependency")
+addFilter("desktop-plus.*statically-linked-binary /usr/lib/desktop-plus/resources/app/git/")
+addFilter("desktop-plus.*script-without-shebang /usr/lib/desktop-plus/resources/app/git/")
+addFilter("desktop-plus.*unstripped-binary-or-object")

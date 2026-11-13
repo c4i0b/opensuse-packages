@@ -1,0 +1,9 @@
+# Self-contained upstream tool tree in /opt (live-USB toolkit with foreign-
+# architecture prebuilt helpers: static xzcat per arch, mips64el GUI binaries
+# with executable stacks, upstream-set executable bit on languages.json)
+addFilter("ventoy.*: E: filelist-forbidden-opt")
+addFilter("ventoy.*: W: dir-or-file-outside-snapshot /opt/ventoy")
+addFilter("ventoy.*: E: statically-linked-binary /opt/ventoy")
+addFilter("ventoy.*: E: executable-stack /opt/ventoy")
+addFilter("ventoy.*: E: script-without-shebang /opt/ventoy")
+addFilter("ventoy.*: E: spelling-error.*bootable")

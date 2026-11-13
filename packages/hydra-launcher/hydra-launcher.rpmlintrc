@@ -1,0 +1,6 @@
+# Bundled Electron/Python tree under %_libdir: system-library deps are
+# declared explicitly (the bundle's own requires are excluded) and stripping
+# is disabled (embedded snapshot) — rpmlint cannot see that intent.
+addFilter("hydra-launcher.*explicit-lib-dependency")
+addFilter("hydra-launcher.*unstripped-binary-or-object")
+addFilter("hydra-launcher.*zero-length")

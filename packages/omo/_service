@@ -1,0 +1,20 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">raw.githubusercontent.com</param>
+    <param name="path">/code-yeongyu/oh-my-openagent/v5.1.69/LICENSE.md</param>
+    <param name="filename">LICENSE.md</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/code-yeongyu/oh-my-openagent/releases/download/v5.1.69/omo-linux-x64</param>
+    <param name="filename">omo-linux-x64</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/code-yeongyu/oh-my-openagent/releases/download/v5.1.69/omo-linux-arm64</param>
+    <param name="filename">omo-linux-arm64</param>
+  </service>
+</services>
