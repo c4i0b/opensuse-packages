@@ -48,7 +48,6 @@ doc over growing this file.
   [rust](docs/packaging/rust.md)
 - Failure diagnosis: [skills/diagnose-obs-failure/SKILL.md](skills/diagnose-obs-failure/SKILL.md)
 - Package templates: [templates/](templates/) (`*.spec.tpl`)
-- Planned work: [BACKLOG.md](BACKLOG.md)
 - Task tracking (optional): when the `bd` command is available on the host,
   organize multi-step work with it; when it is not, carry on without it.
   Details: [docs/workflow.md](docs/workflow.md)
