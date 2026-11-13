@@ -1,0 +1,5 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of netscanner 0.6.43: Rust TUI network scanner from
+  the upstream git tag, vendored cargo crates, manpage shipped.

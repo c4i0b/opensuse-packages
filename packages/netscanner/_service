@@ -1,0 +1,23 @@
+<services>
+  <service name="tar_scm" mode="serveronly">
+    <param name="url">https://github.com/Chleba/netscanner.git</param>
+    <param name="scm">git</param>
+    <param name="revision">v0.6.43</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+    <param name="versionrewrite-replacement">\1</param>
+    <param name="exclude">.git</param>
+  </service>
+  <service name="recompress" mode="serveronly">
+    <param name="file">*.tar</param>
+    <param name="compression">zst</param>
+  </service>
+  <service name="set_version" mode="serveronly"/>
+  <!-- cargo_vendor is not in the server-side allowlist of api.opensuse.org:
+       vendor.tar.zst is regenerated client-side (see rust-source template)
+       and pushed alongside the sources. -->
+  <service name="cargo_vendor" mode="manual">
+    <param name="srcdir">netscanner</param>
+    <param name="compression">zst</param>
+  </service>
+</services>
