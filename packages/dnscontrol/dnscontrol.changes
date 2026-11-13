@@ -1,0 +1,6 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of dnscontrol 5.8.2: source build from the v5.8.2 git
+  tag with Go modules vendored server-side via the OBS go_modules
+  service.
