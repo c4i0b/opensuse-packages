@@ -1,0 +1,8 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of cloudflare-speed-cli 1.0.12: Rust Cloudflare
+  speed test CLI/TUI from the upstream git tag, vendored cargo crates.
+- Upstream ships no completions command and no manpage; TLS stack is
+  rustls+ring (no aws-lc-sys), so no cmake nor the fedora -O2/debug
+  workarounds are needed.
