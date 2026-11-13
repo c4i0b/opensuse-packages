@@ -1,8 +1,0 @@
-<project name="@@PROJECT@@">
-  <title>Personal openSUSE packages</title>
-  <description>RPMs for openSUSE Tumbleweed.</description>
-  <repository name="@@REPO@@">
-    <path project="openSUSE:Tumbleweed" repository="standard"/>
-@@ARCHES@@
-  </repository>
-</project>

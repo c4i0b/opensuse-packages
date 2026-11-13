@@ -99,7 +99,8 @@ upstream release
 - Each package lives in `packages/<name>/`. Required: `*.spec`. Optional:
   `_service`, `fetch.sh`, `bump.sh`, `BIN`, `.obsignore`, `<name>.rpmlintrc`,
   `<name>.changes`.
-- `_project.meta.xml` holds the OBS project template (repos, arches).
+- `tools/project-meta.sh` renders the OBS project meta (repos, arches):
+  Tumbleweed (x86_64+aarch64) and Slowroll (x86_64).
 - Each package's `_service` tells OBS to fetch official upstream release
   artifacts server-side, so no archives are committed.
 - A scheduled workflow (`autoupdate`) checks upstream releases (per

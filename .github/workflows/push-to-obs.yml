@@ -122,7 +122,6 @@ jobs:
         env:
           OBS_API: "https://api.opensuse.org"
           OBS_PROJECT: "home:${{ secrets.OBS_USER }}"
-          OBS_REPO: "opensuse_tumbleweed"
           PACKAGES: ${{ steps.resolve.outputs.packages }}
         run: |
           set -euo pipefail
@@ -131,16 +130,11 @@ jobs:
 
           ensure_project() {
             if ! osc_meta meta prj "$OBS_PROJECT" >/dev/null 2>&1; then
-              arches=""
-              for a in x86_64 aarch64; do
-                [ -n "$arches" ] && arches+="\n"
-                arches+="    <arch>$a</arch>"
-              done
+              # tools/project-meta.sh is the single source of truth for the
+              # repo/arch table; keep this in sync with setup-obs.sh only by
+              # delegation, never by copying the sed.
               tmp="$(mktemp)"
-              sed -e "s|@@PROJECT@@|${OBS_PROJECT}|g" \
-                  -e "s|@@REPO@@|${OBS_REPO}|g" \
-                  -e "s|@@ARCHES@@|${arches}|g" \
-                  "$GITHUB_WORKSPACE/_project.meta.xml" > "$tmp"
+              OBS_USER="${OBS_PROJECT#home:}" bash tools/project-meta.sh > "$tmp"
               osc_meta meta prj -F "$tmp" "$OBS_PROJECT"
               rm -f "$tmp"
             fi

@@ -56,7 +56,7 @@ fetch pkg:
 bump pkg version:
     {{runner}} "{{repo}}/{{pkg}}/bump.sh" "{{version}}"
 
-# Create (or re-apply) the OBS project from _project.meta.xml (force=1)
+# Create (or re-apply) the OBS project meta (force=1)
 create-project force="0":
     {{runner}} tools/setup-obs.sh {{force}}
 
@@ -76,7 +76,7 @@ osc +args:
 results pkg:
     {{runner}} osc -A {{OBS_API}} results "home:{{OBS_USER}}" "$(basename {{pkg}})"
 
-# Whole-project build status snapshot (all packages, both arches)
+# Whole-project build status snapshot (all packages, all repos/arches)
 status:
     {{runner}} osc -A {{OBS_API}} results "home:{{OBS_USER}}"
 
@@ -84,9 +84,9 @@ status:
 watch interval="90":
     {{runner}} tools/watch-build.sh {{interval}}
 
-# Show the OBS buildlog of one package (opensuse_tumbleweed x86_64)
-log pkg:
-    {{runner}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}" "$(basename {{pkg}})" {{OBS_REPO}} {{OBS_ARCH}}
+# Show the OBS buildlog of one package (default opensuse_tumbleweed x86_64)
+log pkg repo=OBS_REPO:
+    {{runner}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}" "$(basename {{pkg}})" {{repo}} {{OBS_ARCH}}
 
 # Prepend a dated entry to <pkg>/<name>.changes (host-side: opens $EDITOR)
 vc pkg:

@@ -22,8 +22,10 @@ server-side.
   commits with `osc addremove` + `osc ci`.
 - The rsync excludes dev-only files OBS must not see: `fetch.sh`, `bump.sh`,
   `BIN`, archives, `.obsignore`.
-- `_project.meta.xml` is the project template (repos, arches);
-  `just create-project` applies it.
+- `tools/project-meta.sh` renders the project meta and owns the repo/arch
+  table (Tumbleweed x86_64+aarch64, Slowroll x86_64 — Slowroll publishes no
+  aarch64). `just create-project 1` re-applies it; CI creates the
+  project from the same renderer, so the table has exactly one definition.
 - `just new-pkg <name>` creates a package from the templates and fills the
   OBS `<title>`/`<description>` from the spec automatically.
 
