@@ -125,6 +125,22 @@ resolve() {
   printf 'latest\t%s\t%s\n' "$pkg" "$latest" > "$resolved/$pkg"
 }
 
+# spec-bearing packages without an `upstream` file are invisible to the
+# bot; say so once per run instead of resolving silently (aggregated over 5)
+no_upstream="$(find "$root/packages" -mindepth 1 -maxdepth 1 -type d | while IFS= read -r d; do
+  ls "$d"/*.spec >/dev/null 2>&1 && [ ! -f "$d/upstream" ] && basename "$d"
+done | sort)"
+if [ -n "$no_upstream" ]; then
+  n_no_upstream="$(wc -l <<<"$no_upstream")"
+  if [ "$n_no_upstream" -gt 5 ]; then
+    echo "::warning::$n_no_upstream packages have no upstream file, not auto-updated: $(paste -sd, - <<<"$no_upstream")"
+  else
+    while IFS= read -r p; do
+      echo "::warning::$p: no upstream file, not auto-updated"
+    done <<<"$no_upstream"
+  fi
+fi
+
 find "$root/packages" -name upstream -maxdepth 2 \
   | xargs -P 8 -I{} bash -c "$(declare -f get resolve); resolve \"{}\""
 
@@ -201,6 +217,21 @@ if [ $((now - last_commit)) -gt $((45 * 86400)) ]; then
   keepalive=1
 fi
 
+# REQ/RETRY stats were collected but never surfaced (the fedora
+# rate-summary was half-ported): aggregate the stats file into one notice
+packages_total="$(find "$root/packages" -name upstream -maxdepth 2 | wc -l)"
+total_req="$(grep -c '^REQ' "$stats" || true)"
+read -r c200 c403 c429 c404 minrl <<< "$(awk -F'\t' '$1=="REQ"{c[$3]++; if($5+0>0 && (m==0||$5+0<m)) m=$5+0} END{print c[200]+0, c[403]+0, c[429]+0, c[404]+0, m+0}' "$stats")"
+cother=$(( total_req - c200 - c403 - c429 - c404 ))
+# this port writes no RETRY lines: a retry is any REQ with attempt > 1
+retries="$(awk -F'\t' '$1=="REQ" && $4>1' "$stats" | wc -l)"
+final_fail=$(( packages_total - $(find "$resolved" -type f | wc -l) ))
+wall=$(( $(date +%s) - job_start ))
+# a 404 on releases/latest is expected for tags-only repos (the fallback
+# resolves them), so it gets its own bucket instead of polluting "other"
+summary="packages=$packages_total bumped=$bumped requests=$total_req ok200=$c200 throttled403=$c403 throttled429=$c429 fallback404=$c404 other=$cother retries=$retries final_failures=$final_fail min_rlrem=$minrl wall=${wall}s"
+echo "::notice::[rate-summary] $summary"
+
 count=$((bumped + keepalive))
 if [ "$count" -gt 0 ]; then
   # transient network only: the branch name is unique, no race to lose
@@ -228,5 +259,9 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
     else
       echo "no updates this run"
     fi
+    echo
+    echo '```'
+    echo "$summary"
+    echo '```'
   } >> "$GITHUB_STEP_SUMMARY"
 fi

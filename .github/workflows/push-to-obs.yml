@@ -168,6 +168,10 @@ jobs:
           IFS=',' read -ra list <<< "$PACKAGES"
           for pkg in "${list[@]}"; do
             [ -n "$pkg" ] || continue
+            # phase stamps + immediate OK lines keep partial delivery of a
+            # timed-out fleet run diagnosable from the log/summary
+            echo "::notice::push $pkg: start"
+            pkg_t0="$(date +%s)"
             name="${pkg##*/}"
             src="$GITHUB_WORKSPACE/$pkg"
             dest="$GITHUB_WORKSPACE/.osc-work/$name"
@@ -198,6 +202,8 @@ jobs:
             (cd "$dest" && osc_meta addremove && osc_meta st)
             (cd "$dest" && osc_meta ci -m "ci: update $pkg")
             pushed+=("$pkg")
+            echo "pushed OK: $pkg"
+            echo "::notice::push $pkg: done ($(( $(date +%s) - pkg_t0 ))s)"
           done
           printf 'pushed=%s\n' "$(IFS=,; echo "${pushed[*]}")" >> "$GITHUB_OUTPUT"
 

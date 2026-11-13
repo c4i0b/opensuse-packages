@@ -35,7 +35,9 @@ names follow it (file name always equals `name:`):
 - `autoupdate` — scheduled version bumps.
 - `validate` — the git-side gate (PR): version/asset checks.
 - `push-to-obs` — delivery: syncs touched packages to OBS (the builder
-  cannot pull).
+  cannot pull). Run duration in the Actions list includes
+  concurrency-group queueing: a 5m13s "run" can be a 2s no-op that
+  queued behind a fleet push — not slowness.
 - `badges` — status-artifact refresh.
 - `auto-merge` — Dependabot PR merging, gated on `validate`.
 
