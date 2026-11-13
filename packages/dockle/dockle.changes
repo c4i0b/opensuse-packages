@@ -1,0 +1,5 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of dockle 0.4.15: container image linter for
+  security, built from source with server-side Go module vendoring.
