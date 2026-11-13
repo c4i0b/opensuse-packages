@@ -1,0 +1,7 @@
+-------------------------------------------------------------------
+Fri Nov 13 21:39:56 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of crunch 3.6: upstream does not git-tag releases, so the
+  _service pins the master commit that declares VERSION 3.6 in the Makefile
+  and carries the version literally; built with the distro gcc and the
+  Makefile's -g -o0 OPTFLAGS overridden by the RPM flags.

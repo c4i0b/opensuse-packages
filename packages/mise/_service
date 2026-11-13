@@ -1,0 +1,26 @@
+<services>
+  <service name="tar_scm" mode="serveronly">
+    <param name="url">https://github.com/jdx/mise.git</param>
+    <param name="scm">git</param>
+    <param name="revision">v2026.10.23</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+    <param name="versionrewrite-replacement">\1</param>
+    <param name="exclude">.git</param>
+  </service>
+  <service name="recompress" mode="serveronly">
+    <param name="file">*.tar</param>
+    <param name="compression">zst</param>
+  </service>
+  <service name="set_version" mode="serveronly"/>
+  <!-- cargo_vendor is not in the server-side allowlist of api.opensuse.org:
+       vendor.tar.zst is regenerated client-side (see rust-source template)
+       and pushed alongside the sources. NB: the obs cargo_vendor service
+       refuses to run on mise (upstream ships vendor/aqua-registry data);
+       regenerate manually: cargo vendor --locked vendor >> .cargo/config.toml
+       then tar --zstd -cf vendor.tar.zst vendor .cargo Cargo.lock. -->
+  <service name="cargo_vendor" mode="manual">
+    <param name="srcdir">mise</param>
+    <param name="compression">zst</param>
+  </service>
+</services>

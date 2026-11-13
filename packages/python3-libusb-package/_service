@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/pyocd/libusb-package/archive/refs/tags/v1.0.30.1.tar.gz</param>
+    <param name="filename">libusb-package-1.0.30.1.tar.gz</param>
+  </service>
+</services>

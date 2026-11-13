@@ -1,0 +1,15 @@
+<services>
+  <service name="tar_scm">
+    <param name="url">https://github.com/crunchsec/crunch.git</param>
+    <param name="scm">git</param>
+    <param name="exclude">.git</param>
+    <param name="revision">3bdc4a8941eb64e5c15086778df56af79d54e06b</param>
+    <param name="versionformat">3.6</param>
+  </service>
+  <service name="set_version">
+  </service>
+  <service name="recompress">
+    <param name="file">*.tar</param>
+    <param name="compression">gz</param>
+  </service>
+</services>

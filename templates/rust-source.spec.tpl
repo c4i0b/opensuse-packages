@@ -34,7 +34,12 @@
 #     podman run --rm -v $PWD:/work:Z registry.opensuse.org/opensuse/tumbleweed:latest \
 #       bash -c 'zypper -qn in --no-recommends obs-service-cargo_vendor &&
 #                /usr/lib/obs/service/cargo_vendor --src __NAME__-__VERSION__ \
-#                  --outdir /work --compression zst'
+#                  --outdir /work --compression zst \
+#                  --respect-lockfile true --update false'
+#   Two hard-won flags/requirements (2026-11 mise/oxker/atac/ludusavi fleet):
+#   the --src glob needs the extracted source tree present in the package dir
+#   (extract the tag tarball there first, delete it after), and the default
+#   --update true rewrites Cargo.lock and then aborts under --locked.
 #   The archive carries vendor/ + .cargo/config.toml + Cargo.lock at its root,
 #   exactly what %autosetup -a1 + %cargo_build (offline) expect.
 # - %cargo_build comes from cargo-packaging (linter enforces the BuildRequires).

@@ -16,11 +16,9 @@ BuildRequires:  python3-rpm-macros
 Requires:       hashcat
 Requires:       python3-platformdirs
 Requires:       python3-pyusb
+Requires:       python3-libusb-package
 Requires:       python3-rich
 Requires:       python3-textual
-# libusb-package (bundled libusb-1.0 lookup helper) has no Tumbleweed
-# package; flagged upstream of this repo — add python3-libusb-package here
-# once it exists.
 
 %description
 Wifit3 talks to USB Wi-Fi adapters directly from userland with its own chip

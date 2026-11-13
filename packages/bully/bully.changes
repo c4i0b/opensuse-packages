@@ -1,0 +1,7 @@
+-------------------------------------------------------------------
+Fri Nov 13 21:39:56 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of bully 1.2: source build from the 1.2 git tag (upstream
+  tags are not v-prefixed) with the distro gcc against libpcap; ports the
+  env-CFLAGS Makefile workaround from the fedora-packages sibling and ships
+  the bully-cleanup session-file helper from Kali's packaging.

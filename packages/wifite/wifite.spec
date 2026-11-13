@@ -30,8 +30,9 @@ Requires:       hcxtools
 Requires:       hcxdumptool
 # used by the --random-mac flag
 Requires:       macchanger
-# Not in Tumbleweed, upstream treats them as optional (warns and skips):
-# pixiewps, reaver, bully, cowpatty.
+Requires:       bully
+# Still not packaged in Tumbleweed (upstream treats them as optional,
+# warns and skips): pixiewps, reaver, cowpatty.
 
 %description
 Wifite is an automated wireless attack tool. It wraps the auditing
