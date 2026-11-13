@@ -1,0 +1,18 @@
+<services>
+  <service name="tar_scm">
+    <param name="url">https://github.com/projectdiscovery/nuclei.git</param>
+    <param name="scm">git</param>
+    <param name="exclude">.git</param>
+    <param name="revision">v3.11.1</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+  </service>
+  <service name="set_version">
+  </service>
+  <service name="recompress">
+    <param name="file">*.tar</param>
+    <param name="compression">gz</param>
+  </service>
+  <service name="go_modules">
+  </service>
+</services>

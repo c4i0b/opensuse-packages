@@ -1,0 +1,5 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of nuclei 3.11.1: source build from the v3.11.1 git
+  tag, Go modules vendored server-side via the OBS go_modules service.
