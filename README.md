@@ -55,6 +55,23 @@ OBS, where they are built.
 
 ## How it works
 
+### Automatic updates
+
+```
+upstream release
+       │
+       ▼  every 4h, per packages/<name>/upstream
+┌───────────┐   bump spec + _service
+│ autoupdate│──────────────▶ commit to main
+└───────────┘                    │  GITHUB_TOKEN fires no push event:
+                                 ▼  push-to-obs rides workflow_run
+                     push-to-obs syncs the touched
+                     packages to OBS → OBS builds
+                                 │
+                                 ▼  ~1h20 after the bump
+                     badges refresh (README + badges/*.json)
+```
+
 - Each package lives in `packages/<name>/`. Required: `*.spec`. Optional:
   `_service`, `fetch.sh`, `bump.sh`, `BIN`, `.obsignore`, `<name>.rpmlintrc`,
   `<name>.changes`.
