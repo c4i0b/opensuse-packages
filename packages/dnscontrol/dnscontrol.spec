@@ -5,7 +5,10 @@ Summary:        Infrastructure as code for DNS
 License:        MIT
 URL:            https://github.com/DNSControl/dnscontrol
 Source0:        dnscontrol-%{version}.tar.gz
-Source1:        vendor.tar.gz
+# go_modules cannot vendor this server-side yet (OBS service runs go 1.26,
+# go.mod requires >= 1.27.3), so vendor.tar.zst is generated client-side:
+#   go mod vendor && tar --zstd -cf vendor.tar.zst vendor
+Source1:        vendor.tar.zst
 ExclusiveArch:  x86_64 aarch64
 BuildRequires:  golang(API) >= 1.27
 

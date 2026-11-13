@@ -2,5 +2,6 @@
 Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
 
 - Initial package of dnscontrol 5.8.2: source build from the v5.8.2 git
-  tag with Go modules vendored server-side via the OBS go_modules
-  service.
+  tag. The OBS go_modules service still runs go 1.26 (go.mod requires
+  >= 1.27.3), so vendor.tar.zst is generated client-side instead;
+  version bumps are manual until the service catches up.
