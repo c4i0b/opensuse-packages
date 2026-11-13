@@ -486,6 +486,32 @@ def check_go_modules_toolchain(spec: SpecModel) -> list[Finding]:
     return []
 
 
+def check_date_tag_service(spec: SpecModel) -> list[Finding]:
+    # red: hand-written _service files put the dot-sanitized Version into the
+    # download path, but upstream tags carry dashes (2026-08-10 vs 2026.08.10)
+    # and the fetch 404s server-side. The raw tag belongs in %global tag and
+    # in the _service path; only the filename param uses the dot form.
+    m = re.search(r"^%global\s+tag\s+(\d{4}-\d{2}-\d{2})\s*$", spec.text, re.M)
+    if not m:
+        return []
+    tag = m.group(1)
+    svc = spec.path.parent / "_service"
+    if not svc.is_file():
+        return []
+    text = svc.read_text()
+    dots = tag.replace("-", ".")
+    if f"tags/{dots}" in text:
+        return [Finding(FAIL, "date-tag-path",
+            f"_service download path uses the dot form `{dots}` — upstream "
+            f"tags are dashed ({tag}); the fetch 404s server-side. Keep the "
+            "raw tag in the path and the dot form only in filename/Version.")]
+    if f"tags/{tag}" not in text:
+        return [Finding(WARN, "date-tag-path",
+            f"_service path does not reference the raw tag `{tag}` — "
+            "verify the URL matches the tag exactly.")]
+    return []
+
+
 _CHECKS = [
     check_summary,
     check_release,
@@ -501,6 +527,7 @@ _CHECKS = [
     check_go_modules_toolchain,
     check_duplicate_requires,
     check_local_sources,
+    check_date_tag_service,
 ]
 
 

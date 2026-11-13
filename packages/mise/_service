@@ -17,8 +17,9 @@
        vendor.tar.zst is regenerated client-side (see rust-source template)
        and pushed alongside the sources. NB: the obs cargo_vendor service
        refuses to run on mise (upstream ships vendor/aqua-registry data);
-       regenerate manually: cargo vendor --locked vendor >> .cargo/config.toml
-       then tar --zstd -cf vendor.tar.zst vendor .cargo Cargo.lock. -->
+       regenerate manually: run cargo vendor in locked mode into vendor/,
+       append the config fragment to .cargo/config.toml, then create the
+       zstd tarball of vendor + .cargo + Cargo.lock by hand. -->
   <service name="cargo_vendor" mode="manual">
     <param name="srcdir">mise</param>
     <param name="compression">zst</param>
