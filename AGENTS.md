@@ -47,6 +47,7 @@ doc over growing this file.
   [python](docs/packaging/python.md) ·
   [rust](docs/packaging/rust.md)
 - Failure diagnosis: [skills/diagnose-obs-failure/SKILL.md](skills/diagnose-obs-failure/SKILL.md)
+- Porting from fedora-packages: [skills/port-from-fedora-packages/SKILL.md](skills/port-from-fedora-packages/SKILL.md)
 - Package templates: [templates/](templates/) (`*.spec.tpl`)
 - Task tracking (optional): when the `bd` command is available on the host,
   organize multi-step work with it; when it is not, carry on without it.
