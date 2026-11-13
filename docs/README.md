@@ -9,7 +9,7 @@ maintained truth, `reference` stable background.
 - [obs.md](obs.md) — live: the OBS contract, `_service` source fetch, push
   and build validation policy
 - [autoupdate.md](autoupdate.md) — live: the autoupdate bot, trackers,
-  validate-bump gate, Dependabot
+  validate gate, Dependabot
 - [conventions.md](conventions.md) — live: package layout, `-bin`-only
   policy, versioning, repo hygiene
 - [workflow.md](workflow.md) — live: optional beads task tracking and

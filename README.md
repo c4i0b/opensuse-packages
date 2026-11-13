@@ -8,7 +8,7 @@ merge to `main` triggers `push-to-obs`, which syncs the touched packages to
 OBS, where they are built.
 
 [![push-to-obs](https://github.com/c4i0b/opensuse-packages/actions/workflows/push-to-obs.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/push-to-obs.yml)
-[![validate-bump](https://github.com/c4i0b/opensuse-packages/actions/workflows/validate-bump.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/validate-bump.yml)
+[![validate](https://github.com/c4i0b/opensuse-packages/actions/workflows/validate.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/validate.yml)
 [![autoupdate](https://github.com/c4i0b/opensuse-packages/actions/workflows/autoupdate.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/autoupdate.yml)
 [![badges](https://github.com/c4i0b/opensuse-packages/actions/workflows/badges.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/badges.yml)
 

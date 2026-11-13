@@ -21,7 +21,7 @@ jobs:
         env:
           OBS_USER: ${{ secrets.OBS_USER }}
           OBS_PASSWORD: ${{ secrets.OBS_PASSWORD }}
-      # [skip ci] keeps the push from re-triggering validate-bump; badge
+      # [skip ci] keeps the push from re-triggering validate; badge
       # commits never touch packages/, so push-to-obs resolves nothing
       - run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"

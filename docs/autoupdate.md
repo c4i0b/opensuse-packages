@@ -63,13 +63,13 @@ Renovate + regex managers + an auto-merge workflow ran this repo from
 2026-08 to 2026-11 and produced three real failures: the asset-filename
 freeze above; bot merges done with GITHUB_TOKEN whose pushes fire no
 `push` events (no bump reached OBS in three months); and a PR merged
-while validate-bump was red. fedora-packages had rejected Renovate for
+while validate was red. fedora-packages had rejected Renovate for
 the same class of problems. Reintroducing it needs a NEW observed
 failure of autoupdate, not a better argument.
 
-## validate-bump (manual PR gate)
+## validate (manual PR gate)
 
-The generic `validate-bump.yml` workflow runs on any PR touching
+The generic `validate.yml` workflow runs on any PR touching
 `packages/**`. It:
 
 1. detects which packages changed,
@@ -93,7 +93,7 @@ GITHUB_TOKEN, and pushes created with GITHUB_TOKEN fire no `push` events.
 
 `auto-merge.yml` (name: `auto-merge`) merges bot PRs after the
 required checks pass: it watches `gh pr checks --watch --fail-fast` before
-merging (red: ytm-player 2.2.0 was merged while validate-bump was red over
+merging (red: ytm-player 2.2.0 was merged while validate was red over
 a 404 asset). It no longer handles version bumps (autoupdate does); what
 remains for it is Dependabot keeping GitHub Actions updated.
 

@@ -1,4 +1,4 @@
-name: validate-bump
+name: validate
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  validate-bump:
+  validate:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:

@@ -40,7 +40,7 @@ is long, then work on the file.
   even when the parent package owns the tree.
 - **_service fetch failures.** A bad URL or a version mismatch between the
   spec `Version:` and the `_service` download URL returns an error page
-  instead of a tarball. The validate-bump CI job catches these on PRs, so a
+  instead of a tarball. The validate CI job catches these on PRs, so a
   fetch failure on main means the two files drifted. Fix both together.
 - **BuildRequires present locally but missing on OBS.** Rare for `-bin`
   packages (nothing compiles). The build image installs BuildRequires on

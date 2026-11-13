@@ -39,7 +39,7 @@ doc over growing this file.
 - OBS contract, `_service` fetch, push and build policy:
   [docs/obs.md](docs/obs.md)
 - Environment, container, credentials: [docs/environment.md](docs/environment.md)
-- Automatic updates (autoupdate bot, validate-bump, Dependabot):
+- Automatic updates (autoupdate bot, validate, Dependabot):
   [docs/autoupdate.md](docs/autoupdate.md)
 - Conventions (build models, layout, versioning, hygiene):
   [docs/conventions.md](docs/conventions.md)
