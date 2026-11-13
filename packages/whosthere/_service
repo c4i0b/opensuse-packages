@@ -1,5 +1,5 @@
 <services>
-  <service name="tar_scm">
+  <service name="tar_scm" mode="serveronly">
     <param name="url">https://github.com/ramonvermeulen/whosthere.git</param>
     <param name="scm">git</param>
     <param name="exclude">.git</param>
@@ -7,12 +7,10 @@
     <param name="versionformat">@PARENT_TAG@</param>
     <param name="versionrewrite-pattern">v(.*)</param>
   </service>
-  <service name="set_version">
+  <service name="set_version" mode="serveronly">
   </service>
-  <service name="recompress">
+  <service name="recompress" mode="serveronly">
     <param name="file">*.tar</param>
     <param name="compression">gz</param>
-  </service>
-  <service name="go_modules">
   </service>
 </services>

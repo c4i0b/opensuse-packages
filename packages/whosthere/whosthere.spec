@@ -5,7 +5,10 @@ Summary:        LAN discovery tool with an interactive TUI
 License:        Apache-2.0
 URL:            https://github.com/ramonvermeulen/whosthere
 Source0:        whosthere-%{version}.tar.gz
-Source1:        vendor.tar.gz
+# vendor.tar.zst is generated client-side (see _service): the server-side
+# go_modules service runs go 1.26 with GOTOOLCHAIN=local and cannot vendor
+# a module whose go.mod directive is newer.
+Source1:        vendor.tar.zst
 ExclusiveArch:  x86_64 aarch64
 BuildRequires:  golang(API) >= 1.27
 
