@@ -40,6 +40,11 @@ layout, quirks. Reference the UPSTREAM project by its GitHub URL
    python PyPI names differ (`dbus-fast` → `python3-dbus_fast`). Unverified
    name → grep the Factory snapshot. A missing runtime dep that is itself
    portable is a SEPARATE port (do not inline it) — and a flag to ask (below).
+   CAUTION: the Factory package list is SOURCE-level; binary package names
+   can differ (e.g. source `libusb-1_0` builds binary `libusb-1_0-0`, and
+   deps resolve against binaries). Confirm the BINARY name (zypper se,
+   software.opensuse.org, or a published-binary search) before adding a
+   dep that only matched as a source name.
 6. **Legal/trademark**: repack of vendor binaries (.deb/.rpm from a browser
    vendor, etc.) → flag to ask (below). Upstream release artifacts of the
    project itself are fine.

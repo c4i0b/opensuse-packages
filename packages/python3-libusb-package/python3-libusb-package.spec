@@ -9,10 +9,10 @@ BuildArch:      noarch
 
 BuildRequires:  python3-base
 BuildRequires:  python3-rpm-macros
-BuildRequires:  libusb-1_0
+BuildRequires:  libusb-1_0-0
 # usb.core import in the %check backend test
 BuildRequires:  python3-pyusb
-Requires:       libusb-1_0
+Requires:       libusb-1_0-0
 Requires:       python3-pyusb
 
 %description
