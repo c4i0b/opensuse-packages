@@ -15,9 +15,23 @@ echo "watching ${project} (polling every ${interval}s)..."
 # repo/arch column (header row starts with "_"). Split on ';' (NOT '|') and
 # inspect every state field, not a fixed column index.
 INFLIGHT='scheduled|building|dispatching|sign|blocked|waiting'
+empty=0
 while :; do
     mapfile -t rows < <(osc -A "${OBS_API:-https://api.opensuse.org}" \
         results "$project" --csv 2>/dev/null || true)
+    # A transient osc failure (podman-compose oscrc mount race, API hiccup)
+    # yields an empty CSV: treating that as "nothing in flight" reports a
+    # false green. Retry a few polls, then fail loud.
+    if [ "${#rows[@]}" -eq 0 ]; then
+        empty=$((empty + 1))
+        if [ "$empty" -ge 3 ]; then
+            echo "error: osc results returned no rows 3x; aborting watch (no verdict)" >&2
+            exit 2
+        fi
+        sleep "$interval"
+        continue
+    fi
+    empty=0
     pending=0
     for row in "${rows[@]}"; do
         pkg="${row%%;*}"
