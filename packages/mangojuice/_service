@@ -6,10 +6,9 @@
     <param name="revision">1.0.0</param>
     <param name="versionformat">@PARENT_TAG@</param>
   </service>
-  <service name="set_version">
-  </service>
   <service name="recompress">
     <param name="file">*.tar</param>
     <param name="compression">gz</param>
   </service>
+  <service name="set_version"/>
 </services>

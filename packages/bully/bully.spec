@@ -21,8 +21,10 @@ by wifite for WPS attacks and to fetch the PSK once the PIN is known.
 
 %build
 # Env (not command-line) CFLAGS/LDFLAGS so the Makefile's += keeps the
-# internal crypto defines and -lpcap on top of the RPM flags
-export CFLAGS="%{build_cflags}"
+# internal crypto defines and -lpcap on top of the RPM flags.
+# -Wno-error=return-type: SUSE optflags promote return-type warnings to
+# errors and upstream has a genuinely missing return in pingen_zyxel.
+export CFLAGS="%{build_cflags} -Wno-error=return-type"
 export LDFLAGS="%{build_ldflags}"
 %make_build -C src
 

@@ -71,6 +71,7 @@ HOME=%{_builddir} %{_bindir}/node24 devcontainer.js --get-yargs-completions devc
 %doc README.md CHANGELOG.md
 %{_bindir}/devcontainer
 %{_datadir}/bash-completion/completions/devcontainer
+%dir %{_prefix}/lib/node_modules
 %{_prefix}/lib/node_modules/%{name}/
 
 %changelog

@@ -23,9 +23,11 @@ with size and pattern constraints.
 %make_build CFLAGS="%{optflags}"
 
 %install
-# INSTALL defaults to "sudo install", INSTALL_OPTIONS to "-g root -o root"
+# INSTALL defaults to "sudo install", INSTALL_OPTIONS to "-g root -o root".
+# The Makefile hardcodes /usr/share/doc/crunch (not the openSUSE
+# /usr/share/doc/packages dir); the COPYING there is covered by %license.
 %make_install PREFIX=%{_prefix} INSTALL=install INSTALL_OPTIONS=
-rm %{buildroot}%{_docdir}/crunch/COPYING
+rm -f %{buildroot}%{_datadir}/doc/crunch/COPYING
 
 %files
 %license COPYING
