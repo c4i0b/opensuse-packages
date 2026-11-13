@@ -4,7 +4,7 @@ on:
   # ~1h20 after each autoupdate slot (23 x 1-21/4), when most OBS builds
   # have finished; in-flight ones show yellow with the last built version
   schedule:
-    - cron: "43 2,6,10,14,18,22 * * *"
+    - cron: "41 2,6,10,14,18,22 * * *"
   workflow_dispatch:
 
 permissions:
