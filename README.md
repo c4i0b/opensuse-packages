@@ -15,32 +15,32 @@ OBS, where they are built.
 ## Build status
 
 <!-- repo-badges begin -->
-[![tumbleweed aarch64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-aarch64.json%3Fv%3D17r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
-[![tumbleweed x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-x86_64.json%3Fv%3D19r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![tumbleweed aarch64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-aarch64.json%3Fv%3Df792faccr2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![tumbleweed x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-x86_64.json%3Fv%3Debe9848er2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 <!-- repo-badges end -->
 
 ## Per-package build
 
 <!-- package-badges begin -->
-[![cadcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fcadcraft.json%3Fv%3D0.20.1r2)](https://github.com/storytold/cadcraft)
-[![deckcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fdeckcraft.json%3Fv%3D0.18.1r2)](https://github.com/storytold/deckcraft)
-[![designcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fdesigncraft.json%3Fv%3D0.20.1r2)](https://github.com/storytold/designcraft)
-[![effectcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Feffectcraft.json%3Fv%3D0.24.1r2)](https://github.com/storytold/effectcraft)
-[![figcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffigcraft.json%3Fv%3D0.18.1r2)](https://github.com/storytold/figcraft)
-[![filmcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffilmcraft.json%3Fv%3D0.20.1r2)](https://github.com/storytold/filmcraft)
-[![fisher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffisher.json%3Fv%3D4.4.8r2)](https://github.com/jorgebucaran/fisher/)
-[![gridcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fgridcraft.json%3Fv%3D0.19.1r2)](https://github.com/storytold/gridcraft)
-[![lightcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Flightcraft.json%3Fv%3D0.21.1r2)](https://github.com/storytold/lightcraft)
-[![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D0.21.1r2)](https://github.com/storytold/pdfcraft)
-[![pear-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpear-desktop.json%3Fv%3D3.12.0r2)](https://github.com/pear-devs/pear-desktop/)
-[![photocraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fphotocraft.json%3Fv%3D0.23.1r2)](https://github.com/storytold/photocraft)
-[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D0.40.1r2)](https://github.com/tangency-labs/solidcraft)
-[![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D0.20.1r2)](https://github.com/storytold/soundcraft)
-[![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D1.6.0r2)](https://github.com/yorukot/superfile/)
-[![television](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftelevision.json%3Fv%3D0.15.9r2)](https://github.com/alexpasmantier/television)
-[![vectorcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fvectorcraft.json%3Fv%3D0.24.1r2)](https://github.com/storytold/vectorcraft)
-[![wordcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fwordcraft.json%3Fv%3D0.18.1r2)](https://github.com/storytold/wordcraft)
-[![ytm-player](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fytm-player.json%3Fv%3D2.2.0r2)](https://github.com/peternaame-boop/ytm-player/)
+[![cadcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fcadcraft.json%3Fv%3D38c3d6b8r2)](https://github.com/storytold/cadcraft)
+[![deckcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fdeckcraft.json%3Fv%3Debcf43c2r2)](https://github.com/storytold/deckcraft)
+[![designcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fdesigncraft.json%3Fv%3Dc80dc4bar2)](https://github.com/storytold/designcraft)
+[![effectcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Feffectcraft.json%3Fv%3D876183ber2)](https://github.com/storytold/effectcraft)
+[![figcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffigcraft.json%3Fv%3D1fbb9f1ar2)](https://github.com/storytold/figcraft)
+[![filmcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffilmcraft.json%3Fv%3Dd215d201r2)](https://github.com/storytold/filmcraft)
+[![fisher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffisher.json%3Fv%3Df591a511r2)](https://github.com/jorgebucaran/fisher/)
+[![gridcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fgridcraft.json%3Fv%3D04498ef6r2)](https://github.com/storytold/gridcraft)
+[![lightcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Flightcraft.json%3Fv%3D177297d5r2)](https://github.com/storytold/lightcraft)
+[![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D6f90cf0cr2)](https://github.com/storytold/pdfcraft)
+[![pear-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpear-desktop.json%3Fv%3Dba61723cr2)](https://github.com/pear-devs/pear-desktop/)
+[![photocraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fphotocraft.json%3Fv%3D928be736r2)](https://github.com/storytold/photocraft)
+[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3Daf544fc0r2)](https://github.com/tangency-labs/solidcraft)
+[![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3Db60a9018r2)](https://github.com/storytold/soundcraft)
+[![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D637b83dcr2)](https://github.com/yorukot/superfile/)
+[![television](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftelevision.json%3Fv%3D7788fe9br2)](https://github.com/alexpasmantier/television)
+[![vectorcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fvectorcraft.json%3Fv%3D4c085731r2)](https://github.com/storytold/vectorcraft)
+[![wordcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fwordcraft.json%3Fv%3Dbee98fdfr2)](https://github.com/storytold/wordcraft)
+[![ytm-player](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fytm-player.json%3Fv%3D5cb2171br2)](https://github.com/peternaame-boop/ytm-player/)
 <!-- package-badges end -->
 
 ## Install (openSUSE Tumbleweed)
