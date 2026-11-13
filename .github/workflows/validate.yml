@@ -26,16 +26,34 @@ jobs:
 
       - name: Detect changed packages
         id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
-          base="${{ github.event.pull_request.base.sha }}"
-          pkgs="$(git diff --name-only --diff-filter=ACMR "$base" "HEAD" \
-            | grep -E '^packages/[^/]+/' \
-            | grep -vE '/(fetch\.sh|bump\.sh|BIN|\.obsignore)$' \
-            | grep -vE '\.(tar\.gz|tar\.zst|zip)$' \
-            | cut -d/ -f1-2 | sort -u \
-            | while IFS= read -r p; do [ -d "$p" ] && echo "$p"; done \
-            | paste -sd, - || true)"
+          # PRs diff against the base branch; pushes against the previous
+          # tip (zero sha on the very first push / force-push orphans —
+          # treat as none; the push-to-obs resolver has the same fallback)
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base="$PR_BASE"
+          elif [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            base="$PUSH_BEFORE"
+          else
+            base=""
+          fi
+          if [ -z "$base" ]; then
+            pkgs=""
+          else
+            pkgs="$(git diff --name-only --diff-filter=ACMR "$base" "HEAD" \
+              | grep -E '^packages/[^/]+/' \
+              | grep -vE '/(fetch\.sh|bump\.sh|BIN|\.obsignore)$' \
+              | grep -vE '\.(tar\.gz|tar\.zst|zip)$' \
+              | cut -d/ -f1-2 | sort -u \
+              | while IFS= read -r p; do [ -d "$p" ] && echo "$p"; done \
+              | paste -sd, - || true)"
+          fi
+          echo "Detected: ${pkgs:-<none>}"
           echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
           echo "Detected: ${pkgs:-<none>}"
 
