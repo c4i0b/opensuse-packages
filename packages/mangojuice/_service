@@ -5,6 +5,9 @@
     <param name="exclude">.git</param>
     <param name="revision">1.0.0</param>
     <param name="versionformat">@PARENT_TAG@</param>
+    <!-- tag 1.0.0 references a flatpak-only submodule with no URL in
+         .gitmodules; git submodule update fails and tar_scm aborts -->
+    <param name="submodules">disable</param>
   </service>
   <service name="recompress">
     <param name="file">*.tar</param>

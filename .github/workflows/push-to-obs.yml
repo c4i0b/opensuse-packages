@@ -117,8 +117,9 @@ jobs:
       - name: Push packages to OBS
         id: doit
         if: steps.resolve.outputs.packages != ''
-        # red: a 15-package fleet commit timed out half-delivered at 5 min
-        timeout-minutes: 30
+        # red: a 15-package fleet commit timed out half-delivered at 5 min;
+        # the 61-package port fleet needs far more headroom
+        timeout-minutes: 90
         env:
           OBS_API: "https://api.opensuse.org"
           OBS_PROJECT: "home:${{ secrets.OBS_USER }}"

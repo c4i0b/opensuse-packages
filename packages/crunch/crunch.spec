@@ -32,6 +32,7 @@ rm -f %{buildroot}%{_datadir}/doc/crunch/COPYING
 %files
 %license COPYING
 %{_bindir}/crunch
+%dir %{_datadir}/crunch
 %{_datadir}/crunch/charset.lst
 %{_mandir}/man1/crunch.1%{?ext_man}
 
