@@ -1,9 +1,0 @@
-target/
-.git/
-.github/
-.claude/
-.idea/
-benches/
-network_info_timing/
-*.md
-LICENSE
