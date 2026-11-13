@@ -50,9 +50,12 @@ gh-actions-conventions skill.
   build does not guarantee a green OBS build.
 - After pushing, watch the result with `just results <name>` and read
   failures with `just log <name>`.
+- `just status` snapshots the whole project (all packages, both arches);
+  `just watch` blocks until every in-flight build finishes and exits
+  non-zero if any failed.
 - On an OBS failure, follow the `diagnose-obs-failure` skill
   (`skills/diagnose-obs-failure/SKILL.md`). If the same class of failure
   bites twice, encode it in the linter (`opensuse-lint.py`) — fix the class,
   not the instance.
 - Do not block waiting for OBS builds. Continue working and check
-  `just results` when finishing if builds are pending.
+  `just status` / `just watch` when finishing if builds are pending.

@@ -76,6 +76,14 @@ osc +args:
 results pkg:
     {{runner}} osc -A {{OBS_API}} results "home:{{OBS_USER}}" "$(basename {{pkg}})"
 
+# Whole-project build status snapshot (all packages, both arches)
+status:
+    {{runner}} osc -A {{OBS_API}} results "home:{{OBS_USER}}"
+
+# Watch in-flight builds until all finish; non-zero if any failed
+watch interval="90":
+    {{runner}} tools/watch-build.sh {{interval}}
+
 # Show the OBS buildlog of one package (opensuse_tumbleweed x86_64)
 log pkg:
     {{runner}} osc -A {{OBS_API}} buildlog "home:{{OBS_USER}}" "$(basename {{pkg}})" {{OBS_REPO}} {{OBS_ARCH}}
