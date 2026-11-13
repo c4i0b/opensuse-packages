@@ -1,0 +1,6 @@
+-------------------------------------------------------------------
+Fri Nov 13 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of whosthere 0.9.0: fetch the v0.9.0 git tag and
+  vendor Go modules server-side via the OBS go_modules service, build
+  with the distro Go toolchain.
