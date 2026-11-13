@@ -9,6 +9,8 @@ Source0:        dnscontrol-%{version}.tar.gz
 # go.mod requires >= 1.27.3), so vendor.tar.zst is generated client-side:
 #   go mod vendor && tar --zstd -cf vendor.tar.zst vendor
 Source1:        vendor.tar.zst
+# rpmuncompress needs zstd for the client-side vendor.tar.zst (Source1)
+BuildRequires:  zstd
 ExclusiveArch:  x86_64 aarch64
 BuildRequires:  golang(API) >= 1.27
 
