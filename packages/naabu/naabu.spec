@@ -24,7 +24,7 @@ tools in pipelines.
 
 %build
 export GOFLAGS="-buildmode=pie"
-go build -mod=vendor -o naabu .
+go build -mod=vendor -o naabu ./cmd/naabu
 
 %install
 install -Dpm 0755 naabu %{buildroot}%{_bindir}/naabu
