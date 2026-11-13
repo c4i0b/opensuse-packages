@@ -62,8 +62,10 @@ upstream release
        │
        ▼  every 4h, per packages/<name>/upstream
 ┌───────────┐   bump spec + _service
-│ autoupdate│──────────────▶ commit to main
-└───────────┘                    │  GITHUB_TOKEN fires no push event:
+│ autoupdate│──────────────▶ main, after the in-job
+└───────────┘               gate (version + asset
+                             HEAD checks, validate)
+                                 │  GITHUB_TOKEN fires no push event:
                                  ▼  push-to-obs rides workflow_run
                      push-to-obs syncs the touched
                      packages to OBS → OBS builds
