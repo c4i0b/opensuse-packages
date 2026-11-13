@@ -1,0 +1,15 @@
+<services>
+  <service name="tar_scm">
+    <param name="url">https://github.com/aircrack-ng/mdk4.git</param>
+    <param name="scm">git</param>
+    <param name="exclude">.git</param>
+    <param name="revision">4.2</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+  </service>
+  <service name="set_version">
+  </service>
+  <service name="recompress">
+    <param name="file">*.tar</param>
+    <param name="compression">gz</param>
+  </service>
+</services>
