@@ -11,6 +11,8 @@ Source0:        whosthere-%{version}.tar.gz
 Source1:        vendor.tar.zst
 ExclusiveArch:  x86_64 aarch64
 BuildRequires:  golang(API) >= 1.27
+# rpmuncompress needs zstd for the client-side vendor.tar.zst (Source1)
+BuildRequires:  zstd
 
 %description
 Local Area Network discovery tool with an interactive TUI, written in Go.
