@@ -2,7 +2,10 @@
 # Ported from the fedora-packages autoupdate model (Renovate was rejected
 # there; see docs/autoupdate.md for the local reds that motivated this).
 # Resolves latest upstream versions in parallel, bumps serially, commits
-# to main. push-to-obs picks the commits up via workflow_run.
+# on a dated bump/ branch (never directly on main). The workflow gates the
+# branch (validate-packages.py) and ff-merges the exact gated SHA; commits
+# made with GITHUB_TOKEN fire no push events, so push-to-obs picks the
+# merge up via workflow_run instead.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -11,6 +14,11 @@ job_start="$(date +%s)"
 git config --global --add safe.directory "$root"
 git -C "$root" config user.name "github-actions[bot]"
 git -C "$root" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+# bumps must pass the gate before reaching main: work on a side branch,
+# the workflow merges the exact gated SHA (gh-actions-conventions rule 11)
+branch="bump/$(date -u +%Y%m%d-%H%M)"
+git -C "$root" checkout -b "$branch"
 
 # fetches are network-bound: resolve all latest versions in parallel, then
 # apply bumps serially so git commits never race
@@ -122,6 +130,7 @@ find "$root/packages" -name upstream -maxdepth 2 \
 
 packages="$(mktemp)"
 bumped=0
+bumped_pkgs=()
 for f in "$resolved"/*; do
   [ -f "$f" ] || continue
   cat "$f"
@@ -176,16 +185,36 @@ while IFS=$'\t' read -r _ pkg latest; do
   git -C "$root" add "packages/$pkg"
   git -C "$root" commit -m "chore($pkg): update to $latest_rpm"
   bumped=$((bumped + 1))
+  bumped_pkgs+=("$pkg")
   printf '| %s | %s | %s |\n' "$pkg" "$current" "$latest_rpm" >> "$bumps"
 done < "$packages"
 
 # Keepalive: GitHub disables scheduled workflows after 60 idle days; an
 # empty commit counts as activity and pushes nothing to OBS (no files
-# changed -> push-to-obs resolves zero packages).
+# changed -> push-to-obs resolves zero packages). It rides the bump branch
+# like any other commit.
+keepalive=0
 last_commit="$(git -C "$root" log -1 --format=%ct)"
 now="$(date +%s)"
 if [ $((now - last_commit)) -gt $((45 * 86400)) ]; then
   git -C "$root" commit --allow-empty -qm "chore: keepalive"
+  keepalive=1
+fi
+
+count=$((bumped + keepalive))
+if [ "$count" -gt 0 ]; then
+  # transient network only: the branch name is unique, no race to lose
+  git -C "$root" push origin "$branch" \
+    || (sleep 15; git -C "$root" push origin "$branch")
+fi
+
+if [ -n "${GITHUB_OUTPUT:-}" ]; then
+  {
+    printf 'branch=%s\n' "$branch"
+    printf 'sha=%s\n' "$(git -C "$root" rev-parse HEAD)"
+    printf 'pkgs=%s\n' "${bumped_pkgs[*]}"
+    printf 'count=%s\n' "$count"
+  } >> "$GITHUB_OUTPUT"
 fi
 
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then

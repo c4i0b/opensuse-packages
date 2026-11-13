@@ -17,15 +17,33 @@ concurrency:
 jobs:
   autoupdate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
-      # `bash <script>` instead of direct exec: immune to a lost +x bit
-      - run: bash .github/scripts/autoupdate.sh
+      # `bash <script>` instead of direct exec: immune to a lost +x bit.
+      # Commits bumps on a bump/<ts> branch and pushes it (outputs: branch,
+      # sha, pkgs, count); never touches main itself.
+      - name: Bump
+        id: bump
+        run: bash .github/scripts/autoupdate.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # retry once on a lost race (concurrent run pushed first). Commits by
-      # GITHUB_TOKEN fire no `push` events: push-to-obs picks the bumps up
-      # via its workflow_run trigger on this workflow completing.
-      - run: git push origin main || (sleep 15; git pull --rebase origin main && git push origin main)
+      # In-job gate (gh-actions-conventions rule 11): GITHUB_TOKEN pushes
+      # fire no push events, so validate.yml would never run on these
+      # commits — run the same script here, on the checked-out bump branch.
+      # A red gate fails the run; the branch stays for inspection.
+      - name: Gate bumps (validate-packages.py)
+        if: steps.bump.outputs.count != '0'
+        timeout-minutes: 10
+        env:
+          PKGS: ${{ steps.bump.outputs.pkgs }}
+        run: PACKAGES="${PKGS// /,}" python3 .github/scripts/validate-packages.py
+      # Merge the exact gated SHA; ff-only so a main move during the gate
+      # fails instead of merging ungated content. Commits by GITHUB_TOKEN
+      # fire no push events: push-to-obs picks the merge up via its
+      # workflow_run trigger on this workflow completing.
+      - name: Merge gated SHA to main
+        if: steps.bump.outputs.count != '0'
+        run: bash .github/scripts/autoupdate-merge.sh "${{ steps.bump.outputs.sha }}"

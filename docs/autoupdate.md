@@ -22,10 +22,16 @@ its Rust vendor archive is regenerated client-side (see
 [conventions.md](conventions.md)), so its bumps are manual until vendor
 regeneration is automated.
 
-The bot commits each bump straight to `main` (`chore(<pkg>): update to
-<ver>`). Commits made with GITHUB_TOKEN fire no `push` events, so
-push-to-obs picks them up through its `workflow_run` trigger on the
-autoupdate workflow completing.
+The bot commits each bump on a dated `bump/<timestamp>` branch **inside the
+autoupdate job**, gates it there with `validate-packages.py` (the same
+script validate.yml runs on PRs), then fast-forward-merges the exact gated
+SHA to `main` — because GITHUB_TOKEN pushes skip the validate workflow
+while push-to-obs still delivers via `workflow_run`
+(gh-actions-conventions rule 11; red: ytm-player 2.2.0 landed ungated on a
+dead upstream asset and broke OBS). Commit messages follow
+`chore(<pkg>): update to <ver>`. Commits made with GITHUB_TOKEN fire no
+`push` events, so push-to-obs picks them up through its `workflow_run`
+trigger on the autoupdate workflow completing.
 
 Bumping goes through `packages/<name>/bump.sh` when the package has one,
 else the central `tools/bump.sh`: spec `Version:`, **every** old-version
