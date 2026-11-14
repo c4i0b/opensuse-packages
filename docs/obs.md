@@ -24,7 +24,7 @@ server-side.
   `BIN`, archives, `.obsignore`.
 - `tools/project-meta.sh` renders the project meta and owns the repo/arch
   table (x86_64 only — aarch64 was dropped project-wide).
-  `just create-project 1` re-applies it; CI creates the
+  `just setup 1` re-applies it; CI creates the
   project from the same renderer, so the table has exactly one definition.
 - `just new-pkg <name>` creates a package from the templates and fills the
   OBS `<title>`/`<description>` from the spec automatically.

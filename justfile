@@ -57,7 +57,9 @@ bump pkg version:
     {{runner}} "{{repo}}/{{pkg}}/bump.sh" "{{version}}"
 
 # Create (or re-apply) the OBS project meta (force=1)
-create-project force="0":
+# Create or update the OBS project (re-apply the meta; force=1 overrides
+# an existing project — fedora-packages setup model)
+setup force="0":
     {{runner}} tools/setup-obs.sh {{force}}
 
 # Create the OBS package metadata from the spec, then check it out

@@ -16,7 +16,7 @@ host instead (escape hatch for CI or hosts without podman).
   bind-mounted.
 - `just --list` lists every recipe: `image`, `shell`, `lint`, `lint-all`,
   `build`, `push`, `fetch`, `bump`, `run`, `vc`, `osc`, `checkout`,
-  `new-pkg`, `create-project`, `results`, `log`.
+  `new-pkg`, `setup`, `results`, `log`.
 
 ## Credentials and state
 
