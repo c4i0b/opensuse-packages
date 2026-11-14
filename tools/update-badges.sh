@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Refresh OBS status artifacts (port of the fedora-packages badges model):
-#   badges/*.json — shields.io endpoint JSON (per repo-arch semaphores,
+#   badges/*.json — shields.io endpoint JSON (per-repo semaphores, packages count,
 #                   per-package build state at the repo's current version)
 #   README.md     — the marked badge blocks
 # Data source: the OBS /build/<project>/_result endpoint (basic auth).
@@ -79,21 +79,43 @@ def write_badge(fname, label, message, color):
         f.write(payload)
     return badge_rev(payload)
 
-# ---- repo-arch semaphores --------------------------------------------------
+# ---- repo semaphores (fedora-packages chroot-badge model) -----------------
+# arch joins the file name/label only when a repo builds more than one arch
+arches_by_repo = {}
+for (repo, arch) in cells:
+    arches_by_repo.setdefault(repo, set()).add(arch)
+
+def bname(repo, arch):
+    return f"{repo.replace('_', '-')}-{arch}" if len(arches_by_repo[repo]) > 1 \
+        else repo.replace('_', '-').removeprefix('opensuse-')
+
+def blabel(repo, arch):
+    txt = repo.replace('_', ' ').replace('opensuse tumbleweed', 'tumbleweed') \
+              .replace('opensuse slowroll', 'slowroll')
+    return f"{txt} {arch}" if len(arches_by_repo[repo]) > 1 else txt
+
 repo_lines = []
 for (repo, arch), pkgs in sorted(cells.items()):
     ok = sum(c not in BAD and c not in INFLIGHT for c in pkgs.values())
     bad = sum(c in BAD for c in pkgs.values())
     inflight = sum(c in INFLIGHT for c in pkgs.values())
     color = "red" if bad else ("yellow" if inflight else "brightgreen")
-    state = "failed" if bad else ("building" if inflight else "passing")
-    fname = f"{repo.replace('_', '-')}-{arch}"
-    label = f"{repo.replace('_', ' ').replace('opensuse tumbleweed', 'tumbleweed')} {arch}"
-    rev = write_badge(fname, label, f"{ok}/{len(pkgs)} {state}", color)
+    # ok alone: the packages badge below carries the totals; the color is
+    # the failure/in-flight signal
+    fname, label = bname(repo, arch), blabel(repo, arch)
+    rev = write_badge(fname, label, str(ok), color)
     repo_lines.append(
         f'[![{label}](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com'
         f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{fname}.json%3Fv%3D{rev}r{BADGE_REV})]'
         f'(https://build.opensuse.org/project/monitor?project={project.replace(":", "%3A")})')
+
+# packages count badge opens the block (fedora-packages model)
+all_pkgs = {p for pkgs in cells.values() for p in pkgs}
+rev = write_badge("packages", "packages", str(len(all_pkgs)), "blue")
+repo_lines.insert(0,
+    f'[![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com'
+    f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3D{rev}r{BADGE_REV})]'
+    f'(https://build.opensuse.org/project/monitor?project={project.replace(":", "%3A")})')
 
 # ---- per-package state at the repo's current version ----------------------
 # only git-tracked packages: untracked WIP has never reached OBS and would
@@ -146,10 +168,12 @@ for pkg_dir in sorted(Path(root, "packages").iterdir()):
         f'[![{pkg_dir.name}](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com'
         f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{pkg_dir.name}.json%3Fv%3D{rev}r{BADGE_REV})]({link})')
 
-# prune badges of packages that no longer exist (kept one refresh after a
-# package is removed, the next run drops the stale json)
+# prune stale badges in one sweep: anything not written this run (repo,
+# packages or per-package) is gone from OBS and must not linger (red: the
+# aarch64 repo badge had to be deleted by hand after the arch drop)
+expected = {"packages"} | {bname(r, a) for (r, a) in cells} | written
 for old in badges.glob("*.json"):
-    if old.stem not in written and not old.stem.startswith("opensuse-tumbleweed"):
+    if old.stem not in expected:
         old.unlink()
 
 # ---- README blocks ---------------------------------------------------------
