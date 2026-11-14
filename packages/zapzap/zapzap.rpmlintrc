@@ -1,0 +1,3 @@
+# .mo catalogs ship inside the private zapzap/po package dir (not
+# /usr/share/locale), so %find_lang cannot tag them with %lang
+addFilter("file-not-in-%lang")

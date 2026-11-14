@@ -1,0 +1,8 @@
+<services>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/rafatosta/zapzap/archive/refs/tags/7.5.1.tar.gz</param>
+    <param name="filename">zapzap-7.5.1.tar.gz</param>
+  </service>
+</services>
