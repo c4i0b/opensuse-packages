@@ -9,8 +9,9 @@ __pycache__/
 .build/
 .binaries/
 
-# prebuilt payloads fetched for local pre-flight builds (no extension,
-# multi-MB — GitHub rejects >100 MB; never commit)
+# extensionless Bun prebuilt fetched for local pre-flight builds; upstream
+# asset names are gitignore-unsafe (no extension, >100 MB) — one-off local
+# ignore, mirrors the per-package .obsignore entry
 packages/omo/omo-linux-*
 
 # osc working copies
