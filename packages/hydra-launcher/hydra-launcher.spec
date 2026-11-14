@@ -32,10 +32,10 @@ Requires:       libXScrnSaver
 
 %description
 Hydra is a game launcher that lets you organize and launch your library,
-track playtime, achievements and leaderboards, and download games from
+track playtime, achievements and rankings, and download games from
 self-hosted torrent library sources. Also launches Epic titles via the
-bundled Legendary and runs Windows games through umu/proton.
-Bundles its own Electron and Python runtimes.
+bundled Legendary and runs Windows games through Proton compatibility
+layers. Bundles its own Electron and Python runtime.
 
 %prep
 %setup -T -q -c
@@ -60,6 +60,8 @@ strip --strip-unneeded \
   opt/Hydra/resources/hydra-native/libhydra_torrent_bridge.so
 # classic-level prebuilds ship every architecture; keep the x86-64 one
 rm -rf opt/Hydra/resources/app.asar.unpacked/node_modules/classic-level/prebuilds/{linux-arm64,linux-arm,darwin-x64+arm64,android-arm64,android-arm}
+# upstream ships a stray editor backup; OBS forbids .bak in filelists
+find opt/Hydra/resources -name '*.bak' -delete
 find opt/Hydra/resources/app.asar.unpacked -name '*.node' -o -name '*.so*' \
   | xargs -r strip --strip-unneeded 2>/dev/null || :
 
