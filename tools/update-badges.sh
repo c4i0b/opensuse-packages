@@ -94,8 +94,14 @@ def blabel(repo, arch):
               .replace('opensuse slowroll', 'slowroll')
     return f"{txt} {arch}" if len(arches_by_repo[repo]) > 1 else txt
 
+# explicit order (fedora-packages sort_key model): primary distro first,
+# derived codestream after — NOT the accidental alphabetical sort
+def repo_sort_key(repo):
+    order = {"opensuse_tumbleweed": 0, "opensuse_slowroll": 1}
+    return (order.get(repo, 2), repo)
+
 repo_lines = []
-for (repo, arch), pkgs in sorted(cells.items()):
+for (repo, arch), pkgs in sorted(cells.items(), key=lambda kv: repo_sort_key(kv[0][0])):
     ok = sum(c not in BAD and c not in INFLIGHT for c in pkgs.values())
     bad = sum(c in BAD for c in pkgs.values())
     inflight = sum(c in INFLIGHT for c in pkgs.values())
