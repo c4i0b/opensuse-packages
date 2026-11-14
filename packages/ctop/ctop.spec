@@ -6,7 +6,7 @@ License:        MIT
 URL:            https://github.com/bcicen/ctop
 Source0:        ctop-%{version}.tar.gz
 Source1:        vendor.tar.gz
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 BuildRequires:  golang(API) >= 1.18
 
 %description

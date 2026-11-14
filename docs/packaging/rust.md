@@ -47,14 +47,14 @@ vendor-dir check; a plain prefix grep over `ls vendor` can false-positive
 on crates sharing a prefix), carried by the rust-gui template and every
 craft spec.
 
-## aarch64 OOM
+## Worker OOM (rustc)
 
 The distro RUSTFLAGS inject `-C debuginfo=2` and release profiles use
 thin-LTO + `codegen-units=1`: a single rustc can need >4 GB (or >9 GB)
-and the worker OOM-kills it (boa_engine is the usual victim). The
-canonical mitigation is the **default** in the rust-gui template and in
-every craft spec — keep it even where the build survives without it
-(x86_64 is not the constraint; the aarch64 workers are):
+and the worker OOM-kills it (boa_engine is the usual victim; first seen
+on aarch64 workers). The canonical mitigation is the **default** in the
+rust-gui template and in every craft spec — keep it even where the build
+survives without it:
 
 ```spec
 %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0

@@ -8,8 +8,6 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/anomalyco/opencode/releases/download/v1.19.5/opencode-desktop-linux-aarch64.rpm</param>
-    <param name="filename">opencode-desktop-linux-aarch64.rpm</param>
   </service>
   <service name="download_url">
     <param name="protocol">https</param>

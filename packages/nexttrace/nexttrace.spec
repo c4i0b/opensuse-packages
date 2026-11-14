@@ -11,7 +11,7 @@ Source0:        nexttrace-%{version}.tar.gz
 Source1:        vendor.tar.zst
 # rpmuncompress needs zstd for the client-side vendor.tar.zst (Source1)
 BuildRequires:  zstd
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 BuildRequires:  golang(API) >= 1.27
 
 %description

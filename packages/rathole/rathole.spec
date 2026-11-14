@@ -21,7 +21,7 @@ websocket transport and configuration hot-reloading.
 %autosetup -p1 -a1
 
 %build
-# aarch64 OOM mitigation (docs/packaging/rust.md): upstream release profile
+# OOM mitigation (docs/packaging/rust.md): upstream release profile
 # is fat-LTO with codegen-units=1
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16

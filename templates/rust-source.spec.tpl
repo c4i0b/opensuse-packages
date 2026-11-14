@@ -45,7 +45,7 @@
 # - %cargo_build comes from cargo-packaging (linter enforces the BuildRequires).
 # - rust-toolchain.toml upstream is harmless: OBS cargo is not rustup-wrapped.
 # - From-source builds are strip-safe and need no ExclusiveArch: plain
-#   `cargo build --release` builds wherever rustc exists (x86_64 + aarch64).
+#   `cargo build --release` builds wherever rustc exists.
 # - Completion dirs: zsh/fish parents must be %dir-owned or check-filelist FAILs.
 # - %{?ext_man} on the manpage: brp compresses it and OBS owns the extension.
 Name:           __NAME__
@@ -57,7 +57,7 @@ URL:            __URL__
 Source0:        __NAME__-%{version}.tar.zst
 Source1:        vendor.tar.zst
 BuildRequires:  cargo-packaging
-#   - aarch64 OOM mitigation when a single rustc exceeds worker RAM
+#   - worker OOM mitigation when a single rustc exceeds worker RAM
 #     (see docs/packaging/rust.md): build_rustflags with
 #     -C codegen-units=16 -C debuginfo=0 + CARGO_PROFILE_RELEASE_LTO=false.
 #   - rpm expands macros inside comments — never write a literal macro

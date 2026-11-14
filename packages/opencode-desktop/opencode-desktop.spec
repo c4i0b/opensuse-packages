@@ -6,7 +6,7 @@
 %global __provides_exclude_from ^%{_libdir}/opencode-desktop/.*$
 %global __requires_exclude_from ^%{_libdir}/opencode-desktop/.*$
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           opencode-desktop
 Version:        1.19.5
@@ -15,8 +15,7 @@ Summary:        Desktop app for OpenCode, the open source AI coding agent (Elect
 License:        MIT
 URL:            https://opencode.ai
 Source0:        https://github.com/anomalyco/opencode/releases/download/v%{version}/opencode-desktop-linux-x86_64.rpm
-Source1:        https://github.com/anomalyco/opencode/releases/download/v%{version}/opencode-desktop-linux-aarch64.rpm
-Source2:        https://raw.githubusercontent.com/anomalyco/opencode/v%{version}/LICENSE
+Source1:        https://raw.githubusercontent.com/anomalyco/opencode/v%{version}/LICENSE
 
 BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
@@ -35,11 +34,7 @@ agent. Bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
-%ifarch x86_64
 bsdtar -xf %{SOURCE0}
-%else
-bsdtar -xf %{SOURCE1}
-%endif
 
 %build
 
@@ -68,7 +63,7 @@ done
 install -Dpm644 usr/share/metainfo/ai.opencode.desktop.metainfo.xml \
   %{buildroot}%{_datadir}/metainfo/ai.opencode.desktop.metainfo.xml
 
-install -pm644 %{SOURCE2} LICENSE
+install -pm644 %{SOURCE1} LICENSE
 cp -a opt/OpenCode/LICENSE.electron.txt opt/OpenCode/LICENSES.chromium.html .
 
 %check

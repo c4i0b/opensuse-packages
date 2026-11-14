@@ -9,7 +9,7 @@ Source0:        whosthere-%{version}.tar.gz
 # go_modules service runs go 1.26 with GOTOOLCHAIN=local and cannot vendor
 # a module whose go.mod directive is newer.
 Source1:        vendor.tar.zst
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 BuildRequires:  golang(API) >= 1.27
 # rpmuncompress needs zstd for the client-side vendor.tar.zst (Source1)
 BuildRequires:  zstd

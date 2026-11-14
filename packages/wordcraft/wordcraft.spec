@@ -4,7 +4,7 @@
 # single definition of the desktop-file id (%install/%check/%files)
 %global desktop_id ai.storyteller.%{name}
 
-# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# OOM red: distro RUSTFLAGS inject debuginfo and the release
 # profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
 # relax both
 %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
@@ -12,7 +12,7 @@
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           wordcraft
 Version:        0.18.1

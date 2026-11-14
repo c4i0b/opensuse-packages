@@ -12,7 +12,7 @@ BuildRequires:  gcc
 # cpal -> alsa -> alsa-sys resolves libasound via pkg-config
 BuildRequires:  pkgconfig(alsa)
 BuildRequires:  desktop-file-utils
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 # Bin-only crate: do not install sources into the cargo registry
 %global cargo_install_lib false
@@ -23,7 +23,7 @@ ExclusiveArch:  x86_64 aarch64
 # Release profile strips the binary and vendor sources trip the shebang BRP
 %global debug_package %{nil}
 
-# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# OOM red: distro RUSTFLAGS inject debuginfo and the release
 # profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
 # relax both
 %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0

@@ -6,7 +6,7 @@
 %global __provides_exclude_from ^%{_prefix}/lib/desktop-plus/.*$
 %global __requires_exclude_from ^%{_prefix}/lib/desktop-plus/.*$
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           desktop-plus
 Version:        3.6.11.0
@@ -15,8 +15,7 @@ Summary:        A GitHub Desktop fork with advanced functionality and improvemen
 License:        MIT
 URL:            https://desktop-plus.org
 Source0:        https://github.com/desktop-plus/desktop-plus/releases/download/v%{version}/DesktopPlus-v%{version}-linux-x86_64.rpm
-Source1:        https://github.com/desktop-plus/desktop-plus/releases/download/v%{version}/DesktopPlus-v%{version}-linux-arm64.rpm
-Source2:        org.desktop-plus.DesktopPlus.metainfo.xml
+Source1:        org.desktop-plus.DesktopPlus.metainfo.xml
 
 BuildRequires:  desktop-file-utils
 # rpm2archive streams the payload as a tarball (libarchive misreads the
@@ -36,11 +35,7 @@ commit graph, multiple stashes per branch, and more.
 
 %prep
 %setup -T -q -c
-%ifarch x86_64
 rpm2archive %{SOURCE0} > payload.tgz
-%else
-rpm2archive %{SOURCE1} > payload.tgz
-%endif
 tar -xzf payload.tgz
 
 %build
@@ -58,7 +53,7 @@ ln -sf %{_prefix}/lib/desktop-plus/resources/app/static/desktop-plus-cli \
   %{buildroot}%{_bindir}/desktop-plus-cli
 rm -f %{buildroot}%{_datadir}/doc/desktop-plus/copyright
 
-install -Dpm644 %{SOURCE2} %{buildroot}%{_datadir}/metainfo/org.desktop-plus.DesktopPlus.metainfo.xml
+install -Dpm644 %{SOURCE1} %{buildroot}%{_datadir}/metainfo/org.desktop-plus.DesktopPlus.metainfo.xml
 
 # Upstream desktop file uses an unregistered Category; sanitize it
 sed -i 's/^Categories=.*/Categories=Development;X-GitHub;/' \

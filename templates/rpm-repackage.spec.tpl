@@ -1,10 +1,10 @@
 # Template: upstream-RPM repackage (validated by packages/pear-desktop).
-# Model: NOT a source compile — Source0/Source1 are the official upstream
-# RPMs (one per arch); %prep untars the matching one with bsdtar and %install
-# re-bundles the payload under %_libdir with a wrapper in %_bindir.
+# Model: NOT a source compile — Source0 is the official upstream x86_64 RPM;
+# %prep untars it with bsdtar and %install re-bundles the payload under
+# %_libdir with a wrapper in %_bindir.
 #
 # OBS fetches the RPMs server-side via _service download_url entries shaped
-# like (one per arch + license, filenames must match the spec's sources):
+# like (RPM + license, filenames must match the spec's sources):
 #   <service name="download_url">
 #     <param name="protocol">https</param>
 #     <param name="host">github.com</param>
@@ -26,7 +26,7 @@
 %global __provides_exclude_from ^%{_libdir}/__NAME__/.*$
 %global __requires_exclude_from ^%{_libdir}/__NAME__/.*$
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           __NAME__
 Version:        __VERSION__
@@ -36,8 +36,7 @@ Summary:        __SUMMARY__
 License:        __LICENSE__
 URL:            __URL__
 Source0:        https://github.com/__OWNER_REPO__/releases/download/v%{version}/__RPMBASE__-%{version}.x86_64.rpm
-Source1:        https://github.com/__OWNER_REPO__/releases/download/v%{version}/__RPMBASE__-%{version}.aarch64.rpm
-Source2:        https://raw.githubusercontent.com/__OWNER_REPO__/v%{version}/license
+Source1:        https://raw.githubusercontent.com/__OWNER_REPO__/v%{version}/license
 
 BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
@@ -55,11 +54,7 @@ __DESCRIPTION__
 
 %prep
 %setup -T -q -c
-%ifarch x86_64
 bsdtar -xf %{SOURCE0}
-%else
-bsdtar -xf %{SOURCE1}
-%endif
 
 %build
 
@@ -85,7 +80,7 @@ for png in usr/share/icons/hicolor/*/apps/*.png; do
   install -Dpm644 "$png" "%{buildroot}%{_datadir}/icons/hicolor/${png#*hicolor/}"
 done
 
-install -pm644 %{SOURCE2} LICENSE
+install -pm644 %{SOURCE1} LICENSE
 cp -a __PAYLOAD_DIR__/LICENSE.electron.txt __PAYLOAD_DIR__/LICENSES.chromium.html .
 
 %check

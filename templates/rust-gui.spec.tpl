@@ -67,17 +67,17 @@
 #     being compiled: in a vendored tree that hits the vendored "xml" crate
 #     (whose extensionless LICENSE panics the macro) instead of atspi-common's
 #     D-Bus XML dir — export LOCKSTEP_XML_PATH before %cargo_build.
-#   - wgpu has no 32-bit/ppc story: ExclusiveArch x86_64 aarch64 explicitly
+#   - wgpu has no 32-bit/ppc story: ExclusiveArch x86_64 explicitly
 #   - Unbraced `%cargo_build -p name` makes the macro parse -p as its own
 #     option (red: "Unknown option p in cargo_build()"); the braced form
 #     above forwards flags to cargo. rpm also expands macros INSIDE
 #     COMMENTS — never write a literal macro call in a comment.
-#   - aarch64 OOM red: distro RUSTFLAGS add -C debuginfo=2 and release
-#     profiles use thin-LTO + codegen-units=1; a single rustc can need
-#     >4 GB and the worker kills it (boa_engine is the usual victim). The
-#     canonical mitigation below (rustflags global + profile env exports)
-#     is the DEFAULT: keep it even if the package builds without it —
-#     the aarch64 workers are the constraint, not x86_64.
+#   - worker OOM red (seen on aarch64, kept as the default): distro RUSTFLAGS
+#     add -C debuginfo=2 and release profiles use thin-LTO +
+#     codegen-units=1; a single rustc can need >4 GB and the worker
+#     kills it (boa_engine is the usual victim). The canonical mitigation
+#     below (rustflags global + profile env exports) is the DEFAULT: keep
+#     it even if the package builds without it.
 #     (never %{go_arches}-style macros — see opensuse-lint check.)
 #   - Icons under icons/hicolor/<size>/apps need %dir ownership of the hicolor
 #     tree or OBS check-filelist FAILs (linter rule "icon").
@@ -88,14 +88,14 @@
 # filename from the tarball glob instead (see solidcraft)
 %global desktop_id ai.storyteller.%{name}
 
-# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
-# profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
-# relax both
+# OOM red (worker RAM, see header): distro RUSTFLAGS inject debuginfo and
+# the release profile uses thin-LTO + codegen-units=1, so one rustc needs
+# >4 GB; relax both
 %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
 
 %global debug_package %{nil}
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           __NAME__
 Version:        __VERSION__
@@ -137,7 +137,7 @@ done
 %build
 # drop if the vendored tree has no atspi-common (no accessibility stack)
 [ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
-# aarch64 OOM mitigation, second half of the build_rustflags global above
+# OOM mitigation, second half of the build_rustflags global above
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 # drop -p if the crate is not a virtual-workspace member

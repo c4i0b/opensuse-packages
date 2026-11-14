@@ -6,7 +6,7 @@ License:        MIT
 URL:            https://github.com/projectdiscovery/httpx
 Source0:        httpx-%{version}.tar.gz
 Source1:        vendor.tar.gz
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 BuildRequires:  golang(API) >= 1.26
 
 %description

@@ -6,7 +6,7 @@ License:        MIT
 URL:            https://github.com/yorukot/superfile
 Source0:        superfile-%{version}.tar.gz
 Source1:        vendor.tar.gz
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 BuildRequires:  golang(API) >= 1.25
 
 %description

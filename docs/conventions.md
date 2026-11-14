@@ -81,7 +81,7 @@ A fix that only repairs the current instance dies at the next bump.
    directory said 2.2.0).
 4. **Class knowledge lives in docs/templates, not spec-local
    comments** — and check the sibling packages: one member's fix
-   usually applies to the family (red: the aarch64 rustc OOM
+   usually applies to the family (red: the rustc worker-OOM
    mitigation lives in only 5 of the 14 craft siblings; the rest are
    one bad link away from the same OOM kill).
 

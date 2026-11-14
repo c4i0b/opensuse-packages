@@ -1,11 +1,11 @@
 %global cargo_install_lib false
 
-# aarch64 OOM mitigation: relax distro debuginfo + thin-LTO defaults
+# OOM mitigation: relax distro debuginfo + thin-LTO defaults
 %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
 
 %global debug_package %{nil}
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           rio
 Version:        0.5.30

@@ -8,7 +8,7 @@ Source0:        naabu-%{version}.tar.gz
 Source1:        vendor.tar.gz
 # %{go_arches} is NOT defined in Tumbleweed's prjconf anymore: an empty
 # expansion makes OBS exclude every arch. List the arches explicitly.
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 BuildRequires:  golang(API) >= 1.26
 BuildRequires:  libpcap-devel
 

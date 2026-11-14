@@ -10,7 +10,7 @@
 # single definition of the upstream desktop-file id
 %global desktop_id com.github.th-ch.youtube-music
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           pear-desktop
 Version:        3.12.0
@@ -20,8 +20,7 @@ Summary:        YouTube Music Desktop App including custom plugins (Electron)
 License:        MIT AND BSD-2-Clause AND BSD-3-Clause AND LGPL-2.1-or-later AND Apache-2.0 AND Zlib
 URL:            https://github.com/pear-devs/pear-desktop
 Source0:        https://github.com/pear-devs/pear-desktop/releases/download/v%{version}/youtube-music-%{version}.x86_64.rpm
-Source1:        https://github.com/pear-devs/pear-desktop/releases/download/v%{version}/youtube-music-%{version}.aarch64.rpm
-Source2:        https://raw.githubusercontent.com/pear-devs/pear-desktop/v%{version}/license
+Source1:        https://raw.githubusercontent.com/pear-devs/pear-desktop/v%{version}/license
 
 BuildRequires:  bsdtar
 BuildRequires:  desktop-file-utils
@@ -39,11 +38,7 @@ It bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
-%ifarch x86_64
 bsdtar -xf %{SOURCE0}
-%else
-bsdtar -xf %{SOURCE1}
-%endif
 
 %build
 
@@ -74,7 +69,7 @@ for png in usr/share/icons/hicolor/*/apps/*.png; do
   install -Dpm644 "$png" "%{buildroot}%{_datadir}/icons/hicolor/${png#*hicolor/}"
 done
 
-install -pm644 %{SOURCE2} LICENSE
+install -pm644 %{SOURCE1} LICENSE
 cp -a "opt/YouTube Music/LICENSE.electron.txt" "opt/YouTube Music/LICENSES.chromium.html" .
 
 %check

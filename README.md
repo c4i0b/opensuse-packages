@@ -15,8 +15,7 @@ OBS, where they are built.
 ## Build status
 
 <!-- repo-badges begin -->
-[![opensuse slowroll x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-slowroll-x86_64.json%3Fv%3D599120fer2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
-[![tumbleweed x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-x86_64.json%3Fv%3D6be226efr2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![tumbleweed x86_64](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopensuse-tumbleweed-x86_64.json%3Fv%3Dd7851b5cr2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 <!-- repo-badges end -->
 
 <!-- build-status begin -->
@@ -145,7 +144,7 @@ upstream release
   `_service`, `fetch.sh`, `bump.sh`, `BIN`, `.obsignore`, `<name>.rpmlintrc`,
   `<name>.changes`.
 - `tools/project-meta.sh` renders the OBS project meta (repos, arches):
-  Tumbleweed (x86_64+aarch64) and Slowroll (x86_64).
+  Tumbleweed (x86_64) and Slowroll (x86_64).
 - Each package's `_service` tells OBS to fetch official upstream release
   artifacts server-side, so no archives are committed.
 - A scheduled workflow (`autoupdate`) checks upstream releases (per

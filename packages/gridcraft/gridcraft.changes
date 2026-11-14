@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sat Nov 14 00:07:56 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Drop aarch64: x86_64-only project.
+
+-------------------------------------------------------------------
 Thu Nov 12 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
 
 - Initial package of gridcraft 0.19.1 (from-source Rust build).

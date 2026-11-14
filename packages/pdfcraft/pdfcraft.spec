@@ -1,4 +1,4 @@
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           pdfcraft
 Version:        0.21.1
@@ -18,7 +18,7 @@ BuildRequires:  gcc
 BuildRequires:  cmake
 BuildRequires:  desktop-file-utils
 
-# aarch64 OOM red: distro RUSTFLAGS inject debuginfo and the release
+# OOM red: distro RUSTFLAGS inject debuginfo and the release
 # profile uses thin-LTO + codegen-units=1, so one rustc needs >4 GB;
 # relax both
 %global build_rustflags -Clink-arg=-Wl,-z,relro,-z,now -C codegen-units=16 -C debuginfo=0
