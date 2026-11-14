@@ -17,7 +17,8 @@ REPOS=(
 {
   echo " <project name=\"${project}\">"
   echo "  <title>Personal openSUSE packages</title>"
-  echo "  <description>RPMs for openSUSE Tumbleweed and Slowroll.</description>"
+  echo "  <description>Automated, bleeding-edge openSUSE Tumbleweed and Slowroll RPM packages, continuously updated from upstream source releases via CI and an autoupdate bot. GitHub is the source of truth: every merge to main syncs the touched packages to OBS automatically.</description>"
+  echo "  <url>https://github.com/c4i0b/opensuse-packages</url>"
   for entry in "${REPOS[@]}"; do
     IFS='|' read -r name path_project path_repo arches <<<"$entry"
     echo "  <repository name=\"${name}\">"
