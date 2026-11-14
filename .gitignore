@@ -9,6 +9,10 @@ __pycache__/
 .build/
 .binaries/
 
+# prebuilt payloads fetched for local pre-flight builds (no extension,
+# multi-MB — GitHub rejects >100 MB; never commit)
+packages/omo/omo-linux-*
+
 # osc working copies
 work/
 
