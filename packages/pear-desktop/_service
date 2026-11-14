@@ -7,10 +7,6 @@
   </service>
   <service name="download_url">
     <param name="protocol">https</param>
-    <param name="host">github.com</param>
-  </service>
-  <service name="download_url">
-    <param name="protocol">https</param>
     <param name="host">raw.githubusercontent.com</param>
     <param name="path">/pear-devs/pear-desktop/v3.12.0/license</param>
     <param name="filename">license</param>

@@ -543,6 +543,29 @@ def check_date_tag_service(spec: SpecModel) -> list[Finding]:
     return []
 
 
+def check_service_download_url(spec: SpecModel) -> list[Finding]:
+    # red: dropping a multi-arch source left a <service name="download_url">
+    # stub with protocol/host but no path — the OBS source-service stage dies
+    # with "ERROR: need url or host, path" and the package goes broken with
+    # no buildlog. Removing an arch means removing the whole service block.
+    svc = spec.path.parent / "_service"
+    if not svc.is_file():
+        return []
+    text = svc.read_text()
+    out = []
+    for i, block in enumerate(
+        re.findall(r"<service name=\"download_url\">.*?</service>", text, re.S), 1
+    ):
+        for param in ("path", "filename"):
+            if f'<param name="{param}">' not in block:
+                out.append(Finding(FAIL, "service-download-url",
+                    f"_service download_url entry #{i} lacks `{param}` — the "
+                    "source service fails on OBS with 'need url or host, path' "
+                    "and the package breaks with no buildlog. Leftover stub "
+                    "from a dropped arch? Delete the whole service block."))
+    return out
+
+
 _CHECKS = [
     check_summary,
     check_release,
@@ -559,6 +582,7 @@ _CHECKS = [
     check_duplicate_requires,
     check_local_sources,
     check_date_tag_service,
+    check_service_download_url,
 ]
 
 

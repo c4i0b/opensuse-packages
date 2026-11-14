@@ -11,6 +11,9 @@
 #     <param name="path">/OWNER/REPO/releases/download/v__VERSION__/NAME-__VERSION__.x86_64.rpm</param>
 #     <param name="filename">NAME-__VERSION__.x86_64.rpm</param>
 #   </service>
+# Dropping an arch from a multi-arch _service? Remove the whole <service>
+# block — a leftover protocol/host-only stub breaks the source-service stage
+# (linter red: service-download-url).
 # Never commit the RPMs (gitignored); a per-package fetch.sh curls them for
 # local pre-flight builds.
 #
