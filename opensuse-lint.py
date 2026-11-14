@@ -398,6 +398,37 @@ def check_tracked_archives(repo: Path) -> list[Finding]:
     return []
 
 
+# Files a blind `git add -A` would swallow must stay tiny: committable
+# content in this repo tops out ~35 KB (specs/docs), so anything over
+# 5 MB — two orders of magnitude above the norm — is a fetched payload
+# that lost its ignored extension (GitHub warns at 50 MB and rejects
+# the push at 100 MB). Gitignored files (vendor archives, fetched
+# tarballs, .rpm payloads) can never be committed, so only committable
+# ones are flagged.
+# Red: the omo Bun payload (202 MB, no extension) entered the aarch64-drop
+# commit and the push bounced with GH001 until filter-branch removed it.
+_GITHUB_SIZE_LIMIT = 5 * 1024 * 1024
+
+def check_oversize_payloads(repo: Path) -> list[Finding]:
+    out = []
+    for f in (repo / "packages").rglob("*"):
+        if not f.is_file() or f.stat().st_size <= _GITHUB_SIZE_LIMIT:
+            continue
+        r = subprocess.run(
+            ["git", "check-ignore", "-q", str(f)],
+            cwd=repo, capture_output=True,
+        )
+        if r.returncode == 0:
+            continue  # ignored: can never reach a commit
+        out.append(Finding(FAIL, "oversize-payload",
+            f"{f.relative_to(repo)} is {f.stat().st_size // 1024} KB — over "
+            f"the 5 MB ceiling for committable files (norm here is ~35 KB; "
+            f"GitHub rejects pushes at 100 MB). It is almost certainly a "
+            f"fetched payload without an ignored extension: fetch it under "
+            f"an ignored name or remove it."))
+    return out
+
+
 # Archives are legitimately absent from a clean checkout by design: the
 # upstream tarball is fetched server-side via _service, and Rust vendor
 # archives (vendor.tar.zst, generated client-side by cargo_vendor) are
@@ -548,6 +579,10 @@ def lint_repo(repo: Path, specs: list[Path]) -> int:
     archive_findings = check_tracked_archives(repo)
     if archive_findings:
         all_findings.append(("git", archive_findings))
+
+    oversize_findings = check_oversize_payloads(repo)
+    if oversize_findings:
+        all_findings.append(("git", oversize_findings))
 
     has_fail = False
     for name, findings in all_findings:

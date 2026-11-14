@@ -9,11 +9,6 @@ __pycache__/
 .build/
 .binaries/
 
-# extensionless Bun prebuilt fetched for local pre-flight builds; upstream
-# asset names are gitignore-unsafe (no extension, >100 MB) — one-off local
-# ignore, mirrors the per-package .obsignore entry
-packages/omo/omo-linux-*
-
 # osc working copies
 work/
 
