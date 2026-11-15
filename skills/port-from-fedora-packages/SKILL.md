@@ -23,13 +23,33 @@ layout, quirks. Reference the UPSTREAM project by its GitHub URL
    or check https://software.opensuse.org)? If either is true → stop, report,
    do not port. Name variants count (e.g. `heroic` vs `heroic-games-launcher`).
 2. **Build model classification** (from the fedora spec): rust-from-source /
-   go / python-pyproject / C / fish-plugin / fonts / icon-theme /
-   prebuilt-electron / prebuilt-rpm-repackage / deb-repack / other.
+   go / python-pyproject / npm-bundle (npm tarball + build-time `npm install`
+   -> offline via `local-npm-registry` + client-side `node_modules.obscpio`;
+   template npm-bundle.spec.tpl, validated by openclaw/rea-agents) /
+   python-venv-wheels (app ships its own venv/uv runtime -> offline via
+   client-side `wheels.tar.zst` + `--no-index --find-links`; template
+   python-venv-wheels.spec.tpl, validated by hermes-agent) / C / fish-plugin /
+   fonts / icon-theme / prebuilt-electron / prebuilt-rpm-repackage /
+   deb-repack / other.
    Pick the matching `templates/*.spec.tpl`; if none fits, decide whether a
    NEW template is warranted (reusable pattern) before improvising.
 3. **OBS-offline feasibility**: does the build need network (npm install,
-   go mod download, crates.io fetch)? If yes, it must be vendored
-   client-side (`vendor.tar.zst`) or the port is impossible → report skip.
+   go mod download, crates.io fetch, pip/uv)? If yes it must go through a
+   sanctioned offline model: a client-side vendor archive
+   (`vendor.tar.zst` / `node_modules.obscpio` / `wheels.tar.zst`, generated
+   per package by its `fetch.sh --vendor`) or `local-npm-registry`. The
+   linter FAILs build-time installers without an offline guard
+   (`offline-build`) and bumps that skip re-vendoring
+   (`lockfile-version-drift`) → report skip.
+   YELLOW FLAG: a fedora spec running `npm install` / `pip install` /
+   `uv pip install` in `%build`/`%install` builds only on COPR's
+   networked workers (Koji, like OBS, is offline) — never copy those
+   steps; re-model offline. For npm, first check whether the release
+   tarball ships a prebuilt `dist/` (the cockpit route; our
+   `devcontainers-cli`) — then no build-time npm is needed at all; the
+   legacy `%nodejs_symlink_deps` per-module model is dead for apps.
+   Go context: Fedora's `go-vendor-tools` is the direct analogue of our
+   client-side `vendor.tar.zst`.
 4. **Prebuilt policy**: if any Source is a prebuilt binary, the package must
    be registered in `PREBUILT_ORIGIN` (opensuse-lint.py) with the right
    origin — `bun` needs `%global __os_install_post %{nil}`; `electron`

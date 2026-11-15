@@ -2,6 +2,10 @@
 *.tar.gz
 *.tar.zst
 *.zip
+*.tgz
+*.obscpio
+*.whl
+node_modules/
 *.rpm
 *.log
 *.pyc

@@ -1,0 +1,10 @@
+<services>
+  <!-- Source10000+ registry URLs from node_modules.spec.inc -->
+  <service name="download_files"/>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">registry.npmjs.org</param>
+    <param name="path">/rea-agents/-/rea-agents-6.9.0.tgz</param>
+    <param name="filename">rea-agents-6.9.0.tgz</param>
+  </service>
+</services>

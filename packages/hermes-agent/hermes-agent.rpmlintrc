@@ -1,0 +1,10 @@
+# Bundled venv payload under /usr/lib64/hermes-agent — vendored Python
+# packages ship example/test scripts with env shebangs (nothing in the venv
+# is meant to run standalone; /usr/bin/hermes* are the entrypoints), CFFI
+# headers and speedup .c sources, and upstream repo artifacts (gitkeep).
+addFilter("hermes-agent.*non-executable-script")
+addFilter("hermes-agent.*env-script-interpreter")
+addFilter("hermes-agent.*script-without-shebang")
+addFilter("hermes-agent.*devel-file-in-non-devel-package")
+addFilter("hermes-agent.*zero-length /usr/lib64/hermes-agent/")
+addFilter("hermes-agent.*version-control-internal-file")

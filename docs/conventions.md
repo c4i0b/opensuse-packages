@@ -20,7 +20,9 @@ Packages build from source whenever the ecosystem allows it; the repo is
 no longer `-bin`-only:
 
 - **Python** — sdist via `_service download_url`, deps from Tumbleweed
-  `python3-*` packages (see [packaging/python.md](packaging/python.md)).
+  `python3-*` packages (see [packaging/python.md](packaging/python.md));
+  or the bundled-venv model (`python-venv-wheels.spec.tpl`) when
+  upstream's lock must be honored verbatim.
 - **Go** — `_service` with `tar_scm` + `go_modules`: the OBS server-side
   service vendors modules, nothing client-side is needed (reference:
   Factory/lazygit; template `go-source.spec.tpl`). `ExclusiveArch` must
@@ -31,7 +33,8 @@ no longer `-bin`-only:
   the lint FAILs above it — red: nexttrace 1.7.6 needed go 1.27.3, the
   service host ran 1.26, package broken with no logfile). Above the
   ceiling: client-side `vendor.tar.zst` + `BuildRequires: zstd`, like
-  Rust (reference: dnscontrol, nexttrace); bumps stay manual until the
+  Rust (reference: dnscontrol, nexttrace; the direct analogue of Fedora's
+  `go-vendor-tools`); bumps stay manual until the
   service host catches up.
 - **Rust** — `cargo_vendor` is NOT in the OBS server-side service
   allowlist: the vendor archive is generated client-side (`vendor.tar.zst`,

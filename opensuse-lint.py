@@ -285,6 +285,11 @@ PREBUILT_ORIGIN = {
     # bun-compiled single-file executables (payload appended after the ELF
     # section strip removes): spec carries __os_install_post %{nil}
     "omo": "bun",
+    # npm prebuilds (@lydell/node-pty ELF addons): strip-safe native ELFs
+    "rea-agents": "native",
+    # manylinux wheels installed into the vendored venv: strip-safe .so
+    # payloads (openclaw is noarch, exempt from this check)
+    "hermes-agent": "native",
 }
 
 _STRIP_GUARD = re.compile(
@@ -390,7 +395,7 @@ def check_tracked_archives(repo: Path) -> list[Finding]:
         ["git", "ls-files"], capture_output=True, text=True, cwd=repo
     )
     bad = [f for f in result.stdout.splitlines()
-           if f.endswith((".tar.gz", ".tgz", ".tar.xz", ".zip", ".rpm", ".deb", ".AppImage"))]
+           if f.endswith((".tar.gz", ".tgz", ".tar.xz", ".zip", ".rpm", ".deb", ".AppImage", ".obscpio", ".whl"))]
     if bad:
         return [Finding(FAIL, "tracked-archive",
             f"{len(bad)} archive(s) tracked in git: {', '.join(bad[:3])}"
@@ -453,7 +458,7 @@ def check_oversize_payloads(repo: Path) -> list[Finding]:
 # archives (vendor.tar.zst, generated client-side by cargo_vendor) are
 # gitignored and only live on OBS. Based on the check_tracked_archives
 # extension list, plus .tar.zst (the vendor-archive format).
-_ARCHIVE_EXTS = (".tar.gz", ".tgz", ".tar.xz", ".tar.zst", ".zip", ".rpm", ".deb", ".AppImage")
+_ARCHIVE_EXTS = (".tar.gz", ".tgz", ".tar.xz", ".tar.zst", ".zip", ".rpm", ".deb", ".AppImage", ".obscpio", ".whl")
 
 
 def check_local_sources(spec: SpecModel) -> list[Finding]:
@@ -585,6 +590,106 @@ def check_service_download_url(spec: SpecModel) -> list[Finding]:
     return out
 
 
+def check_offline_installs(spec: SpecModel) -> list[Finding]:
+    # red: OBS build workers are offline — any dependency install that
+    # resolves against a registry/index at build time fails there. Two
+    # sanctioned offline models exist in this repo (see templates/):
+    # npm-bundle (local-npm-registry serving vendored node_modules/ tarballs)
+    # and python-venv-wheels (uv/pip with --no-index --find-links).
+    script = re.sub(r"\\\n\s*", " ", spec.text)
+    out = []
+    for cmd in re.findall(r"^.*(?:npm|pip|uv)\b.*$", script, re.M):
+        if cmd.lstrip().startswith("#"):
+            continue  # comment, not a build command
+        # npm ci/add resolve against the registry exactly like npm install
+        is_npm = re.search(r"(?<![\w-])npm(?:-\d+)?\s+((?:-\S+\s+|\S+=\S+\s+)*)(?:install|ci|add)\b", cmd)
+        is_npm = is_npm and "local-npm-registry" not in cmd
+        is_pip = re.search(r"(?:uv\s+)?pip\s+(?:-\S+\s+)*(?:install|sync)\b", cmd)
+        is_uv_sync = re.search(r"(?<![\w-])uv\s+sync\b", cmd)
+        if is_uv_sync and "--offline" not in cmd:
+            out.append(Finding(FAIL, "offline-build",
+                f"`uv sync` at build time ({cmd.strip()[:60]}...) resolves "
+                "against PyPI — OBS workers are offline. Use the "
+                "python-venv-wheels model (templates/"
+                "python-venv-wheels.spec.tpl): vendored wheels + "
+                "--no-index --find-links."))
+        if is_npm and "local-npm-registry" not in script:
+            out.append(Finding(FAIL, "offline-build",
+                f"`npm install` at build time ({cmd.strip()[:60]}...) resolves "
+                "against registry.npmjs.org — OBS workers are offline. Use the "
+                "npm-bundle model (templates/npm-bundle.spec.tpl): vendor "
+                "node_modules/ client-side and install through "
+                "BuildRequires: local-npm-registry."))
+        if is_pip and "--no-index" not in cmd:
+            out.append(Finding(FAIL, "offline-build",
+                f"`pip/uv install` without --no-index ({cmd.strip()[:60]}...) "
+                "resolves against PyPI at build time — OBS workers are offline. "
+                "Use the python-venv-wheels model (templates/"
+                "python-venv-wheels.spec.tpl): vendored wheels + "
+                "--no-index --find-links."))
+    return out
+
+
+def check_vendor_pin_drift(spec: SpecModel) -> list[Finding]:
+    # red class: python-venv-wheels specs pin build-backend wheels (e.g.
+    # setuptools==X) that fetch.sh --vendor must download into wheels.tar.zst.
+    # Bumping one side without the other fails the OBS build late and
+    # confusingly ("no matching distribution found" from --no-index). The
+    # same == pins must appear verbatim in the spec and in fetch.sh.
+    if "wheels.tar.zst" not in spec.text:
+        return []
+    fetch = spec.pkgdir / "fetch.sh"
+    if not fetch.is_file():
+        return []
+    ftext = fetch.read_text(errors="replace")
+    pin_re = r"[A-Za-z0-9_.-]+==[A-Za-z0-9_.!+*-]+"
+    spec_code = "\n".join(l for l in spec.lines if not l.lstrip().startswith("#"))
+    fetch_code = "\n".join(
+        l for l in ftext.splitlines() if not l.lstrip().startswith("#")
+    )
+    out = []
+    for pin in sorted(set(re.findall(pin_re, spec_code))):
+        if pin not in fetch_code:
+            out.append(Finding(FAIL, "vendor-pin-drift",
+                f"`{pin}` pinned in the spec but absent from fetch.sh — the "
+                "wheel is not in wheels.tar.zst and the offline install "
+                "fails on OBS. Re-run `fetch.sh --vendor` and keep the pins "
+                "identical in both files."))
+    for pin in sorted(set(re.findall(pin_re, fetch_code))):
+        if pin not in spec_code:
+            out.append(Finding(FAIL, "vendor-pin-drift",
+                f"`{pin}` downloaded by fetch.sh but not pinned in the spec "
+                "— the spec's offline install asks for a different version "
+                "than the vendored wheel. Keep the pins identical in both "
+                "files."))
+    return out
+
+
+def check_lockfile_version(spec: SpecModel) -> list[Finding]:
+    # red: a version bump that does not re-vendor — the spec moves to the new
+    # version while package-lock.json (and node_modules.obscpio / wheels
+    # vendor) still pin the old one. The OBS build then fails late and
+    # confusingly (npm resolves the old tree, %check sees the old --version).
+    # Catch it at lint/validate time instead: re-run fetch.sh --vendor.
+    lock = spec.pkgdir / "package-lock.json"
+    if not lock.is_file():
+        return []
+    m = re.search(r"^Version:\s*(\S+)", spec.text, re.M)
+    if not m:
+        return []
+    try:
+        locked = json.loads(lock.read_text()).get("version")
+    except (OSError, ValueError):
+        return []
+    if locked and locked != m.group(1):
+        return [Finding(FAIL, "lockfile-version-drift",
+            f"package-lock.json pins `{locked}` but the spec says "
+            f"`{m.group(1)}` — a bump without re-vendoring. Re-run the "
+            "package's `fetch.sh --vendor` so the lock, the vendor archive "
+            "and the spec stay in sync.")]
+    return []
+
+
 def check_rpm_payload_extract(spec: SpecModel) -> list[Finding]:
     # red: pear-desktop 3.12.1 (fedora-packages twin) — electron-builder
     # ships RPMv4 containers that libarchive/bsdtar cannot parse, and old
@@ -621,6 +726,9 @@ _CHECKS = [
     check_date_tag_service,
     check_service_download_url,
     check_rpm_payload_extract,
+    check_offline_installs,
+    check_lockfile_version,
+    check_vendor_pin_drift,
 ]
 
 

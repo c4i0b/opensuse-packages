@@ -1,0 +1,11 @@
+# npm-bundle payload: hundreds of upstream JS payloads under
+# /usr/lib/node_modules/openclaw — env-node shebangs (the /usr/bin/openclaw
+# wrapper is the entrypoint and calls node24 directly), examples/docs scripts,
+# and vendored native sources of @earendil-works/pi-tui.
+addFilter("openclaw.*env-script-interpreter")
+addFilter("openclaw.*non-executable-script")
+addFilter("openclaw.*script-without-shebang")
+addFilter("openclaw.*wrong-script-end-of-line-encoding")
+addFilter("openclaw.*zero-length /usr/lib/node_modules/openclaw/")
+# (Badness parenthesization comes between the tag and path, so filter by tag)
+addFilter("openclaw.*devel-file-in-non-devel-package")

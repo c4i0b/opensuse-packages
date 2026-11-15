@@ -1,0 +1,11 @@
+<services>
+  <!-- download_url, not tar_scm: the repo is large enough that the OBS
+       source-service git clone died with HTTP 408; the codeload archive is
+       the same tree (fedora spec used this URL as Source0 too) -->
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/NousResearch/hermes-agent/archive/refs/tags/v0.23.1.tar.gz</param>
+    <param name="filename">hermes-agent-0.23.1.tar.gz</param>
+  </service>
+</services>

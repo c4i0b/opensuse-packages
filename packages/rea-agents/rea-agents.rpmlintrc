@@ -1,0 +1,7 @@
+# npm-bundle payload under /usr/lib/node_modules/rea-agents — env-node
+# shebangs (the /usr/bin/rea wrapper is the entrypoint and calls node24
+# directly) plus example/doc scripts in vendored dependencies.
+addFilter("rea-agents.*env-script-interpreter")
+addFilter("rea-agents.*non-executable-script")
+addFilter("rea-agents.*script-without-shebang")
+addFilter("rea-agents.*zero-length /usr/lib/node_modules/rea-agents/")

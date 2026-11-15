@@ -20,7 +20,16 @@ manual dispatch), ported from the fedora-packages model. Per package,
 A package without an `upstream` file is opt-out: `television` has none —
 its Rust vendor archive is regenerated client-side (see
 [conventions.md](conventions.md)), so its bumps are manual until vendor
-regeneration is automated.
+regeneration is automated. The same applies to the client-side-vendored
+npm-bundle packages (`openclaw`, `rea-agents`: `fetch.sh --vendor`
+regenerates package-lock.json + node_modules.obscpio + node_modules.spec.inc)
+and to the bundled-venv package (`hermes-agent`: wheels.tar.zst +
+requirements.txt). For the npm-bundle packages a spec bump without
+re-vendoring is caught by the `lockfile-version-drift` lint check
+(package-lock.json still pins the old version); for hermes-agent the
+`vendor-pin-drift` check guards the shared `==` pins, but a wholly stale
+wheel closure only surfaces as an OBS build failure — re-vendor on every
+bump.
 
 The bot commits each bump on a dated `bump/<timestamp>` branch **inside the
 autoupdate job**, gates it there with `validate-packages.py` (the same
