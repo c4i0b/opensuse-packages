@@ -9,7 +9,7 @@
 ExclusiveArch:  x86_64
 
 Name:           desktop-plus
-Version:        3.6.11.0
+Version:        3.6.12.0
 Release:        0
 Summary:        A GitHub Desktop fork with advanced functionality and improvements
 License:        MIT
