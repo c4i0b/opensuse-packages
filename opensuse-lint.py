@@ -398,6 +398,25 @@ def check_tracked_archives(repo: Path) -> list[Finding]:
     return []
 
 
+# Scripts CI executes directly (tools/*.sh, .github/scripts/*.sh, per-
+# package bump.sh/fetch.sh) must carry the exec bit: a lost +x aborts the
+# autoupdate bot's bump loop with "Permission denied" (red: tools/bump.sh
+# lost it and every central-bump package skipped its update).
+def check_script_exec_bits(repo: Path) -> list[Finding]:
+    result = subprocess.run(
+        ["git", "ls-files", "-s"], capture_output=True, text=True, cwd=repo
+    )
+    out = []
+    for entry in result.stdout.splitlines():
+        meta, _, path = entry.partition("\t")
+        if (path.endswith(".sh") or path.split("/")[-1] in ("bump.sh", "fetch.sh")) \
+                and meta.startswith("100644"):
+            out.append(Finding(FAIL, "script-exec-bit",
+                f"{path} is tracked without the exec bit — CI runs it "
+                f"directly and fails with 'Permission denied'"))
+    return out
+
+
 # Files a blind `git add -A` would swallow must stay tiny: committable
 # content in this repo tops out ~35 KB (specs/docs), so anything over
 # 5 MB — two orders of magnitude above the norm — is a fetched payload
@@ -566,6 +585,24 @@ def check_service_download_url(spec: SpecModel) -> list[Finding]:
     return out
 
 
+def check_rpm_payload_extract(spec: SpecModel) -> list[Finding]:
+    # red: pear-desktop 3.12.1 (fedora-packages twin) — electron-builder
+    # ships RPMv4 containers that libarchive/bsdtar cannot parse, and old
+    # cpio misreads payload sizes; %prep died on "Unrecognized archive
+    # format" in every chroot. rpm2archive streams a tar on every rpm
+    # version, so bundled .rpm payloads must go through it.
+    if not re.search(r"^Source\d*:\s*\S*\.rpm", spec.text, re.M):
+        return []
+    hits = [i for i, l in enumerate(spec.lines, 1)
+            if not l.lstrip().startswith("#")
+            and re.search(r"(bsdtar\s+-|rpm2cpio)", l)]
+    return [Finding(FAIL, "rpm-payload-extract",
+        "bundled .rpm payload extracted with bsdtar/rpm2cpio — use "
+        "`rpm2archive %{SOURCE0} > payload.tgz && tar -xzf payload.tgz` "
+        "(libarchive cannot parse RPMv4 containers, cpio misreads payload "
+        "sizes)", line=i) for i in hits]
+
+
 _CHECKS = [
     check_summary,
     check_release,
@@ -583,6 +620,7 @@ _CHECKS = [
     check_local_sources,
     check_date_tag_service,
     check_service_download_url,
+    check_rpm_payload_extract,
 ]
 
 
@@ -607,6 +645,10 @@ def lint_repo(repo: Path, specs: list[Path]) -> int:
     oversize_findings = check_oversize_payloads(repo)
     if oversize_findings:
         all_findings.append(("git", oversize_findings))
+
+    execbit_findings = check_script_exec_bits(repo)
+    if execbit_findings:
+        all_findings.append(("git", execbit_findings))
 
     has_fail = False
     for name, findings in all_findings:
