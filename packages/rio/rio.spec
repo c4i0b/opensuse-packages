@@ -8,7 +8,7 @@
 ExclusiveArch:  x86_64
 
 Name:           rio
-Version:        0.5.30
+Version:        0.5.32
 Release:        0
 Summary:        Hardware-accelerated terminal emulator built with Rust
 License:        MIT
