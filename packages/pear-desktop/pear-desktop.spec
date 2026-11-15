@@ -13,7 +13,7 @@
 ExclusiveArch:  x86_64
 
 Name:           pear-desktop
-Version:        3.12.0
+Version:        3.12.1
 Release:        0
 Summary:        YouTube Music Desktop App including custom plugins (Electron)
 
