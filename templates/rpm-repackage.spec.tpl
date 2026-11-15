@@ -1,6 +1,6 @@
 # Template: upstream-RPM repackage (validated by packages/pear-desktop).
 # Model: NOT a source compile — Source0 is the official upstream x86_64 RPM;
-# %prep untars it with bsdtar and %install re-bundles the payload under
+# %prep unpacks it with rpm2archive and %install re-bundles the payload under
 # %_libdir with a wrapper in %_bindir.
 #
 # OBS fetches the RPMs server-side via _service download_url entries shaped
@@ -41,7 +41,9 @@ URL:            __URL__
 Source0:        https://github.com/__OWNER_REPO__/releases/download/v%{version}/__RPMBASE__-%{version}.x86_64.rpm
 Source1:        https://raw.githubusercontent.com/__OWNER_REPO__/v%{version}/license
 
-BuildRequires:  bsdtar
+# rpm2archive streams the payload as a tarball (libarchive/bsdtar cannot
+# parse the RPMv4 containers electron-builder ships in new releases)
+BuildRequires:  rpm
 BuildRequires:  desktop-file-utils
 
 # Host libs the bundled Electron dlopen()s: their requires are excluded with
@@ -57,7 +59,8 @@ __DESCRIPTION__
 
 %prep
 %setup -T -q -c
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
+tar -xzf payload.tgz
 
 %build
 

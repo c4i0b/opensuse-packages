@@ -22,7 +22,9 @@ URL:            https://github.com/pear-devs/pear-desktop
 Source0:        https://github.com/pear-devs/pear-desktop/releases/download/v%{version}/youtube-music-%{version}.x86_64.rpm
 Source1:        https://raw.githubusercontent.com/pear-devs/pear-desktop/v%{version}/license
 
-BuildRequires:  bsdtar
+# rpm2archive streams the payload as a tarball (libarchive/bsdtar cannot
+# parse the RPMv4 containers electron-builder ships since 3.12.1)
+BuildRequires:  rpm
 BuildRequires:  desktop-file-utils
 
 Requires:       gtk3
@@ -38,7 +40,8 @@ It bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
+tar -xzf payload.tgz
 
 %build
 

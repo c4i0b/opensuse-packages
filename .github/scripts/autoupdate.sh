@@ -243,7 +243,10 @@ if [ -n "${GITHUB_OUTPUT:-}" ]; then
   {
     printf 'branch=%s\n' "$branch"
     printf 'sha=%s\n' "$(git -C "$root" rev-parse HEAD)"
-    printf 'pkgs=%s\n' "${bumped_pkgs[*]}"
+    # packages/ prefix: validate-packages.py (and validate.yml's detector)
+    # address package dirs as packages/<name> — a bare name globs nothing
+    # and the gate fails with a bogus "no spec" (red: pear-desktop 3.12.1)
+    printf 'pkgs=%s\n' "${bumped_pkgs[*]/#/packages/}"
     printf 'count=%s\n' "$count"
   } >> "$GITHUB_OUTPUT"
 fi

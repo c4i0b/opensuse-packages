@@ -19,7 +19,9 @@ URL:            https://github.com/hydralauncher/hydra
 Source0:        https://github.com/hydralauncher/hydra/releases/download/v%{version}/hydralauncher-%{version}.x86_64.rpm
 Source1:        https://raw.githubusercontent.com/hydralauncher/hydra/v%{version}/LICENSE
 
-BuildRequires:  bsdtar
+# rpm2archive streams the payload as a tarball (libarchive/bsdtar cannot
+# parse the RPMv4 containers electron-builder ships in new releases)
+BuildRequires:  rpm
 BuildRequires:  desktop-file-utils
 BuildRequires:  binutils
 
@@ -39,7 +41,8 @@ layers. Bundles its own Electron and Python runtime.
 
 %prep
 %setup -T -q -c
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
+tar -xzf payload.tgz
 
 %build
 # The app's own i18n is JS; Chromium locale paks only cover Electron-internal

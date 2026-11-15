@@ -17,7 +17,9 @@ URL:            https://opencode.ai
 Source0:        https://github.com/anomalyco/opencode/releases/download/v%{version}/opencode-desktop-linux-x86_64.rpm
 Source1:        https://raw.githubusercontent.com/anomalyco/opencode/v%{version}/LICENSE
 
-BuildRequires:  bsdtar
+# rpm2archive streams the payload as a tarball (libarchive/bsdtar cannot
+# parse the RPMv4 containers electron-builder ships in new releases)
+BuildRequires:  rpm
 BuildRequires:  desktop-file-utils
 
 # Host libs the bundled Electron dlopen()s; the bundle's requires are excluded
@@ -34,7 +36,8 @@ agent. Bundles its own Electron runtime.
 
 %prep
 %setup -T -q -c
-bsdtar -xf %{SOURCE0}
+rpm2archive %{SOURCE0} > payload.tgz
+tar -xzf payload.tgz
 
 %build
 
