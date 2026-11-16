@@ -1,6 +1,6 @@
 # npm-bundle model: official npm tarball + offline dependency install.
 # The dependency closure travels as node_modules.obscpio, which the OBS
-# worker auto-unpacks flat into %{_sourcedir} (cockpit legacy-container
+# worker auto-unpacks flat into %%{_sourcedir} (cockpit legacy-container
 # model); local-npm-registry then serves it to npm as a localhost
 # registry — OBS build workers are offline.
 Name:           openclaw
@@ -33,7 +33,7 @@ official npm bundle with the openclaw CLI.
 %prep
 %autosetup -n package
 # local-npm-registry serves the dependency tarballs (Source10000+: the
-# OBS worker auto-unpacks node_modules.obscpio flat into %{_sourcedir})
+# OBS worker auto-unpacks node_modules.obscpio flat into %%{_sourcedir})
 # as a local npm registry — OBS build workers are offline.
 # --legacy-peer-deps: mistralai pins a conflicting peerOptional;
 # --omit=optional drops the arch-specific fs-safe native addon (noarch)

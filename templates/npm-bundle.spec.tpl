@@ -22,13 +22,13 @@
 #       SRPM provenance, the cockpit shape — nothing is fetched from
 #       them),
 #     * node_modules.obscpio (gitignored; the transport: the OBS worker
-#       auto-unpacks any *.obscpio source flat into %{_sourcedir}.
+#       auto-unpacks any *.obscpio source flat into %%{_sourcedir}.
 #       Uploaded per-bump by a local `just push`; the P filter in
 #       tools/obs-rsync.sh protects it from --delete on CI pushes, whose
 #       checkouts never have one — a bump without a local push builds
 #       against the stale container. Doubles as the local-only cache
 #       fetch.sh expands for the pre-flight build).
-#   `local-npm-registry %{_sourcedir}` then serves the unpacked tarballs
+#   `local-npm-registry %%{_sourcedir}` then serves the unpacked tarballs
 #   to npm as a localhost registry.
 #
 # INVARIANTS (break loudly if violated — see opensuse-lint.py checks):
@@ -44,7 +44,7 @@
 #   package-lock.json and REMOVE it in %prep: its resolved URLs point at
 #   registry.npmjs.org and would bypass the local registry.
 # - env-node shebangs across the payload: keep
-#   %global __brp_mangle_shebangs %{nil} and filter env-script-interpreter
+#   %%global __brp_mangle_shebangs %%{nil} and filter env-script-interpreter
 #   et al. in <name>.rpmlintrc; the /usr/bin/<name> wrapper is the
 #   entrypoint and calls node24 directly.
 #
@@ -65,7 +65,7 @@
 
 # noarch variant: strip arch payloads in %install like openclaw (ELF, wasm,
 # per-platform dirs). Archful variant (native addon prebuilds, e.g.
-# rea-agents): add %global debug_package %{nil},
+# rea-agents): add %%global debug_package %%{nil},
 # %global _missing_build_ids_terminate_build 0 and ExclusiveArch.
 Name:           __NAME__
 Version:        __VERSION__
@@ -93,7 +93,7 @@ __DESCRIPTION__
 %prep
 %autosetup -n package
 # local-npm-registry serves the vendored tarballs (expanded flat into
-# %{_sourcedir} from node_modules.obscpio) as a local npm registry — OBS
+# %%{_sourcedir} from node_modules.obscpio) as a local npm registry — OBS
 # build workers are offline. Adapt the npm flags to the upstream package:
 # --legacy-peer-deps for conflicting peerOptionals, --omit=optional to drop
 # arch-specific native addons (noarch), --os=linux to skip foreign payloads.

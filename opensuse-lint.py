@@ -7,7 +7,7 @@ Usage:
   opensuse-lint.py <spec>...   lint specific spec paths
 """
 from __future__ import annotations
-import argparse, json, re, subprocess, sys
+import argparse, json, re, subprocess, sys, tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -708,6 +708,29 @@ def check_rpm_payload_extract(spec: SpecModel) -> list[Finding]:
         "sizes)", line=i) for i in hits]
 
 
+# Templates must render into conforming packages: fill every placeholder
+# with dummy values and run the same invariants over the rendered spec
+# (ported from fedora-packages' tools/test.sh render pass). local-source
+# is waived: scaffolds ship their local Source files at creation time.
+def check_templates_render(repo: Path) -> list[Finding]:
+    out = []
+    for tpl in sorted((repo / "templates").glob("*.spec.tpl")):
+        rendered = re.sub(r"__[A-Z0-9_]+__", "dummy", tpl.read_text())
+        rendered = rendered.replace("python3.1X", "python3.14")
+        with tempfile.TemporaryDirectory() as td:
+            pkgdir = Path(td) / "tplpkg"
+            pkgdir.mkdir()
+            spec_path = pkgdir / (tpl.stem.replace(".spec", "") + ".spec")
+            spec_path.write_text(rendered)
+            spec = load(spec_path)
+            fails = [f for check in _CHECKS for f in check(spec)
+                     if f.severity == FAIL and f.code != "local-source"]
+        for f in fails:
+            out.append(Finding(FAIL, "template-render",
+                f"{tpl.name} renders non-conforming: [{f.code}] {f.message}"))
+    return out
+
+
 _CHECKS = [
     check_summary,
     check_release,
@@ -757,6 +780,10 @@ def lint_repo(repo: Path, specs: list[Path]) -> int:
     execbit_findings = check_script_exec_bits(repo)
     if execbit_findings:
         all_findings.append(("git", execbit_findings))
+
+    template_findings = check_templates_render(repo)
+    if template_findings:
+        all_findings.append(("templates", template_findings))
 
     has_fail = False
     for name, findings in all_findings:

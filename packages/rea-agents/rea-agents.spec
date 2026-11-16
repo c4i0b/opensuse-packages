@@ -1,6 +1,6 @@
 # npm-bundle model: official npm tarball + offline dependency install.
 # The dependency closure travels as node_modules.obscpio, which the OBS
-# worker auto-unpacks flat into %{_sourcedir} (cockpit legacy-container
+# worker auto-unpacks flat into %%{_sourcedir} (cockpit legacy-container
 # model); local-npm-registry then serves it to npm as a localhost
 # registry — OBS build workers are offline.
 # Archful: @lydell/node-pty ships prebuilt Linux ELF prebuilds for the
@@ -47,7 +47,7 @@ rm -f npm-shrinkwrap.json
 
 %build
 # local-npm-registry serves the dependency tarballs (Source10000+: the
-# OBS worker auto-unpacks node_modules.obscpio flat into %{_sourcedir})
+# OBS worker auto-unpacks node_modules.obscpio flat into %%{_sourcedir})
 # as a local npm registry — OBS build workers are offline.
 # --ignore-scripts: prebuilt payloads only; frida (root optionalDependency)
 # is nonfunctional without its network install script and rea treats it as

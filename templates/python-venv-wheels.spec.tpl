@@ -16,7 +16,7 @@
 # - Source2 is the exported requirements.txt (committed: reviewable pins,
 #   with hashes when upstream locks them).
 # - OBS-side install is offline: uv (BuildRequires python31X-uv) creates a
-#   venv under %{_libdir} from python31X and installs from the vendored
+#   venv under %%{_libdir} from python31X and installs from the vendored
 #   wheels with --no-index --find-links --no-deps.
 #
 # INVARIANTS (see opensuse-lint.py checks):
@@ -32,7 +32,7 @@
 #   come from upstream's [build-system]).
 # - venv console scripts carry the buildroot path in shebangs and
 #   pyvenv.cfg: sed it out, and %check must invoke scripts through
-#   %{buildroot}%{_libdir}/<name>/bin/python (their shebangs point at the
+#   %%{buildroot}%%{_libdir}/<name>/bin/python (their shebangs point at the
 #   FINAL path).
 # - manylinux wheels bundle auditwheel-hashed libs: keep __requires_exclude.
 # - uv venv leaves a 0666 .lock: remove it (rpmlint world-writable).
