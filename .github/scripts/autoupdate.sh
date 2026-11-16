@@ -127,8 +127,10 @@ resolve() {
 
 # spec-bearing packages without an `upstream` file are invisible to the
 # bot; say so once per run instead of resolving silently (aggregated over 5)
+# `if` (not &&-chains): a false last body leaves the while loop nonzero, and
+# with pipefail + set -e that kills the script depending on directory order
 no_upstream="$(find "$root/packages" -mindepth 1 -maxdepth 1 -type d | while IFS= read -r d; do
-  ls "$d"/*.spec >/dev/null 2>&1 && [ ! -f "$d/upstream" ] && basename "$d"
+  if ls "$d"/*.spec >/dev/null 2>&1 && [ ! -f "$d/upstream" ]; then basename "$d"; fi
 done | sort)"
 if [ -n "$no_upstream" ]; then
   n_no_upstream="$(wc -l <<<"$no_upstream")"
