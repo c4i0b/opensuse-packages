@@ -4,7 +4,7 @@
 # model); local-npm-registry then serves it to npm as a localhost
 # registry — OBS build workers are offline.
 Name:           openclaw
-Version:        2026.11.3
+Version:        2026.11.4
 Release:        0
 Summary:        OpenClaw CLI, a personal AI assistant (npm bundle)
 License:        MIT
