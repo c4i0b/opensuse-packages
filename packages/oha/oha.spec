@@ -1,5 +1,5 @@
 Name:           oha
-Version:        1.16.0
+Version:        1.17.0
 Release:        0
 Summary:        Tiny HTTP load generator, inspired by rakyll/hey with tui animation
 License:        MIT
