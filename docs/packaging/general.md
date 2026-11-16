@@ -33,16 +33,17 @@ and any `pip`/`uv pip install` without `--no-index` (check `offline-build`).
 - **npm-bundle** (openclaw, rea-agents): Source0 = registry.npmjs.org
   tarball (via `_service download_url`); `package-lock.json` and
   `node_modules.spec.inc` committed (Source10/Source11, %include'd).
-  spec.inc lists every dependency tarball as a Source10000+ **registry
-  URL with a flat rename** (`url#/<flat-name>.tgz` — the cockpit model in
-  openSUSE:Factory) that the `download_files` service fetches
-  server-side: only the lock and spec.inc are committed or pushed, never
-  the tarballs. At build time `BuildRequires: local-npm-registry` serves
-  the fetched tarballs (flat in `%{_sourcedir}`) to `npm install`;
-  `node_modules.obscpio` is the local-only cache the pre-flight build
-  expands. Gotchas encoded in the template: bundled deps
-  (`"inBundle": true`) have no registry URL — npm-pack them from the
-  tarball itself and let them ride the obs-rsync P filter; a shipped `npm-shrinkwrap.json` doubles as the lockfile and must
+  spec.inc lists every dependency tarball as a Source10000+ registry
+  URL with a flat rename (`url#/<flat-name>.tgz` — SRPM provenance,
+  the cockpit shape). The real transport is `node_modules.obscpio`:
+  the OBS worker auto-unpacks any `*.obscpio` source flat into
+  `%{_sourcedir}`, and `BuildRequires: local-npm-registry` serves the
+  tarballs to `npm install`. The container is regenerated client-side
+  by `fetch.sh --vendor` and uploaded **by a local `just push`** on
+  every bump (obs-rsync P filter protects it from CI `--delete`);
+  a CI-only push builds against the stale container. Gotchas encoded
+  in the template: bundled deps (`"inBundle": true`) are npm-packed
+  from the tarball itself; a shipped `npm-shrinkwrap.json` doubles as the lockfile and must
   be removed in %prep (its resolved URLs bypass the local registry); the
   npm CLI needs `BuildRequires: npm-default` (nodejs24 alone has none) and
   the interpreter is `/usr/bin/node24`. Local pre-flight builds expand the

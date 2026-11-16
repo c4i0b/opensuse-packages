@@ -18,15 +18,18 @@
 #     * package-lock.json (Source10, committed — the reviewable pin set),
 #     * package-lock.json (Source10, committed — the reviewable pin set),
 #     * node_modules.spec.inc (Source11, committed — lists every tarball as
-#       a Source10000+ registry URL with a flat rename, url#/<flat>.tgz,
-#       the cockpit model: the download_files _service fetches them
-#       server-side, so no tarball is ever committed or pushed),
-#     * node_modules.obscpio (gitignored; local-only cache of the tarball
-#       closure that fetch.sh expands flat into the package dir for the
-#       pre-flight build).
-#   OBS package sources are FLAT (no directories): `local-npm-registry
-#   %{_sourcedir}` serves the server-side-fetched tarballs to npm as a
-#   localhost registry.
+#       a Source10000+ registry URL with a flat rename, url#/<flat>.tgz:
+#       SRPM provenance, the cockpit shape — nothing is fetched from
+#       them),
+#     * node_modules.obscpio (gitignored; the transport: the OBS worker
+#       auto-unpacks any *.obscpio source flat into %{_sourcedir}.
+#       Uploaded per-bump by a local `just push`; the P filter in
+#       tools/obs-rsync.sh protects it from --delete on CI pushes, whose
+#       checkouts never have one — a bump without a local push builds
+#       against the stale container. Doubles as the local-only cache
+#       fetch.sh expands for the pre-flight build).
+#   `local-npm-registry %{_sourcedir}` then serves the unpacked tarballs
+#   to npm as a localhost registry.
 #
 # INVARIANTS (break loudly if violated — see opensuse-lint.py checks):
 # - %build must not run a bare `npm install` without local-npm-registry:

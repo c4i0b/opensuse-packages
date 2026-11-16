@@ -6,12 +6,15 @@
 #                             and node_modules.spec.inc
 #                             (needs nodejs24, npm-default, obs-service-node_modules, cpio)
 # OBS package sources are FLAT (no directories): node_modules.spec.inc
-# lists every dependency tarball as a Source10000+ REGISTRY URL with a flat
-# rename (`url#/<flat-name>.tgz`, the cockpit model) that OBS download_files
-# fetches server-side — nothing but the lock/spec.inc is committed or
-# pushed. node_modules.obscpio is the LOCAL cache for the pre-flight build
-# (expanded flat so `local-npm-registry %{_sourcedir}` serves it); keep all
-# three files in sync with Source0 on bumps.
+# lists every dependency tarball as a Source10000+ registry URL with a
+# flat rename (`url#/<flat-name>.tgz`, the cockpit shape — SRPM
+# provenance only). The real transport is node_modules.obscpio, which
+# the OBS worker auto-unpacks flat into %{_sourcedir}; it is uploaded
+# per-bump by a local `just push` and protected by the obs-rsync.sh P
+# filter on CI pushes. The obscpio doubles as the LOCAL cache for the
+# pre-flight build (expanded flat so `local-npm-registry
+# %{_sourcedir}` serves it); keep all three files in sync with Source0
+# on bumps.
 set -euo pipefail
 cd "$(dirname "$0")"
 version="$(sed -n 's/^Version:[[:space:]]*//p' rea-agents.spec)"

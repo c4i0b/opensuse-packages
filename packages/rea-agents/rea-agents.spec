@@ -1,7 +1,7 @@
 # npm-bundle model: official npm tarball + offline dependency install.
-# node_modules.spec.inc lists the dependency tarballs as Source10000+
-# registry URLs (flat rename) that the download_files _service fetches
-# server-side; local-npm-registry then serves them to npm as a localhost
+# The dependency closure travels as node_modules.obscpio, which the OBS
+# worker auto-unpacks flat into %{_sourcedir} (cockpit legacy-container
+# model); local-npm-registry then serves it to npm as a localhost
 # registry — OBS build workers are offline.
 # Archful: @lydell/node-pty ships prebuilt Linux ELF prebuilds for the
 # process-capture feature, so the payload is not noarch.
@@ -46,8 +46,8 @@ analysis can use an existing Hopper, Ghidra, IDA or Kuna installation.
 rm -f npm-shrinkwrap.json
 
 %build
-# local-npm-registry serves the dependency tarballs (Source10000+,
-# fetched server-side into %{_sourcedir} by the download_files service)
+# local-npm-registry serves the dependency tarballs (Source10000+: the
+# OBS worker auto-unpacks node_modules.obscpio flat into %{_sourcedir})
 # as a local npm registry — OBS build workers are offline.
 # --ignore-scripts: prebuilt payloads only; frida (root optionalDependency)
 # is nonfunctional without its network install script and rea treats it as

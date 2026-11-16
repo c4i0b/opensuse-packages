@@ -7,13 +7,15 @@
 #                             (needs nodejs24, npm-default, obs-service-node_modules, cpio)
 # node_modules.spec.inc lists every dependency tarball as a Source10000+
 # REGISTRY URL with a flat rename (`url#/<flat-name>.tgz`, the cockpit
-# model): OBS download_files fetches them server-side, nothing but the
-# lock/spec.inc is committed or pushed. Bundled deps (lock "inBundle":
-# true, npm-packed from the tarball's own node_modules/) have no registry
-# URL — they stay bare filenames and ride the obs-rsync.sh P filter.
-# node_modules.obscpio is the LOCAL cache for the pre-flight build only
-# (expanded flat so `local-npm-registry %{_sourcedir}` serves it); keep
-# all three files in sync with Source0 on bumps.
+# shape) — SRPM provenance only, nothing is fetched from them: the real
+# transport is node_modules.obscpio, which the OBS worker auto-unpacks
+# flat into %{_sourcedir} (uploaded per-bump by a local `just push`,
+# protected by the obs-rsync.sh P filter on CI pushes). Bundled deps
+# (lock "inBundle": true) are npm-packed from the tarball's own
+# node_modules/ into the same container. The obscpio doubles as the
+# LOCAL cache for the pre-flight build (expanded flat so
+# `local-npm-registry %{_sourcedir}` serves it); keep all three files
+# in sync with Source0 on bumps.
 set -euo pipefail
 cd "$(dirname "$0")"
 version="$(sed -n 's/^Version:[[:space:]]*//p' openclaw.spec)"

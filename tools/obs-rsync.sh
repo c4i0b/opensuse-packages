@@ -10,13 +10,18 @@
 # one) — plain --exclude would never upload and a bare transfer would
 # wipe them server-side.
 #
-# npm-bundle packages need no tarball upload at all: node_modules.spec.inc
-# lists the dependency tarballs as Source10000+ registry URLs that the
-# download_files _service fetches server-side (cockpit model). The ONE
-# exception is an npm-packed bundled dep (no registry URL — openclaw's
-# chrome-devtools-mcp): it travels as a bare local-file Source, so it gets
-# its own P filter. The .tgz exclusion stays ANCHORED at the package root:
-# it covers Source0 and the flat pre-flight expansion of the local
+# npm-bundle packages ship their dependency closure as ONE
+# node_modules.obscpio (the cockpit legacy-container model: the OBS worker
+# auto-unpacks any *.obscpio source flat into %{_sourcedir}). The
+# container is regenerated client-side by fetch.sh --vendor and uploaded
+# by a LOCAL `just push` (like the rust vendor.tar.zst); the P filter
+# also protects it from --delete on CI pushes, whose checkouts never have
+# one — a bump without a local push would build against the stale set.
+# node_modules.spec.inc lists the tarballs as Source10000+ registry URLs
+# (flat rename) purely for SRPM provenance — no server-side download
+# (download_files is disabled on api.opensuse.org; the obscpio IS the
+# transport). The .tgz exclusion stays ANCHORED at the package root: it
+# covers Source0 and the flat pre-flight expansion of the local
 # node_modules cache (red: openclaw's first push shipped an empty
 # node_modules and the build died on "Serving 0 packages").
 if [ "${1:-}" = "--list" ]; then
@@ -25,7 +30,7 @@ if [ "${1:-}" = "--list" ]; then
             --exclude=.osc --exclude=fetch.sh --exclude=bump.sh --exclude=BIN \
             --exclude='*.tar.gz' --exclude='/*.tgz' --exclude='*.zip' \
             --filter='P *.tar.zst' \
-            --filter='P chrome-devtools-mcp-*.tgz'
+            --filter='P node_modules.obscpio'
     }
     obs_rsync_excludes
     exit 0
