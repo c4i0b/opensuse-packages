@@ -28,6 +28,7 @@ if [ "${1:-}" = "--list" ]; then
     obs_rsync_excludes() {
         printf '%s\n' \
             --exclude=.osc --exclude=fetch.sh --exclude=bump.sh --exclude=BIN \
+            --exclude=upstream \
             --exclude='*.tar.gz' --exclude='/*.tgz' --exclude='*.zip' \
             --filter='P *.tar.zst' \
             --filter='P node_modules.obscpio'
