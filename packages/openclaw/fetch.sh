@@ -89,8 +89,15 @@ bundled = []
 lines = []
 for i, f in enumerate(have, 10000):
     with tarfile.open(os.path.join(moddir, f)) as tf:
-        pj = json.load(tf.extractfile("package/package.json"))
-    url = urls.get((pj["name"], pj["version"]))
+        # @types tarballs root at <name>/, not package/ (registry shape),
+        # and dist/ trees carry their own package.json: use the shallowest
+        member = min((m for m in tf.getmembers()
+                      if m.name.endswith("/package.json")),
+                     key=lambda m: m.name.count("/"))
+        pj = json.load(tf.extractfile(member))
+    # npm-pack'd bundled deps may lack name/version: they fall through
+    # to the bundled (local-file) source list below
+    url = urls.get((pj.get("name"), pj.get("version")))
     if url:
         lines.append("Source%d:\t%s#/%s" % (i, url, f))
     else:
