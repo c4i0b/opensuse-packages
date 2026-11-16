@@ -665,6 +665,29 @@ def check_vendor_pin_drift(spec: SpecModel) -> list[Finding]:
     return out
 
 
+def check_upstream_vendored(spec: SpecModel) -> list[Finding]:
+    # red: solidcraft 0.43.0 — an `upstream` file on a package whose bump
+    # needs a client-side re-vendor (cargo_vendor/go vendor manual
+    # vendor.tar.*, npm node_modules.obscpio, wheels.tar.zst, package-lock)
+    # lets the autoupdate bot bump the spec while the vendor archive keeps
+    # the OLD Cargo.lock/dependency tree. The OBS build then either fails
+    # on a missing crate (cap-std) or, worse, builds the new source
+    # against the old dependency tree. Such packages bump manually with a
+    # vendor regen (docs/autoupdate.md), so they must carry no `upstream`.
+    vendored = bool(re.search(r"^Source[0-9]+:.*vendor\.tar", spec.text, re.M)) or any(
+        (spec.pkgdir / n).exists()
+        for n in ("node_modules.obscpio", "wheels.tar.zst", "package-lock.json")
+    )
+    if vendored and (spec.pkgdir / "upstream").is_file():
+        return [Finding(FAIL, "upstream-on-vendored",
+            "package needs a client-side re-vendor on bump but also has an "
+            "`upstream` file — the autoupdate bot would bump the spec "
+            "without regenerating the vendor archive (stale Cargo.lock; "
+            "red: solidcraft 0.43.0 missing cap-std). Remove the `upstream` "
+            "file; vendored packages bump manually with a vendor regen.")]
+    return []
+
+
 def check_lockfile_version(spec: SpecModel) -> list[Finding]:
     # red: a version bump that does not re-vendor — the spec moves to the new
     # version while package-lock.json (and node_modules.obscpio / wheels
@@ -751,6 +774,7 @@ _CHECKS = [
     check_rpm_payload_extract,
     check_offline_installs,
     check_lockfile_version,
+    check_upstream_vendored,
     check_vendor_pin_drift,
 ]
 

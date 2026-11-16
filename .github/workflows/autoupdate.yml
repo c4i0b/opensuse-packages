@@ -33,13 +33,17 @@ jobs:
       # In-job gate (gh-actions-conventions rule 11): GITHUB_TOKEN pushes
       # fire no push events, so validate.yml would never run on these
       # commits — run the same script here, on the checked-out bump branch.
+      # opensuse-lint.py adds the vendor/lockfile drift reds the version
+      # gate can't see (red: openclaw 2026.11.4 bumped without re-vendor).
       # A red gate fails the run; the branch stays for inspection.
       - name: Gate bumps (validate-packages.py)
         if: steps.bump.outputs.count != '0'
         timeout-minutes: 10
         env:
           PKGS: ${{ steps.bump.outputs.pkgs }}
-        run: PACKAGES="${PKGS// /,}" python3 .github/scripts/validate-packages.py
+        run: |
+          PACKAGES="${PKGS// /,}" python3 .github/scripts/validate-packages.py
+          python3 opensuse-lint.py $PKGS/*.spec
       # Merge the exact gated SHA; ff-only so a main move during the gate
       # fails instead of merging ungated content. Commits by GITHUB_TOKEN
       # fire no push events: push-to-obs picks the merge up via its

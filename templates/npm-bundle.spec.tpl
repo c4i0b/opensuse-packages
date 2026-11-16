@@ -2,6 +2,11 @@
 # (validated by packages/openclaw, packages/rea-agents).
 # Changelog lives in <name>.changes (OBS merges it into %changelog).
 #
+# NO `upstream` file in the package dir: every bump needs a client-side
+# `fetch.sh --vendor`, so the autoupdate bot must never bump this package
+# (opensuse-lint.py FAILs on upstream+lockfile; red: openclaw 2026.11.4
+# bumped with a 2026.11.3 lock).
+#
 # This is the OBS-canonical npm model: the cockpit family in
 # openSUSE:Factory uses the same local-npm-registry + client-side
 # node_modules vendoring (obs-service-node_modules); their update flow
