@@ -3,9 +3,9 @@
 Personal RPM packaging monorepo for [OBS](https://build.opensuse.org),
 hosted in the
 [`home:caiobruno`](https://build.opensuse.org/project/show/home:caiobruno)
-project (openSUSE Tumbleweed). The GitHub repo is the source of truth: a
-merge to `main` triggers `push-to-obs`, which syncs the touched packages to
-OBS, where they are built.
+project (openSUSE Tumbleweed and Slowroll). The GitHub repo is the source of
+truth: a merge to `main` triggers `push-to-obs`, which syncs the touched
+packages to OBS, where they are built.
 
 [![push-to-obs](https://github.com/c4i0b/opensuse-packages/actions/workflows/push-to-obs.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/push-to-obs.yml)
 [![validate](https://github.com/c4i0b/opensuse-packages/actions/workflows/validate.yml/badge.svg)](https://github.com/c4i0b/opensuse-packages/actions/workflows/validate.yml)
@@ -125,9 +125,12 @@ OBS, where they are built.
 [![zapzap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fzapzap.json%3Fv%3Dca15279fr2)](https://github.com/rafatosta/zapzap/)
 <!-- package-badges end -->
 
-## Install (openSUSE Tumbleweed)
+## Install
 
+    # openSUSE Tumbleweed
     zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno/opensuse_tumbleweed/home:caiobruno.repo
+    # openSUSE Slowroll
+    zypper ar -f https://download.opensuse.org/repositories/home:/caiobruno/opensuse_slowroll/home:caiobruno.repo
     zypper ref
     zypper in <package>
 
