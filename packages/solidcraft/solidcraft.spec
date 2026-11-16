@@ -48,7 +48,10 @@ and ships a headless CLI with an MCP server for AI agents.
 # zbus-lockstep's validate macro resolves ../xml relative to the compiled
 # crate: in a vendored tree that lands on the vendored "xml" crate (whose
 # extensionless LICENSE panics the macro) instead of atspi-common's D-Bus XML dir
-[ -d vendor2/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor2/atspi-common/xml"
+# atspi-common-*/: cargo_vendor --versioned-dirs appends the version, which
+# changes every bump
+lockstep_xml="$(echo vendor2/atspi-common-*/xml)"
+[ -d "$lockstep_xml" ] && export LOCKSTEP_XML_PATH="$(pwd)/$lockstep_xml"
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 %{cargo_build}
