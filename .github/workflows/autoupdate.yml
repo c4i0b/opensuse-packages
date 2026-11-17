@@ -42,8 +42,17 @@ jobs:
         env:
           PKGS: ${{ steps.bump.outputs.pkgs }}
         run: |
+          specs=()
+          for p in $PKGS; do specs+=("$p"/*.spec); done
+          t0=$(date +%s)
           PACKAGES="${PKGS// /,}" python3 .github/scripts/validate-packages.py
-          python3 opensuse-lint.py $PKGS/*.spec
+          v=$(( $(date +%s) - t0 ))
+          t0=$(date +%s)
+          python3 opensuse-lint.py "${specs[@]}"
+          l=$(( $(date +%s) - t0 ))
+          echo "gate_validate=${v}s" >> "$GITHUB_ENV"
+          echo "gate_lint=${l}s" >> "$GITHUB_ENV"
+          echo "::notice::[gate-summary] validated='$PKGS' validate=${v}s lint=${l}s"
       # Merge the exact gated SHA; ff-only so a main move during the gate
       # fails instead of merging ungated content. Commits by GITHUB_TOKEN
       # fire no push events: push-to-obs picks the merge up via its

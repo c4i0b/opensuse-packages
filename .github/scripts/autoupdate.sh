@@ -139,6 +139,7 @@ resolve() {
     body="$(get "$pkg" "https://api.github.com/repos/${source}/tags?per_page=1" "${auth[@]}")" || true
     latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
     latest="${latest#v}"
+    [ -n "$latest" ] && echo "::notice::[tags-fallback] pkg=$pkg source=$source resolved=$latest (no GitHub Releases; releases/latest is re-checked every run)"
   fi
 
   if [ -z "$latest" ]; then
