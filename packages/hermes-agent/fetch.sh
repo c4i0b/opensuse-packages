@@ -17,8 +17,18 @@ mode="${1:-}"
 
 # cached: just build runs fetch.sh every time; skip the re-download
 [ -s "hermes-agent-$version.tar.gz" ] || \
-curl -sL "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v$version.tar.gz" \
-    -o "hermes-agent-$version.tar.gz"
+# codeload can serve a non-gzip body for freshly-generated or rarely
+# accessed tags (seen deterministically from CI runners): verify the
+# magic bytes and retry via the direct codeload host before giving up
+fetch_src() {
+    local url="$1"
+    curl -sL "$url" -o "hermes-agent-$version.tar.gz"
+    head -c2 "hermes-agent-$version.tar.gz" | od -An -tx1 | grep -q "1f 8b"
+}
+if ! fetch_src "https://github.com/NousResearch/hermes-agent/archive/refs/tags/v$version.tar.gz"; then
+    fetch_src "https://codeload.github.com/NousResearch/hermes-agent/tar.gz/refs/tags/v$version" \
+        || { echo "hermes-agent v$version tarball is not a gzip (codeload quirk?)" >&2; exit 1; }
+fi
 
 [ "$mode" = "--vendor" ] || exit 0
 tmp="$(mktemp -d)"
