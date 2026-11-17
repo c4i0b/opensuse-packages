@@ -9,7 +9,7 @@
 ExclusiveArch:  x86_64
 
 Name:           opencode-desktop
-Version:        1.19.5
+Version:        1.19.6
 Release:        0
 Summary:        Desktop app for OpenCode, the open source AI coding agent (Electron)
 License:        MIT
