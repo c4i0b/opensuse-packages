@@ -198,10 +198,15 @@ jobs:
             # bot bump before revendor.sh shipped a stale vendor set).
             if [ -f "$src/fetch.sh" ] \
                || grep -Eq 'go build -mod=vendor|cargo_build' "$spec"; then
-              if bash "$GITHUB_WORKSPACE/tools/revendor.sh" "$name"; then
-                echo "revendor OK: $name"
+              # one retry for transient upstream hiccups (codeload serving
+              # a non-gzip body for fresh tag tarballs)
+              if ! bash "$GITHUB_WORKSPACE/tools/revendor.sh" "$name"; then
+                sleep 20
+                bash "$GITHUB_WORKSPACE/tools/revendor.sh" "$name" \
+                  && echo "revendor OK (retry): $name" \
+                  || echo "::warning::$name: revendor failed; pushing tracked files only (OBS keeps its current archive)"
               else
-                echo "::warning::$name: revendor failed; pushing tracked files only (OBS keeps its current archive)"
+                echo "revendor OK: $name"
               fi
             fi
 

@@ -60,7 +60,7 @@ if [ -f "$dir/fetch.sh" ] && grep -q 'obscpio' "$spec"; then
   [ -n "$ctr" ] || { echo "revendor.sh: $pkg needs a container runtime" >&2; exit 1; }
   "$ctr" run --rm -v "$dir:/work:Z" "$tw_image" bash -c '
     set -euo pipefail
-    zypper -qn in --no-recommends nodejs24 npm-default obs-service-node_modules cpio
+    zypper -qn in --no-recommends nodejs24 npm-default obs-service-node_modules cpio findutils tar
     cd /work && bash fetch.sh --vendor
   '
   echo "revendored $pkg (npm-bundle) in tumbleweed container"

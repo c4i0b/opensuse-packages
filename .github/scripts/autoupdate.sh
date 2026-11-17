@@ -232,10 +232,15 @@ while IFS=$'\t' read -r _ pkg latest; do
   # Cargo.lock). Reverting the worktree drops just this package's bump.
   if [ -f "$root/packages/$pkg/fetch.sh" ] \
      || grep -Eq 'go build -mod=vendor|cargo_build' "$spec"; then
+    # one retry for transient upstream hiccups (red: hermes-agent 0.23.2 —
+    # codeload served a non-gzip body for a freshly-generated tag tarball)
     if ! bash "$root/tools/revendor.sh" "$pkg"; then
-      echo "::warning::$pkg: revendor to $latest_rpm failed, reverting bump"
-      git -C "$root" checkout -- "packages/$pkg"
-      continue
+      sleep 20
+      if ! bash "$root/tools/revendor.sh" "$pkg"; then
+        echo "::warning::$pkg: revendor to $latest_rpm failed, reverting bump"
+        git -C "$root" checkout -- "packages/$pkg"
+        continue
+      fi
     fi
   fi
   git -C "$root" add "packages/$pkg"
