@@ -1,5 +1,5 @@
 Name:           fish-nvm
-Version:        2.2.17
+Version:        2.2.18
 Release:        0
 Summary:        The Node.js version manager for fish
 License:        MIT
