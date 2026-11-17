@@ -26,6 +26,9 @@ run-name: "push-to-obs - ${{ github.event.head_commit.message || github.event.in
 
 permissions:
   contents: read
+  # resolve step queries the runs API to bridge from the last successful
+  # push (superseded pending pushes must not lose their packages)
+  actions: read
 
 concurrency:
   group: push-to-obs-${{ github.ref }}
@@ -52,6 +55,7 @@ jobs:
           INPUT_PACKAGES: ${{ github.event.inputs.packages }}
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.event.after }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           empty_tree="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
@@ -67,8 +71,20 @@ jobs:
               | paste -sd, - || true
           }
 
+          # red: the concurrency group allows ONE pending run — a new
+          # workflow_run cancels the pending push of the previous merge,
+          # and that merge's packages silently never reach OBS (three
+          # vendored bumps in a row each ate its predecessor's push).
+          # Bridge from the LAST SUCCESSFUL push so a superseded run's
+          # packages ride the next one.
+          last_ok="$(gh run list -R "$GITHUB_REPOSITORY" -w push-to-obs \
+            -s success -L 1 --json headSha,createdAt --jq '.[0].headSha' 2>/dev/null || true)"
+
           if [ -n "${INPUT_PACKAGES:-}" ]; then
             pkgs="$INPUT_PACKAGES"
+          elif [ -n "$last_ok" ] && git rev-parse --verify --quiet "$last_ok^{commit}" >/dev/null; then
+            after="${AFTER:-${GITHUB_SHA}}"
+            [ "$after" = "$last_ok" ] || pkgs="$(detect "$last_ok" "$after")"
           else
             after="${AFTER:-${GITHUB_SHA}}"
             before="${BEFORE:-}"
