@@ -80,6 +80,7 @@ resolve() {
     case "$repo_url" in
       gitlab:*) repo_url="https://gitlab.com/${repo_url#gitlab:}" ;;
       codeberg:*) repo_url="https://codeberg.org/${repo_url#codeberg:}" ;;
+      forgejo:*) repo_url="${FORGEJO_HOME:-https://codeberg.org}/${repo_url#forgejo:}" ;;
       *) repo_url="https://github.com/$repo_url" ;;
     esac
     latest="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
@@ -109,6 +110,29 @@ resolve() {
     npm_slug="$(echo "$npm_pkg" | sed 's|/|%2f|')"
     body="$(get "$pkg" "https://registry.npmjs.org/${npm_slug}/latest")" || true
     latest="$(grep -oE '"version": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+  elif [[ "$source" == gitlab:* ]]; then
+    src="${source#gitlab:}"; proj="$(echo "$src" | sed 's|/|%2f|')"
+    local gl_auth=("${auth[@]}")
+    [ -n "${GITLAB_TOKEN:-}" ] && gl_auth=(-H "PRIVATE-TOKEN: $GITLAB_TOKEN")
+    body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/releases" "${gl_auth[@]}")" || true
+    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+    latest="${latest#v}"
+    if [ -z "$latest" ]; then
+      body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/repository/tags?per_page=1" "${gl_auth[@]}")" || true
+      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+      latest="${latest#v}"
+    fi
+  elif [[ "$source" == codeberg:* || "$source" == forgejo:* ]]; then
+    src="${source#*:}"; baseh="https://codeberg.org/api/v1"
+    [[ "$source" == forgejo:* ]] && baseh="${FORGEJO_API:-$baseh}"
+    body="$(get "$pkg" "${baseh}/repos/${src}/releases?limit=1" "${auth[@]}")" || true
+    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+    latest="${latest#v}"
+    if [ -z "$latest" ]; then
+      body="$(get "$pkg" "${baseh}/repos/${src}/tags?limit=1" "${auth[@]}")" || true
+      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+      latest="${latest#v}"
+    fi
   fi
   if [ -z "$latest" ] && [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
     # Tag-only repos (no GitHub Releases): fall back to the latest tag
