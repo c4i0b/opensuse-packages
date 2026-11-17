@@ -17,19 +17,25 @@ manual dispatch), ported from the fedora-packages model. Per package,
   zero API quota)
 - `npm:<package>` → npm dist-tag `latest`
 
-A package without an `upstream` file is opt-out: `television` has none —
-its Rust vendor archive is regenerated client-side (see
-[conventions.md](conventions.md)), so its bumps are manual until vendor
-regeneration is automated. The same applies to the client-side-vendored
-npm-bundle packages (`openclaw`, `rea-agents`: `fetch.sh --vendor`
-regenerates package-lock.json + node_modules.obscpio + node_modules.spec.inc)
-and to the bundled-venv package (`hermes-agent`: wheels.tar.zst +
-requirements.txt). For the npm-bundle packages a spec bump without
-re-vendoring is caught by the `lockfile-version-drift` lint check
+Vendored packages (rust `vendor.tar.zst`, client-side go vendor,
+npm-bundle `node_modules.obscpio`, `hermes-agent` wheels) carry an
+`upstream` file and bump automatically: after `bump.sh` rewrites the
+spec, the bot runs `tools/revendor.sh <pkg>` — the canonical
+cargo_vendor service in a tumbleweed container for Rust (docker on the
+runner, podman on dev hosts), `go mod vendor` for go,
+`fetch.sh --vendor` for npm-bundle/wheels — and **reverts the bump**
+when the re-vendor fails (red: solidcraft 0.43.0 bumped with a 0.40.1
+vendor Cargo.lock broke the offline build). push-to-obs re-runs
+revendor before rsync so the regenerated archive is uploaded (the
+obs-rsync `P` filter uploads any artifact present in the workspace).
+`opensuse-lint.py` still FAILs on `upstream` for vendor models
+revendor.sh does not cover (pinvendor overlays like pdfcraft/photocraft).
+A package without an `upstream` file remains opt-out (crunch,
+fish-hydro, unimatrix publish no releases or tags; rathole moved to
+rathole-org). For the npm-bundle packages a spec bump without
+re-vendoring is also caught by the `lockfile-version-drift` lint check
 (package-lock.json still pins the old version); for hermes-agent the
-`vendor-pin-drift` check guards the shared `==` pins, but a wholly stale
-wheel closure only surfaces as an OBS build failure — re-vendor on every
-bump.
+`vendor-pin-drift` check guards the shared `==` pins.
 
 The bot commits each bump on a dated `bump/<timestamp>` branch **inside the
 autoupdate job**, gates it there with `validate-packages.py` (the same
@@ -53,11 +59,11 @@ To skip or downgrade a release: push a commit whose message is
 `autoupdate: override <version>` touching the package dir; the bot
 respects the latest override.
 
-## Manual bumps: vendored Rust packages
+## Manual bumps: vendor models revendor.sh does not cover
 
-Rust packages with a client-side vendor archive carry no `upstream`
-file, so the bot skips them (see the note on `television` above). A
-manual bump must touch all four, in one commit:
+pdfcraft/photocraft (pinvendor overlays) carry no `upstream` file, so the
+bot skips them (opensuse-lint enforces it). A manual bump must touch all
+four, in one commit:
 
 1. spec `Version:` (`bump.sh` covers the spec + `_service` + `.changes`
    part),

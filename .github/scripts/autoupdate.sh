@@ -225,6 +225,19 @@ while IFS=$'\t' read -r _ pkg latest; do
     echo "::warning::$pkg: bump to $latest_rpm failed, skipping"
     continue
   fi
+  # Vendored packages: regenerate the client-side artifacts and tracked
+  # side files (requirements.txt, node_modules.spec.inc, ...) BEFORE
+  # committing — a bump that cannot re-vendor ships a stale archive and
+  # breaks the OBS build offline (red: solidcraft 0.43.0 with a 0.40.1
+  # Cargo.lock). Reverting the worktree drops just this package's bump.
+  if [ -f "$root/packages/$pkg/fetch.sh" ] \
+     || grep -Eq 'go build -mod=vendor|cargo_build' "$spec"; then
+    if ! bash "$root/tools/revendor.sh" "$pkg"; then
+      echo "::warning::$pkg: revendor to $latest_rpm failed, reverting bump"
+      git -C "$root" checkout -- "packages/$pkg"
+      continue
+    fi
+  fi
   git -C "$root" add "packages/$pkg"
   git -C "$root" commit -m "chore($pkg): update to $latest_rpm"
   bumped=$((bumped + 1))

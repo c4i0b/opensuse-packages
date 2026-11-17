@@ -11,9 +11,11 @@ television. The templates carry the mechanics:
 `_service` fetches the tag server-side (`tar_scm`), and `vendor.tar.zst`
 is generated on a dev machine with the template one-liner (tumbleweed
 container + `obs-service-cargo_vendor`) and rides `just push` (the rsync
-`--filter=P *.tar.zst` uploads it when present, never deletes it). Rust
-packages have no `upstream` file — bumps regenerate the vendor archive
-manually until that is automated.
+`--filter=P *.tar.zst` uploads it when present, never deletes it). Since
+`tools/revendor.sh` the bot regenerates the archive itself (canonical
+cargo_vendor in a tumbleweed container, docker on the runner / podman on
+dev hosts) and reverts the bump when the re-vendor fails; push-to-obs
+re-runs revendor before rsync so the fresh archive is uploaded.
 
 Upstreams shipping their own `vendor/` (path-patched forks) need the
 custom overlay scripts (`tools/pinvendor-*.py`, pdfcraft/photocraft).

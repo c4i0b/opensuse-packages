@@ -191,6 +191,20 @@ jobs:
               "$src/bump.sh" "$ver" || true
             fi
 
+            # Vendored packages: regenerate the client-side archive in the
+            # runner so the obs-rsync P filter uploads it — a CI checkout
+            # has none (gitignored), and without this the P filter would
+            # only protect OBS's stale archive from --delete (red: every
+            # bot bump before revendor.sh shipped a stale vendor set).
+            if [ -f "$src/fetch.sh" ] \
+               || grep -Eq 'go build -mod=vendor|cargo_build' "$spec"; then
+              if bash "$GITHUB_WORKSPACE/tools/revendor.sh" "$name"; then
+                echo "revendor OK: $name"
+              else
+                echo "::warning::$name: revendor failed; pushing tracked files only (OBS keeps its current archive)"
+              fi
+            fi
+
             # shellcheck source=../tools/obs-rsync.sh
             mapfile -t ex < <(bash "$GITHUB_WORKSPACE/tools/obs-rsync.sh" --list)
             [ -f "$src/.obsignore" ] && ex+=(--exclude-from="$src/.obsignore")

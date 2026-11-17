@@ -672,20 +672,39 @@ def check_upstream_vendored(spec: SpecModel) -> list[Finding]:
     # lets the autoupdate bot bump the spec while the vendor archive keeps
     # the OLD Cargo.lock/dependency tree. The OBS build then either fails
     # on a missing crate (cap-std) or, worse, builds the new source
-    # against the old dependency tree. Such packages bump manually with a
-    # vendor regen (docs/autoupdate.md), so they must carry no `upstream`.
+    # against the old dependency tree. Since tools/revendor.sh the bot
+    # re-vendors automatically (and reverts the bump when the re-vendor
+    # fails), so `upstream` is allowed only when revendor.sh handles the
+    # package's model: fetch.sh present, client-side go vendor, or
+    # cargo_build. Packages with no revendor model (pinvendor overlays,
+    # server-side go_modules needs none) stay manual.
     vendored = bool(re.search(r"^Source[0-9]+:.*vendor\.tar", spec.text, re.M)) or any(
         (spec.pkgdir / n).exists()
         for n in ("node_modules.obscpio", "wheels.tar.zst", "package-lock.json")
     )
-    if vendored and (spec.pkgdir / "upstream").is_file():
-        return [Finding(FAIL, "upstream-on-vendored",
-            "package needs a client-side re-vendor on bump but also has an "
-            "`upstream` file — the autoupdate bot would bump the spec "
-            "without regenerating the vendor archive (stale Cargo.lock; "
-            "red: solidcraft 0.43.0 missing cap-std). Remove the `upstream` "
-            "file; vendored packages bump manually with a vendor regen.")]
-    return []
+    if not vendored or not (spec.pkgdir / "upstream").is_file():
+        return []
+    revendorable = (spec.pkgdir / "fetch.sh").is_file() or bool(
+        re.search(r"go build -mod=vendor", spec.text)
+        and (spec.pkgdir / "_service").is_file()
+        and not re.search(r'service name="go_modules"',
+                          (spec.pkgdir / "_service").read_text())
+    ) or bool(re.search(r"cargo_build", spec.text))
+    # server-side go_modules: OBS regenerates the vendor archive itself,
+    # the bot needs no client-side model
+    if (spec.pkgdir / "_service").is_file() and re.search(
+            r'service name="go_modules"',
+            (spec.pkgdir / "_service").read_text()):
+        revendorable = True
+    if revendorable:
+        return []
+    return [Finding(FAIL, "upstream-on-vendored",
+        "package needs a client-side re-vendor on bump that tools/revendor.sh "
+        "does not model but also has an `upstream` file — the autoupdate bot "
+        "would bump the spec without regenerating the vendor archive (stale "
+        "Cargo.lock; red: solidcraft 0.43.0 missing cap-std). Remove the "
+        "`upstream` file or teach revendor.sh the model.")]
+
 
 
 def check_lockfile_version(spec: SpecModel) -> list[Finding]:

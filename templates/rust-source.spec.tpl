@@ -1,9 +1,10 @@
 # Template: Rust from-source build (validated by packages/television).
 # Changelog lives in <name>.changes (OBS merges it into %changelog).
 #
-# NO `upstream` file in the package dir: the vendor archive regen is
-# client-side, so the autoupdate bot must never bump this package
-# (opensuse-lint.py FAILs on upstream+vendor.tar; red: solidcraft 0.43.0).
+# `upstream` file allowed: the autoupdate bot re-vendors via
+# tools/revendor.sh (canonical cargo_vendor in a tumbleweed container)
+# on every bump and reverts on failure (red that started manual-only:
+# solidcraft 0.43.0 with a 0.40.1 vendor Cargo.lock).
 #
 # Pair with this _service (placeholders in __UPSTREAM__/<v>); the tag tarball
 # is fetched server-side, vendoring is CLIENT-side:
