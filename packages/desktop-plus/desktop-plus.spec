@@ -58,7 +58,7 @@ install -Dpm644 %{SOURCE1} %{buildroot}%{_datadir}/metainfo/org.desktop-plus.Des
 # Upstream desktop file uses an unregistered Category; sanitize it
 sed -i 's/^Categories=.*/Categories=Development;X-GitHub;/' \
   %{buildroot}%{_datadir}/applications/*.desktop
-install -pm644 "$appdir"/LICENSE . 2>/dev/null || true
+install -pm644 "$appdir"/LICENSE . || { echo "LICENSE missing from the upstream RPM" >&2; exit 1; }
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop

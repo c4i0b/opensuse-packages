@@ -135,8 +135,11 @@ for crate in $(awk '/^\[patch\.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/
 done
 
 %build
-# drop if the vendored tree has no atspi-common (no accessibility stack)
-[ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
+# drop if the vendored tree has no atspi-common (no accessibility stack);
+# obs-service-cargo_vendor dirs carry a version suffix, hence the glob
+for d in vendor/atspi-common-*/xml; do
+    [ -d "$d" ] && export LOCKSTEP_XML_PATH="$PWD/$d"
+done
 # OOM mitigation, second half of the build_rustflags global above
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16

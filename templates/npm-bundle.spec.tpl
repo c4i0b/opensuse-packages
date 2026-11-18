@@ -21,7 +21,6 @@
 # - The dependency closure is vendored CLIENT-side by each package's
 #   `fetch.sh --vendor` as:
 #     * package-lock.json (Source10, committed — the reviewable pin set),
-#     * package-lock.json (Source10, committed — the reviewable pin set),
 #     * node_modules.spec.inc (Source11, committed — lists every tarball as
 #       a Source10000+ registry URL with a flat rename, url#/<flat>.tgz:
 #       SRPM provenance, the cockpit shape — nothing is fetched from

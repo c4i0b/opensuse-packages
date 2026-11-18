@@ -46,11 +46,12 @@ formats via its own codec suite.
 
 %prep
 %autosetup -p1 -a1
-# [patch.crates-io] redirects egui/winit to storytold forks; entries for
-# crates outside the dependency graph (egui_demo_lib, egui_inspection,
-# egui_system_font_provider) are never vendored, and cargo then fails
-# resolving the patch against the vendored source replacement
-sed -i -E '/^(egui_demo_lib|egui_inspection|egui_system_font_provider) = \{ git /d' Cargo.toml
+# cargo eagerly validates every [patch.crates-io] git entry against its
+# source: crates outside the dependency graph are never vendored and the
+# offline build dies on them — drop patch lines with no vendor/ crate dir
+for crate in $(awk '/^\[patch\.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/{print $1}' Cargo.toml); do
+    ls -d vendor/"$crate"-* >/dev/null 2>&1 || sed -i "/^$crate = { git = /d" Cargo.toml
+done
 
 %build
 # zbus-lockstep's validate macro looks for ../xml relative to the crate

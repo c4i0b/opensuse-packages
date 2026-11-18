@@ -689,7 +689,10 @@ def check_upstream_vendored(spec: SpecModel) -> list[Finding]:
         and (spec.pkgdir / "_service").is_file()
         and not re.search(r'service name="go_modules"',
                           (spec.pkgdir / "_service").read_text())
-    ) or bool(re.search(r"cargo_build", spec.text))
+    ) or bool(re.search(r"cargo_build|__cargo", spec.text))
+    # pinvendor overlays (pdfcraft/photocraft): duplicate git crates
+    if (spec.pkgdir.parent.parent / "tools" / f"pinvendor-{spec.pkgdir.name}.py").is_file():
+        revendorable = True
     # server-side go_modules: OBS regenerates the vendor archive itself,
     # the bot needs no client-side model
     if (spec.pkgdir / "_service").is_file() and re.search(

@@ -107,24 +107,65 @@ if grep -q 'go build -mod=vendor' "$spec"; then
   exit 0
 fi
 
-# 4. Rust (canonical cargo_vendor service in a container)
-if grep -q 'cargo_build' "$spec"; then
+# 3.5 pinvendor overlays (pdfcraft/photocraft): duplicate git crates and
+# unused [patch.crates-io] entries need the pin/drop logic; the overlay
+# (vendor-deps/, dup-pinned/, .cargo/, patched Cargo.toml, Cargo.lock)
+# is packed as the Source1 archive, unpacked over the source by -a1
+if [ -f "$root/tools/pinvendor-$pkg.py" ]; then
   ctr="$(container)"
   [ -n "$ctr" ] || { echo "revendor.sh: $pkg needs a container runtime" >&2; exit 1; }
   service_params
   git clone -q --depth 1 --branch "$rev" "$url" "$tmp/work-tree"
   mkdir -p "$tmp/work"
   mv "$tmp/work-tree" "$tmp/work/$pkg-$ver"
+  "$ctr" run --rm -v "$tmp:/work:Z" -v "$root/tools/pinvendor-$pkg.py:/pinvendor.py:ro" \
+    "$tw_image" bash -c '
+      set -euo pipefail
+      zypper -qn in --no-recommends cargo
+      cd /work/work
+      python3 /pinvendor.py "'"$pkg"'-'"$ver"'"
+    '
+  ws="$tmp/work/$pkg-$ver"
+  # dup-pinned/ only exists when a duplicate git crate was pinned; tar
+  # fails on missing operands, so list only what exists
+  overlay=(vendor-deps .cargo Cargo.toml Cargo.lock)
+  [ -d "$ws/dup-pinned" ] && overlay+=(dup-pinned)
+  (cd "$ws" && tar --zstd -cf "$tmp/overlay.tar.zst" "${overlay[@]}")
+  [ -s "$tmp/overlay.tar.zst" ] || { echo "revendor.sh: pinvendor overlay empty for $pkg" >&2; exit 1; }
+  mv "$tmp/overlay.tar.zst" "$dir/vendor.tar.zst"
+  echo "revendored $pkg (pinvendor overlay) -> vendor.tar.zst"
+  exit 0
+fi
+
+# 4. Rust (canonical cargo_vendor service in a container)
+if grep -q 'cargo_build\|__cargo' "$spec"; then
+  ctr="$(container)"
+  [ -n "$ctr" ] || { echo "revendor.sh: $pkg needs a container runtime" >&2; exit 1; }
+  service_params
+  git clone -q --depth 1 --branch "$rev" "$url" "$tmp/work-tree"
+  mkdir -p "$tmp/work"
+  mv "$tmp/work-tree" "$tmp/work/$pkg-$ver"
+  # upstream-shipped vendor/ (mise, solidcraft): cargo_vendor refuses
+  # without a unique tag; --tag vendor2 vendors deps alongside the
+  # upstream tree (exact shape of the manual archives: vendor2/ +
+  # .cargo/config.toml with directory=vendor2 + Cargo.lock)
+  tag_arg=()
+  [ -d "$tmp/work/$pkg-$ver/vendor" ] && tag_arg=(--tag vendor2)
   # flags from templates/rust-source.spec.tpl (2026-11 mise/oxker/atac/
   # ludusavi fleet): respect the lockfile, never update, zst compression
   "$ctr" run --rm -v "$tmp/work:/work:Z" "$tw_image" bash -c '
     set -euo pipefail
     zypper -qn in --no-recommends obs-service-cargo_vendor
     /usr/lib/obs/service/cargo_vendor --src "/work/'"$pkg"'-'"$ver"'" \
-      --outdir /work --compression zst --respect-lockfile true --update false
+      --outdir /work --compression zst --respect-lockfile true --update false '"${tag_arg[*]}"'
   '
-  [ -f "$tmp/work/vendor.tar.zst" ] || { echo "revendor.sh: cargo_vendor produced no vendor.tar.zst for $pkg" >&2; exit 1; }
-  mv "$tmp/work/vendor.tar.zst" "$dir/vendor.tar.zst"
+  out="$tmp/work/vendor.tar.zst"
+  # --tag X output lands as vendor-X.tar.zst
+  for cand in vendor2.tar.zst vendor-vendor2.tar.zst; do
+    [ -f "$tmp/work/$cand" ] && out="$tmp/work/$cand"
+  done
+  [ -f "$out" ] || { echo "revendor.sh: cargo_vendor produced no vendor archive for $pkg" >&2; exit 1; }
+  mv "$out" "$dir/vendor.tar.zst"
   echo "revendored $pkg (rust, cargo_vendor) -> vendor.tar.zst"
   exit 0
 fi

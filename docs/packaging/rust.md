@@ -17,8 +17,11 @@ cargo_vendor in a tumbleweed container, docker on the runner / podman on
 dev hosts) and reverts the bump when the re-vendor fails; push-to-obs
 re-runs revendor before rsync so the fresh archive is uploaded.
 
-Upstreams shipping their own `vendor/` (path-patched forks) need the
-custom overlay scripts (`tools/pinvendor-*.py`, pdfcraft/photocraft).
+Upstreams shipping their own `vendor/` (path-patched forks): revendor.sh
+passes `--tag vendor2` to cargo_vendor (deps land in `vendor2/` beside
+the upstream tree). Duplicate git crates (pdfcraft, photocraft) go
+through the overlay scripts `tools/pinvendor-*.py`, which revendor.sh
+runs in the container and packs as the Source1 archive.
 
 ## `_service` version detection
 

@@ -15,6 +15,8 @@
 #       <param name="scm">git</param>
 #       <param name="revision">__VERSION__</param>
 #       <param name="versionformat">@PARENT_TAG@</param>
+#       <!-- v-prefixed tags: strip or set_version cannot detect the version -->
+#       <param name="versionrewrite-pattern">v(.*)</param>
 #       <param name="exclude">.git</param>
 #     </service>
 #     <service name="recompress" mode="serveronly">

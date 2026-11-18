@@ -45,17 +45,21 @@ IDML and EPUB content.
 
 %prep
 %autosetup -p1 -a1
-# patched but unused in the build graph: cargo locks them but does not
-# vendor them, and offline cargo cannot verify their git patch locations
-sed -i -e '/^egui_demo_lib = /d' -e '/^egui_inspection = /d' \
-       -e '/^egui_system_font_provider = /d' Cargo.toml
+# cargo eagerly validates every [patch.crates-io] git entry against its
+# source: crates outside the dependency graph are never vendored and the
+# offline build dies on them — drop patch lines with no vendor/ crate dir
+for crate in $(awk '/^\[patch\.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/{print $1}' Cargo.toml); do
+    ls -d vendor/"$crate"-* >/dev/null 2>&1 || sed -i "/^$crate = { git = /d" Cargo.toml
+done
 
 %build
 # zbus-lockstep's validate macro looks for ../xml relative to the crate
 # being compiled: in a vendored tree that resolves to the vendored "xml"
 # crate (whose extensionless LICENSE panics the macro) instead of
 # atspi-common's D-Bus XML dir
-[ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
+for d in vendor/atspi-common-*/xml; do
+    [ -d "$d" ] && export LOCKSTEP_XML_PATH="$PWD/$d"
+done
 # virtual workspace: build only the app member
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16

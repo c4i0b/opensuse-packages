@@ -29,7 +29,10 @@ vendor Cargo.lock broke the offline build). push-to-obs re-runs
 revendor before rsync so the regenerated archive is uploaded (the
 obs-rsync `P` filter uploads any artifact present in the workspace).
 `opensuse-lint.py` still FAILs on `upstream` for vendor models
-revendor.sh does not cover (pinvendor overlays like pdfcraft/photocraft).
+revendor.sh does not model (none today).
+Opt-outs with no `upstream` file: crunch, fish-hydro, unimatrix (no
+releases or tags upstream) and press-start-2p-fonts (raw files, no
+versioned source).
 A package without an `upstream` file remains opt-out (crunch,
 fish-hydro, unimatrix publish no releases or tags; rathole moved to
 rathole-org). For the npm-bundle packages a spec bump without
@@ -59,11 +62,11 @@ To skip or downgrade a release: push a commit whose message is
 `autoupdate: override <version>` touching the package dir; the bot
 respects the latest override.
 
-## Manual bumps: vendor models revendor.sh does not cover
+## Manual bumps: no automated model
 
-pdfcraft/photocraft (pinvendor overlays) carry no `upstream` file, so the
-bot skips them (opensuse-lint enforces it). A manual bump must touch all
-four, in one commit:
+Only packages with no resolvable upstream (crunch, fish-hydro,
+unimatrix, press-start-2p-fonts) stay manual; everything else bumps
+through the bot. A manual bump must touch all four, in one commit:
 
 1. spec `Version:` (`bump.sh` covers the spec + `_service` + `.changes`
    part),

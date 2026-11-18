@@ -1,4 +1,4 @@
-# Template: Electron app prebuilt (validated by packages/pear-desktop-bin).
+# Template: Electron app prebuilt (validated by packages/pear-desktop).
 # Invariants: the app tree installs under %{_libdir}/<name> with a symlink in
 # %{_bindir}. The desktop file is a Source because release tarballs rarely
 # ship one. Every dir under icons/hicolor must be owned via %dir or OBS

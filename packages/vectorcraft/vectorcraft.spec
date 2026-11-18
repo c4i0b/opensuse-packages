@@ -59,7 +59,9 @@ done
 # being compiled: in a vendored tree that resolves to the vendored "xml"
 # crate (whose extensionless LICENSE panics the macro) instead of
 # atspi-common's D-Bus XML dir
-[ -d vendor/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor/atspi-common/xml"
+for d in vendor/atspi-common-*/xml; do
+    [ -d "$d" ] && export LOCKSTEP_XML_PATH="$PWD/$d"
+done
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
 %{cargo_build}

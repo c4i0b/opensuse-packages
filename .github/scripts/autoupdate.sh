@@ -101,6 +101,18 @@ resolve() {
             [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
           done | head -1)"
     fi
+  elif [[ "$source" == commit:* ]]; then
+    # commits-only repos (no releases, no tags): version by the HEAD
+    # commit's date, and the bump also rewrites the _service revision sha
+    local repo="${source#commit:}"
+    body="$(get "$pkg" "https://api.github.com/repos/${repo}/commits/HEAD" "${auth[@]}")" || true
+    csha="$(grep -oE '"sha": ?"[0-9a-f]{40}"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
+    cdate="$(grep -oE '"[0-9]{4}-[0-9]{2}-[0-9]{2}T' <<<"$body" | head -1 | tr -d '"T')" || true
+    if [ -n "$csha" ] && [ -n "$cdate" ]; then
+      latest="${cdate//-/.}"
+      printf 'latest\t%s\t%s\t%s\n' "$pkg" "$latest" "$csha" > "$resolved/$pkg"
+      return 0
+    fi
   elif [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
     body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
     latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
@@ -179,7 +191,7 @@ for f in "$resolved"/*; do
   cat "$f"
 done | sort > "$packages"
 
-while IFS=$'\t' read -r _ pkg latest; do
+while IFS=$'\t' read -r _ pkg latest csha; do
   # Manual pin: a commit message "autoupdate: override <version>" on the
   # package dir keeps the bot from re-bumping to an unwanted release
   if git -C "$root" log -1 --format=%B -- "packages/$pkg" \
@@ -225,13 +237,22 @@ while IFS=$'\t' read -r _ pkg latest; do
     echo "::warning::$pkg: bump to $latest_rpm failed, skipping"
     continue
   fi
+  # commit:-tracked packages: the _service pins the source by sha, so a
+  # bump must also move it (both the archive path and any sha-named
+  # filename; GitHub serves short and full-sha archive URLs alike)
+  if [ -n "${csha:-}" ]; then
+    old_sha="$(grep -oE 'archive/[0-9a-f]{7,40}' "$root/packages/$pkg/_service" 2>/dev/null | head -1 | cut -d/ -f2)"
+    if [ -n "$old_sha" ] && [ "$old_sha" != "$csha" ]; then
+      sed -i "s|${old_sha}|${csha}|g" "$root/packages/$pkg/_service"
+    fi
+  fi
   # Vendored packages: regenerate the client-side artifacts and tracked
   # side files (requirements.txt, node_modules.spec.inc, ...) BEFORE
   # committing — a bump that cannot re-vendor ships a stale archive and
   # breaks the OBS build offline (red: solidcraft 0.43.0 with a 0.40.1
   # Cargo.lock). Reverting the worktree drops just this package's bump.
-  if [ -f "$root/packages/$pkg/fetch.sh" ] \
-     || grep -Eq 'go build -mod=vendor|cargo_build' "$spec"; then
+  if [ -f "$root/packages/$pkg/fetch.sh" ] || [ -f "$root/tools/pinvendor-$pkg.py" ] \
+     || grep -Eq 'go build -mod=vendor|cargo_build|__cargo' "$spec"; then
     # one retry for transient upstream hiccups (red: hermes-agent 0.23.2 —
     # codeload served a non-gzip body for a freshly-generated tag tarball)
     if ! bash "$root/tools/revendor.sh" "$pkg"; then

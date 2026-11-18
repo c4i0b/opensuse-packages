@@ -45,9 +45,14 @@ import json, os, sys
 lock = json.load(open(sys.argv[1]))
 pkgroot, moddir = sys.argv[2], sys.argv[3]
 for path, entry in lock.get("packages", {}).items():
-    if not path.startswith("node_modules/") or "/" in path[len("node_modules/"):]:
+    rest = path[len("node_modules/"):]
+    parts = rest.split("/")
+    # top-level only ("name" or "@scope/name"); the bare "/" test also
+    # skipped SCOPED top-level deps (red: openclaw's @homebridge/ciao)
+    if not path.startswith("node_modules/") or len(parts) > 2 \
+            or (len(parts) == 2 and not parts[0].startswith("@")):
         continue
-    name = path[len("node_modules/"):]
+    name = rest
     expected = name.replace("/", "-") + "-" + entry["version"] + ".tgz"
     if not os.path.exists(os.path.join(moddir, expected)):
         bundled = os.path.join(pkgroot, path)
