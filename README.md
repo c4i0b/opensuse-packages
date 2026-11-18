@@ -133,20 +133,28 @@ packages to OBS, where they are built.
 ### Automatic updates
 
 ```
-upstream release
-       │
-       ▼  3×/day (01:23/09:23/17:23 UTC), per packages/<name>/upstream
-┌───────────┐   bump spec + _service
-│ autoupdate│──────────────▶ main, after the in-job
-└───────────┘               gate (version + asset
-                             HEAD checks, validate)
-                                 │  GITHUB_TOKEN fires no push event:
-                                 ▼  push-to-obs rides workflow_run
-                     push-to-obs syncs the touched
-                     packages to OBS → OBS builds
-                                 │
-                                 ▼  ~1h20 after the bump
-                     badges refresh (README + badges/*.json)
+ (upstream release)
+  |
+  |  3x/day scan @ 01:23 / 09:23 / 17:23 UTC (data-driven slots,
+  |  see docs/autoupdate.md)
+  |
+  o  AUTOUPDATE BOT .......... bump spec + _service, re-vendor in CI
+  |                          (gate red -> only that package reverts)
+  |
+  o  IN-JOB GATE ............ version + asset HEAD + lint/drift
+  |
+  o  MAIN ................... ff-merge of the gated SHA
+  |                          GITHUB_TOKEN pushes fire no push event:
+  |                          push-to-obs rides workflow_run
+  |
+  o  PUSH-TO-OBS ............ syncs touched packages + vendor archives
+  |
+  o  OBS BUILDS ............. offline, from the vendored sources
+  |
+  o  BADGES ................ README + badges/*.json, ~1h20 after bump
+  |                          blue ok - v->v building - red failed
+  |
+ (end of the pipeline)
 ```
 
 - Each package lives in `packages/<name>/`. Required: `*.spec`. Optional:
