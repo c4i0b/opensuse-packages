@@ -55,6 +55,12 @@ for pkg in pkgs:
     # download path carries '-' while Version is the dot-sanitized form,
     # so the version reference may live in the renamed filename param.
     fn = param("filename") or ""
+    # commit:-tracked packages (no releases/tags upstream): the source is
+    # pinned by a full commit sha and the version is the commit date, so
+    # neither the URL nor the filename references it — the sha IS the pin
+    if re.search(r"/archive/[0-9a-f]{40}(?:/|\.|$)", url):
+        print(f"{pkg}: Version {ver}, commit-pinned source")
+        continue
     if not (re.search(r"(^|[/_.-])v?" + re.escape(ver) + r"([/_.-]|$)", url)
             or re.search(r"(^|[_.-])v?" + re.escape(ver) + r"([_.-]|$)", fn)):
         failures.append(f"{pkg}: _service URL ({url}, filename {fn!r}) does not reference version {ver}")
