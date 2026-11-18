@@ -2,7 +2,7 @@
 %global commit dff519f972103f91384f360f270614184de8aa92
 
 Name:           unimatrix
-Version:        0.1.0
+Version:        2026.05.20
 Release:        0
 Summary:        Simulate the display from "The Matrix" in a terminal
 License:        GPL-3.0-or-later
