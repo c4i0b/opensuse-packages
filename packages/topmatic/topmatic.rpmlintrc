@@ -1,2 +1,2 @@
 # Product/tool names rpmlint's dictionary does not know
-addFilter("topmatic.*: E: spelling-error.*")
+addFilter("topmatic.*: E: spelling-error.* (topgrade|topmatic|systemd)")

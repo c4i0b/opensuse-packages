@@ -1,5 +1,5 @@
 # Electron payload: stripping corrupts the embedded snapshot
-%define debug_package %{nil}
+%global debug_package %{nil}
 %global __strip /bin/true
 # bundled python stdlib ships "#!/usr/bin/env python" shebangs brp-mangle rejects
 %global __brp_mangle_shebangs %{nil}

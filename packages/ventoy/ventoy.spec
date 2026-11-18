@@ -1,6 +1,6 @@
 # Upstream source build is impractical (cross grub/edk2 + root image steps);
 # the official release tarball ships the finished tool tree
-%define debug_package %{nil}
+%global debug_package %{nil}
 # Bundle ships 32-bit and foreign ELFs whose sonames must not leak into requires
 %global __requires_exclude_from ^/opt/ventoy/.*$
 %global __provides_exclude_from ^/opt/ventoy/.*$

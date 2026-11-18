@@ -1,7 +1,7 @@
 Name:           fish-fzf
 Version:        11.0
 Release:        0
-Summary:        fzf key bindings for the fish shell
+Summary:        Fzf key bindings for the fish shell
 License:        MIT
 URL:            https://github.com/patrickf1/fzf.fish
 Source0:        fish-fzf-%{version}.tar.gz

@@ -1,5 +1,5 @@
 # Electron payload: stripping corrupts the embedded snapshot
-%define debug_package %{nil}
+%global debug_package %{nil}
 %global __strip /bin/true
 
 # Bundled Electron must not leak into rpm provides/requires
