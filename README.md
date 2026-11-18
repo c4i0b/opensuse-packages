@@ -16,8 +16,8 @@ packages to OBS, where they are built.
 
 <!-- repo-badges begin -->
 [![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3D8663ea6cr2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
-[![tumbleweed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftumbleweed.json%3Fv%3Ddac7228er2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
-[![slowroll](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fslowroll.json%3Fv%3D7956dcf0r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![tumbleweed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftumbleweed.json%3Fv%3D904254fer2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![slowroll](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fslowroll.json%3Fv%3Ddac0641br2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 <!-- repo-badges end -->
 
 <!-- build-status begin -->
@@ -31,7 +31,7 @@ packages to OBS, where they are built.
 [![atac](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fatac.json%3Fv%3D78d316ffr2)](https://github.com/julien-cpsn/ATAC/)
 [![bandwhich](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fbandwhich.json%3Fv%3D2ced91f4r2)](https://github.com/imsnif/bandwhich/)
 [![bombardier](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fbombardier.json%3Fv%3D7cc0a996r2)](https://github.com/codesenberg/bombardier/)
-[![bully](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fbully.json%3Fv%3D9df1969er2)](https://github.com/aanarchyy/bully/)
+[![bully](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fbully.json%3Fv%3D52483c27r2)](https://github.com/aanarchyy/bully/)
 [![cadcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fcadcraft.json%3Fv%3D04c17811r2)](https://github.com/storytold/cadcraft/)
 [![cloudflare-speed-cli](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fcloudflare-speed-cli.json%3Fv%3Df3d295f4r2)](https://github.com/kavehtehrani/cloudflare-speed-cli/)
 [![colloid-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fcolloid-icon-theme.json%3Fv%3D90b6a660r2)](https://github.com/vinceliuice/Colloid-icon-theme/)
