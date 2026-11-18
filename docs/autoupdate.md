@@ -24,6 +24,15 @@ manual dispatch). Per package,
 - `tags:owner/repo` → latest git tag via `ls-remote` (tags-only repos,
   zero API quota)
 - `npm:<package>` → npm dist-tag `latest`
+- `commit:[github:|gitlab:|codeberg:|forgejo:]owner/repo` → HEAD commit
+  of the default branch; version is the commit date (`YYYY.MM.DD`) and
+  the bump also rewrites the `_service` source sha (commits-only
+  upstreams — fish-hydro, unimatrix)
+
+Forge knowledge lives in one registry (`FORGES` in
+`tools/upstream_resolver.py`, unit-tested in `tests/`): adding a forge
+is one entry, and every source form (`owner/repo`, `tags:`, `commit:`)
+works against every forge in the registry.
 
 Vendored packages (rust `vendor.tar.zst`, client-side go vendor,
 npm-bundle `node_modules.obscpio`, `hermes-agent` wheels) carry an
