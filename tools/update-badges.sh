@@ -65,7 +65,7 @@ for result in tree.findall("result"):
     for status in result.findall("status"):
         cells.setdefault((repo, arch), {})[status.get("package")] = status.get("code")
 
-BAD = {"failed", "broken"}
+BAD = {"failed", "broken", "unresolvable"}
 INFLIGHT = {"scheduled", "building", "sign", "dispatching", "blocked", "waiting"}
 
 badges = Path(root) / "badges"
@@ -105,7 +105,7 @@ for (repo, arch), pkgs in sorted(cells.items(), key=lambda kv: repo_sort_key(kv[
     ok = sum(c not in BAD and c not in INFLIGHT for c in pkgs.values())
     bad = sum(c in BAD for c in pkgs.values())
     inflight = sum(c in INFLIGHT for c in pkgs.values())
-    color = "red" if bad else ("yellow" if inflight else "brightgreen")
+    color = "red" if bad else ("yellow" if inflight else "blue")
     # ok alone: the packages badge below carries the totals; the color is
     # the failure/in-flight signal
     fname, label = bname(repo, arch), blabel(repo, arch)
@@ -204,12 +204,18 @@ for pkg_dir in sorted(Path(root, "packages").iterdir()):
     # building, red failed), instead of a stateless "building" that hides
     # the last built version
     msg = (f"v{pub} → v{ver}" if pub and pub != ver else f"v{pub or ver}")
+    # color semantics (fedora-packages parity): blue only when EVERY
+    # (repo, arch) cell succeeded — "not failed" is not success;
+    # unresolvable is a red (broken deps), excluded/idle is grey, never
+    # green-by-default
     if any(s in BAD for s in states):
         color = "red"
     elif any(s in INFLIGHT for s in states):
         color = "yellow"
+    elif states and all(s == "succeeded" for s in states):
+        color = "blue"
     else:
-        color = "brightgreen"
+        color = "lightgrey"
     rev = write_badge(pkg_dir.name, pkg_dir.name, msg, color)
     written.add(pkg_dir.name)
     link = upstream_link(pkg_dir)
