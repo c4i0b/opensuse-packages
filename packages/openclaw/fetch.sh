@@ -47,9 +47,15 @@ import json, os, sys
 lock = json.load(open(sys.argv[1]))
 pkgroot, moddir = sys.argv[2], sys.argv[3]
 for path, entry in lock.get("packages", {}).items():
-    if not path.startswith("node_modules/") or "/" in path[len("node_modules/"):]:
+    rest = path[len("node_modules/"):]
+    parts = rest.split("/")
+    # top-level only: "name" or "@scope/name"; nested entries go deeper.
+    # A bare "/" test wrongly skipped SCOPED top-level deps (red:
+    # @homebridge/ciao 1.3.12 unpacked -> OBS %prep 404 on it)
+    if not path.startswith("node_modules/") or len(parts) > 2 \
+            or (len(parts) == 2 and not parts[0].startswith("@")):
         continue
-    name = path[len("node_modules/"):]
+    name = rest
     expected = name.replace("/", "-") + "-" + entry["version"] + ".tgz"
     if not os.path.exists(os.path.join(moddir, expected)):
         bundled = os.path.join(pkgroot, path)
@@ -106,9 +112,15 @@ for i, f in enumerate(have, 10000):
         bundled.append(f)
         lines.append("Source%d:\t%s" % (i, f))
 for path, entry in lock.get("packages", {}).items():
-    if not path.startswith("node_modules/") or "/" in path[len("node_modules/"):]:
-        continue  # nested/scoped entries: tarball name is not derivable from the path
-    name = path[len("node_modules/"):]
+    rest = path[len("node_modules/"):]
+    parts = rest.split("/")
+    # same top-level rule as the bundled-dep scanner above (scoped deps
+    # are top-level; the bare "/" test skipped them and their tarball
+    # never got verified, hiding the openclaw %prep 404)
+    if not path.startswith("node_modules/") or len(parts) > 2 \
+            or (len(parts) == 2 and not parts[0].startswith("@")):
+        continue  # nested entries: tarball name is not derivable from the path
+    name = rest
     expected = name.replace("/", "-") + "-" + entry["version"] + ".tgz"
     if expected not in have:
         missing.append(expected)
