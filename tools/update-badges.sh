@@ -170,7 +170,15 @@ def upstream_link(pkg_dir):
     up = pkg_dir / "upstream"
     if up.exists():
         src = up.read_text().strip()
-        src = re.sub(r"^tags:", "", src)
+        # strip the non-repo source forms so the link lands on the repo,
+        # not on a literal "commit:owner/repo" URL
+        src = re.sub(r"^(tags|commit):", "", src)
+        forge_hosts = {"gitlab:": "https://gitlab.com/",
+                       "codeberg:": "https://codeberg.org/",
+                       "forgejo:": "https://codeberg.org/"}
+        for prefix, host in forge_hosts.items():
+            if src.startswith(prefix):
+                return host + src[len(prefix):] + "/"
         if not src.startswith(("npm:", "http")) and "/" in src:
             return f"https://github.com/{src}/"
     for spec in pkg_dir.glob("*.spec"):
