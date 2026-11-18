@@ -131,6 +131,34 @@ tracked = set(
       .read().split())
 tracked_pkgs = {p.split("/")[1] for p in tracked if p.count("/") >= 2}
 
+# name -> last PUBLISHED version, straight from the binary repos' repodata
+# (fedora-packages model): once a rebuild is in flight, the build monitor
+# stops reporting the previous succeeded state, so repodata is the only
+# source for "last complete build" while one is running
+import gzip, time
+def published_versions(repo):
+    base = f"https://download.opensuse.org/repositories/{project}/{repo}"
+    try:
+        repomd = get(f"{base}/repodata/repomd.xml?nc={time.time_ns()}").decode()
+        href = re.search(r'href="(repodata/[^"]*primary\.xml\.(?:gz|zst))"', repomd).group(1)
+        data = get(f"{base}/{href}?nc={time.time_ns()}")
+        if href.endswith(".zst"):
+            from compression.zstd import decompress as zdec
+            data = zdec(data)
+        else:
+            data = gzip.decompress(data)
+        xml = data.decode(errors="replace")
+        return dict(re.findall(
+            r'<name>([^<]+)</name>.*?<version[^>]*?ver="([^"]+)"', xml, re.S))
+    except Exception as e:
+        print(f"WARNING: repodata fetch failed for {repo}: {e}")
+        return {}
+
+published = {}
+for repo in sorted({r for (r, _a) in cells}, key=repo_sort_key):
+    for pkg_name, ver in published_versions(repo).items():
+        published.setdefault(pkg_name, ver)
+
 def spec_version(spec):
     for line in spec.read_text().splitlines():
         m = re.match(r"^Version:\s+(\S+)", line)
@@ -161,12 +189,19 @@ for pkg_dir in sorted(Path(root, "packages").iterdir()):
         continue
     states = [c for pkgs in cells.values() for p, c in pkgs.items() if p == pkg_dir.name]
     ver = spec_version(next(pkg_dir.glob("*.spec")))
+    pub = published.get(pkg_dir.name)
+    # fedora-packages message convention: the badge always carries a
+    # version — what is installable on the left, the in-flight/failed
+    # attempt on the right — and the COLOR carries the state (yellow
+    # building, red failed), instead of a stateless "building" that hides
+    # the last built version
+    msg = (f"v{pub} → v{ver}" if pub and pub != ver else f"v{pub or ver}")
     if any(s in BAD for s in states):
-        color, msg = "red", "failed"
+        color = "red"
     elif any(s in INFLIGHT for s in states):
-        color, msg = "yellow", "building"
+        color = "yellow"
     else:
-        color, msg = "brightgreen", f"v{ver}"
+        color = "brightgreen"
     rev = write_badge(pkg_dir.name, pkg_dir.name, msg, color)
     written.add(pkg_dir.name)
     link = upstream_link(pkg_dir)
