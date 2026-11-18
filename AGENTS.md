@@ -12,7 +12,10 @@ doc over growing this file.
 
 - The host provides only `just` + `podman`; every recipe runs in the
   ephemeral `tooling` container. Run `just image` once (it also wires the
-  git hooks); `just shell` for interactive work.
+  git hooks); `just shell` for interactive work. Host shells need NO PATH
+  setup: git/gh/curl orchestration runs host-side as-is, and repo
+  operations go through `just` (instructions requiring PATH exports from
+  sibling repos do not apply here).
   Full details: [docs/environment.md](docs/environment.md).
 
 ## Golden rules
