@@ -22,6 +22,9 @@ doc over growing this file.
 
 - OBS is the build validator: `just build` is a pre-flight rpmlint-gated
   rpmbuild, never a substitute. Push, then watch `just results`/`just log`.
+- Never package what official openSUSE repos already ship: run the
+  official-repo gap check BEFORE writing any file
+  ([conventions.md](docs/conventions.md#before-adding-a-package-official-repo-gap-check)).
 - Never commit archives — OBS fetches sources via `_service`.
 - Register every prebuilt package's origin in `PREBUILT_ORIGIN`
   (`opensuse-lint.py`): `bun` and Electron bundles must disable strip,

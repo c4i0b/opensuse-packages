@@ -21,7 +21,9 @@ layout, quirks. Reference the UPSTREAM project by its GitHub URL
    `openSUSE:Factory` (the local snapshot `/tmp/opencode/factory.txt` if
    fresh, else re-fetch: `just osc api /source/openSUSE:Factory` and grep,
    or check https://software.opensuse.org)? If either is true → stop, report,
-   do not port. Name variants count (e.g. `heroic` vs `heroic-games-launcher`).
+   do not port. Name variants count (search by the upstream project name
+   AND likely binary names). This is the repo-wide rule in
+   [conventions.md](../docs/conventions.md#before-adding-a-package-official-repo-gap-check).
 2. **Build model classification** (from the fedora spec): rust-from-source /
    go / python-pyproject / npm-bundle (npm tarball + build-time `npm install`
    -> offline via `local-npm-registry` + client-side `node_modules.obscpio`;

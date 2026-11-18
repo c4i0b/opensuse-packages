@@ -60,6 +60,19 @@ and updates now run through our own autoupdate bot, which can be taught
 whatever the repo needs. The 2026-11 conversion validated the model end
 to end on OBS.
 
+## Before adding a package: official-repo gap check
+
+Do not package what the distro already ships. Before writing any file,
+check whether the package is available from the official openSUSE
+repositories (Tumbleweed; Slowroll inherits Tumbleweed snapshots):
+`zypper se <name>`, https://software.opensuse.org, or the Factory
+snapshot. If yes → stop, report, do not package. Name variants count —
+search by the upstream project name AND likely binary names. Exception:
+a home package is justified when the official version lags upstream
+badly and the user wants faster bumps, or to carry a local patch — say
+so explicitly. Slowroll lag alone is not a reason (wait for the next
+snapshot).
+
 ## Versioning
 
 Single source of truth: the spec's `Version:` tag. There is no `VERSION`
