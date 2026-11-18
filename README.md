@@ -21,7 +21,6 @@ packages to OBS, where they are built.
 <!-- repo-badges end -->
 
 <!-- build-status begin -->
-
 *Updated 2026-11-18 12:49 UTC*
 <!-- build-status end -->
 
@@ -57,7 +56,7 @@ packages to OBS, where they are built.
 [![fish-fifc](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-fifc.json%3Fv%3D0d1f73bcr2)](https://github.com/gazorby/fifc/)
 [![fish-fzf](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-fzf.json%3Fv%3D913a5619r2)](https://github.com/patrickf1/fzf.fish/)
 [![fish-gitnow](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-gitnow.json%3Fv%3D0e494639r2)](https://github.com/joseluisq/gitnow/)
-[![fish-hydro](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-hydro.json%3Fv%3D65e8a4c2r2)](https://github.com/commit:jorgebucaran/hydro/)
+[![fish-hydro](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-hydro.json%3Fv%3D65e8a4c2r2)](https://github.com/jorgebucaran/hydro/)
 [![fish-nvm](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-nvm.json%3Fv%3D153f45d8r2)](https://github.com/jorgebucaran/nvm.fish/)
 [![fish-puffer-fish](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-puffer-fish.json%3Fv%3D64fe7ad7r2)](https://github.com/nickeb96/puffer-fish/)
 [![fish-pure](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffish-pure.json%3Fv%3D28fe26bdr2)](https://github.com/pure-fish/pure/)
@@ -107,7 +106,7 @@ packages to OBS, where they are built.
 [![tela-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftela-icon-theme.json%3Fv%3D15740ae4r2)](https://github.com/vinceliuice/Tela-icon-theme/)
 [![television](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftelevision.json%3Fv%3D7788fe9br2)](https://github.com/alexpasmantier/television/)
 [![topmatic](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftopmatic.json%3Fv%3Db88abaf9r2)](https://github.com/c4i0b/topmatic/)
-[![unimatrix](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Funimatrix.json%3Fv%3D75c8022br2)](https://github.com/commit:will8211/unimatrix/)
+[![unimatrix](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Funimatrix.json%3Fv%3D75c8022br2)](https://github.com/will8211/unimatrix/)
 [![vectorcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fvectorcraft.json%3Fv%3D4c085731r2)](https://github.com/storytold/vectorcraft/)
 [![ventoy](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fventoy.json%3Fv%3D074f0e3er2)](https://github.com/ventoy/Ventoy/)
 [![waydroid-helper](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fwaydroid-helper.json%3Fv%3D18da9989r2)](https://github.com/waydroid-helper/waydroid-helper/)
