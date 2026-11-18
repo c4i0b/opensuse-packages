@@ -68,100 +68,6 @@ get() {
   return 1
 }
 
-resolve() {
-  upstream_file="$1"
-  pkg="$(basename "$(dirname "$upstream_file")")"
-  source="$(cat "$upstream_file")"
-
-  auth=()
-  [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
-  if [[ "$source" == tags:* ]]; then
-    # tags-only repos: ls-remote is forge-agnostic and costs no API quota
-    local repo_url="${source#tags:}"
-    case "$repo_url" in
-      gitlab:*) repo_url="https://gitlab.com/${repo_url#gitlab:}" ;;
-      codeberg:*) repo_url="https://codeberg.org/${repo_url#codeberg:}" ;;
-      forgejo:*) repo_url="${FORGEJO_HOME:-https://codeberg.org}/${repo_url#forgejo:}" ;;
-      *) repo_url="https://github.com/$repo_url" ;;
-    esac
-    latest="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
-      | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2}' \
-      | while IFS= read -r t; do
-          # strict pass first: plain v<version> tags only. Component tags
-          # (anomalyco/opencode's vscode-v1.0.0) pollute the prefix-stripped
-          # pass and resolve as downgrades.
-          [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
-        done | head -1)"
-    if [ -z "$latest" ]; then
-      # fallback for prefixed tags (openai/codex's rust-v0.163.0): strip
-      # the prefix, keep the version part
-      latest="$(git ls-remote --tags --sort=-v:refname "$repo_url" 2>/dev/null \
-        | awk '!/\^\{\}/ {sub(/^refs\/tags\//, "", $2); print $2}' \
-        | while IFS= read -r t; do
-            t="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$t")"
-            [[ "${t#v}" =~ ^[0-9][A-Za-z0-9._+~-]*$ ]] && { printf '%s\n' "${t#v}"; break; }
-          done | head -1)"
-    fi
-  elif [[ "$source" == commit:* ]]; then
-    # commits-only repos (no releases, no tags): version by the HEAD
-    # commit's date, and the bump also rewrites the _service revision sha
-    local repo="${source#commit:}"
-    body="$(get "$pkg" "https://api.github.com/repos/${repo}/commits/HEAD" "${auth[@]}")" || true
-    csha="$(grep -oE '"sha": ?"[0-9a-f]{40}"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    cdate="$(grep -oE '"[0-9]{4}-[0-9]{2}-[0-9]{2}T' <<<"$body" | head -1 | tr -d '"T')" || true
-    if [ -n "$csha" ] && [ -n "$cdate" ]; then
-      latest="${cdate//-/.}"
-      printf 'latest\t%s\t%s\t%s\n' "$pkg" "$latest" "$csha" > "$resolved/$pkg"
-      return 0
-    fi
-  elif [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
-    body="$(get "$pkg" "https://api.github.com/repos/${source}/releases/latest" "${auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-  elif [[ "$source" == npm:* ]]; then
-    npm_pkg="${source#npm:}"
-    npm_slug="$(echo "$npm_pkg" | sed 's|/|%2f|')"
-    body="$(get "$pkg" "https://registry.npmjs.org/${npm_slug}/latest")" || true
-    latest="$(grep -oE '"version": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-  elif [[ "$source" == gitlab:* ]]; then
-    src="${source#gitlab:}"; proj="$(echo "$src" | sed 's|/|%2f|')"
-    local gl_auth=("${auth[@]}")
-    [ -n "${GITLAB_TOKEN:-}" ] && gl_auth=(-H "PRIVATE-TOKEN: $GITLAB_TOKEN")
-    body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/releases" "${gl_auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-    if [ -z "$latest" ]; then
-      body="$(get "$pkg" "https://gitlab.com/api/v4/projects/${proj}/repository/tags?per_page=1" "${gl_auth[@]}")" || true
-      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-      latest="${latest#v}"
-    fi
-  elif [[ "$source" == codeberg:* || "$source" == forgejo:* ]]; then
-    src="${source#*:}"; baseh="https://codeberg.org/api/v1"
-    [[ "$source" == forgejo:* ]] && baseh="${FORGEJO_API:-$baseh}"
-    body="$(get "$pkg" "${baseh}/repos/${src}/releases?limit=1" "${auth[@]}")" || true
-    latest="$(grep -oE '"tag_name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-    if [ -z "$latest" ]; then
-      body="$(get "$pkg" "${baseh}/repos/${src}/tags?limit=1" "${auth[@]}")" || true
-      latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-      latest="${latest#v}"
-    fi
-  fi
-  if [ -z "$latest" ] && [[ "$source" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
-    # Tag-only repos (no GitHub Releases): fall back to the latest tag
-    body="$(get "$pkg" "https://api.github.com/repos/${source}/tags?per_page=1" "${auth[@]}")" || true
-    latest="$(grep -oE '"name": ?"[^"]*"' <<<"$body" | head -1 | cut -d'"' -f4)" || true
-    latest="${latest#v}"
-    [ -n "$latest" ] && echo "::notice::[tags-fallback] pkg=$pkg source=$source resolved=$latest (no GitHub Releases; releases/latest is re-checked every run)"
-  fi
-
-  if [ -z "$latest" ]; then
-    echo "::warning::$pkg: could not resolve latest release of $source"
-    return 0
-  fi
-  latest="$(sed -E 's/^.+-v([0-9])/\1/' <<<"$latest")"
-  printf 'latest\t%s\t%s\n' "$pkg" "$latest" > "$resolved/$pkg"
-}
 
 # spec-bearing packages without an `upstream` file are invisible to the
 # bot; say so once per run instead of resolving silently (aggregated over 5)
@@ -181,8 +87,11 @@ if [ -n "$no_upstream" ]; then
   fi
 fi
 
+# resolution lives in tools/upstream_resolver.py (pure, unit-tested in
+# tests/): same TSV contract as the old bash resolver, threads instead
+# of xargs -P, identical annotation vocabulary
 find "$root/packages" -name upstream -maxdepth 2 \
-  | xargs -P 8 -I{} bash -c "$(declare -f get resolve); resolve \"{}\""
+  | python3 "$root/tools/upstream_resolver.py" "$resolved"
 
 packages="$(mktemp)"
 bumped=0
