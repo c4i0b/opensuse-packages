@@ -80,6 +80,7 @@ jobs:
           last_ok="$(gh run list -R "$GITHUB_REPOSITORY" -w push-to-obs \
             -s success -L 1 --json headSha,createdAt --jq '.[0].headSha' 2>/dev/null || true)"
 
+          pkgs=""
           if [ -n "${INPUT_PACKAGES:-}" ]; then
             pkgs="$INPUT_PACKAGES"
           elif [ -n "$last_ok" ] && git rev-parse --verify --quiet "$last_ok^{commit}" >/dev/null; then
