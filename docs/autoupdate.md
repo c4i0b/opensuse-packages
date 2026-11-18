@@ -1,5 +1,12 @@
 # Automatic updates
 
+Schedule slots are sized from measured bump yield per slot (90 days of
+run history, catch-up runs excluded), not even spacing — method and
+rationale: agent-skills `gh-actions-conventions` rule 14
+(~/Projects/agent-skills/skills/foundations/gh-actions-conventions/SKILL.md).
+The same slots apply repo-family-wide (fedora-packages); badges run 2 h
+behind each autoupdate slot.
+
 Updates must stay fully automatic: a human should never need to touch a
 package to get its next version. This requirement is why the repo is
 `-bin`-only (see the source-builds-rejected section in
@@ -7,7 +14,8 @@ package to get its next version. This requirement is why the repo is
 
 ## autoupdate (the bot)
 
-Scheduled workflow (`.github/workflows/autoupdate.yml`, every 4 hours +
+Scheduled workflow (`.github/workflows/autoupdate.yml`, 3×/day at
+01:23/09:23/17:23 UTC +
 manual dispatch). Per package,
 `packages/<name>/upstream` selects the tracker:
 
