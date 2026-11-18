@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Refresh OBS status artifacts (port of the fedora-packages badges model):
+# Refresh OBS status artifacts:
 #   badges/*.json — shields.io endpoint JSON (per-repo semaphores, packages count,
 #                   per-package build state at the repo's current version)
 #   README.md     — the marked badge blocks
@@ -39,8 +39,8 @@ def badge_rev(payload):
     return hashlib.sha256(payload.encode()).hexdigest()[:8]
 
 def get(url, tries=3):
-    # OBS API hiccups must not fail the whole refresh (fedora-packages
-    # pattern: retry with growing backoff)
+    # OBS API hiccups must not fail the whole refresh: retry with
+    # growing backoff
     import time
     for attempt in range(tries):
         try:
@@ -79,7 +79,7 @@ def write_badge(fname, label, message, color):
         f.write(payload)
     return badge_rev(payload)
 
-# ---- repo semaphores (fedora-packages chroot-badge model) -----------------
+# ---- repo semaphores ------------------------------------------------------
 # arch joins the file name/label only when a repo builds more than one arch
 arches_by_repo = {}
 for (repo, arch) in cells:
@@ -94,7 +94,7 @@ def blabel(repo, arch):
               .replace('opensuse slowroll', 'slowroll')
     return f"{txt} {arch}" if len(arches_by_repo[repo]) > 1 else txt
 
-# explicit order (fedora-packages sort_key model): primary distro first,
+# explicit order: primary distro first,
 # derived codestream after — NOT the accidental alphabetical sort
 def repo_sort_key(repo):
     order = {"opensuse_tumbleweed": 0, "opensuse_slowroll": 1}
@@ -115,7 +115,7 @@ for (repo, arch), pkgs in sorted(cells.items(), key=lambda kv: repo_sort_key(kv[
         f'%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2F{fname}.json%3Fv%3D{rev}r{BADGE_REV})]'
         f'(https://build.opensuse.org/project/monitor?project={project.replace(":", "%3A")})')
 
-# packages count badge opens the block (fedora-packages model)
+# packages count badge opens the block
 all_pkgs = {p for pkgs in cells.values() for p in pkgs}
 rev = write_badge("packages", "packages", str(len(all_pkgs)), "blue")
 repo_lines.insert(0,
@@ -132,7 +132,7 @@ tracked = set(
 tracked_pkgs = {p.split("/")[1] for p in tracked if p.count("/") >= 2}
 
 # name -> last PUBLISHED version, straight from the binary repos' repodata
-# (fedora-packages model): once a rebuild is in flight, the build monitor
+# Once a rebuild is in flight, the build monitor
 # stops reporting the previous succeeded state, so repodata is the only
 # source for "last complete build" while one is running
 import gzip, time
@@ -190,7 +190,7 @@ for pkg_dir in sorted(Path(root, "packages").iterdir()):
     states = [c for pkgs in cells.values() for p, c in pkgs.items() if p == pkg_dir.name]
     ver = spec_version(next(pkg_dir.glob("*.spec")))
     pub = published.get(pkg_dir.name)
-    # fedora-packages message convention: the badge always carries a
+    # The badge always carries a
     # version — what is installable on the left, the in-flight/failed
     # attempt on the right — and the COLOR carries the state (yellow
     # building, red failed), instead of a stateless "building" that hides
@@ -233,7 +233,7 @@ text = replace_block(text, "repo-badges", repo_lines)
 text = replace_block(text, "package-badges", pkg_lines)
 
 # build-status: failures table + an Updated timestamp that only moves when
-# the status itself changed (last-STATE-CHANGE, the fedora-packages model).
+# the status itself changed (last-STATE-CHANGE).
 # The essence compare drops the WHOLE timestamp line: a bare text sub
 # leaves stray '*' making every refresh look like a state change.
 from datetime import datetime, timezone

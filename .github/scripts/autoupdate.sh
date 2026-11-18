@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Ported from the fedora-packages autoupdate model (Renovate was rejected
-# there; see docs/autoupdate.md for the local reds that motivated this).
+# Bot model (Renovate was rejected repo-family-wide
+# after three real failures; see docs/autoupdate.md for the local reds
+# that motivated this).
 # Resolves latest upstream versions in parallel, bumps serially, commits
 # on a dated bump/ branch (never directly on main). The workflow gates the
 # branch (validate-packages.py) and ff-merges the exact gated SHA; commits

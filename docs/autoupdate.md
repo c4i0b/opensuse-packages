@@ -8,7 +8,7 @@ package to get its next version. This requirement is why the repo is
 ## autoupdate (the bot)
 
 Scheduled workflow (`.github/workflows/autoupdate.yml`, every 4 hours +
-manual dispatch), ported from the fedora-packages model. Per package,
+manual dispatch). Per package,
 `packages/<name>/upstream` selects the tracker:
 
 - `owner/repo` → GitHub Releases latest (leading `v` stripped; falls back

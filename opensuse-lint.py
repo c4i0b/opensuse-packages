@@ -268,7 +268,7 @@ def _is_section(line: str) -> bool:
 # NOT be flagged. Register new prebuilt packages here so the lint knows what to
 # check for; unknown prebuilts get a WARN asking to be classified.
 PREBUILT_ORIGIN = {
-    # upstream-RPM repackage (fedora-packages model): Electron bundle under
+    # upstream-RPM repackage: Electron bundle under
     # %{_libdir}, strip disabled in the spec itself (stripping corrupts the
     # embedded snapshot). superfile/television/ytm-player build from source
     # since 2026-11 — no prebuilt registry entries left.
@@ -755,7 +755,7 @@ def check_rpm_payload_extract(spec: SpecModel) -> list[Finding]:
 
 # Templates must render into conforming packages: fill every placeholder
 # with dummy values and run the same invariants over the rendered spec
-# (ported from fedora-packages' tools/test.sh render pass). local-source
+# (render-pass inherited from the original port). local-source
 # is waived: scaffolds ship their local Source files at creation time.
 def check_templates_render(repo: Path) -> list[Finding]:
     out = []

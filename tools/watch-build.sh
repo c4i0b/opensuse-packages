@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Watch in-flight OBS builds until every package reaches a terminal state,
-# then report and exit non-zero if anything failed (the fedora-packages
-# watch contract). Uses `osc results --watch` for the waiting and the CSV
-# output for the verdict.
+# then report and exit non-zero if anything failed. Uses `osc results
+# --watch` for the waiting and the CSV output for the verdict.
 set -euo pipefail
 
 project="home:${OBS_USER:-caiobruno}"

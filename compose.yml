@@ -1,4 +1,4 @@
-# opensuse-packages tooling — Compose Spec (same model as fedora-packages:
+# opensuse-packages tooling — Compose Spec (ephemeral builder:
 # the host provides only `just` + `podman`, every command runs in an ephemeral
 # container via `podman compose run --rm tooling`).
 name: opensuse-packages
