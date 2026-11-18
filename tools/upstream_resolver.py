@@ -101,7 +101,8 @@ def parse_commit(body):
 
 class Http:
     """GET with the resolver's auth/retry conventions (hiccups must not
-    fail the whole run; growing backoff)."""
+    fail the whole run; growing backoff). REQ/RETRY stats go to the file
+    named by RESOLVER_STATS (same TSV the bash rate-summary reads)."""
 
     def __init__(self):
         self.github_auth = ()
@@ -109,15 +110,28 @@ class Http:
             self.github_auth = (("Authorization",
                                  "Bearer " + os.environ["GITHUB_TOKEN"]),)
 
-    def get(self, url, headers=(), tries=3):
+    def _stat(self, pkg, code, attempt, rlrem):
+        path = os.environ.get("RESOLVER_STATS")
+        if path:
+            with open(path, "a") as fh:
+                fh.write(f"REQ\t{pkg}\t{code}\t{attempt}\t{rlrem}\n")
+
+    def get(self, url, headers=(), tries=3, pkg="-"):
         last = None
-        for attempt in range(tries):
+        for attempt in range(1, tries + 1):
             try:
                 req = urllib.request.Request(url)
                 for k, v in headers:
                     req.add_header(k, v)
-                with urllib.request.urlopen(req, timeout=60) as r:
-                    return r.read().decode(errors="replace")
+                try:
+                    with urllib.request.urlopen(req, timeout=60) as r:
+                        self._stat(pkg, r.status, attempt,
+                                   r.headers.get("x-ratelimit-remaining", "-"))
+                        return r.read().decode(errors="replace")
+                except urllib.error.HTTPError as e:
+                    self._stat(pkg, e.code, attempt,
+                               e.headers.get("x-ratelimit-remaining", "-"))
+                    raise
             except Exception as e:
                 last = e
         raise last
@@ -126,7 +140,10 @@ class Http:
 def resolve(upstream_file, http):
     pkg = os.path.basename(os.path.dirname(upstream_file))
     source = open(upstream_file).read().strip()
-    gh = http.github_auth
+
+    def get(url, headers=()):
+        return http.get(url, headers, pkg=pkg)
+
 
     def w(msg):
         print(f"::warning::{pkg}: {msg}")
@@ -152,8 +169,8 @@ def resolve(upstream_file, http):
 
     if source.startswith("commit:"):
         repo = source[len("commit:"):]
-        body = http.get(f"https://api.github.com/repos/{repo}/commits/HEAD",
-                        gh)
+        body = get(f"https://api.github.com/repos/{repo}/commits/HEAD",
+                        http.github_auth)
         sha, version = parse_commit(body)
         if sha and version:
             return out(version, sha)
@@ -162,7 +179,7 @@ def resolve(upstream_file, http):
 
     if source.startswith("npm:"):
         slug = source[len("npm:"):].replace("/", "%2f")
-        version = json_field(http.get(
+        version = json_field(get(
             f"https://registry.npmjs.org/{slug}/latest"),
             r'"version": ?"([^"]*)"')
         if version:
@@ -174,11 +191,11 @@ def resolve(upstream_file, http):
         proj = source[len("gitlab:"):].replace("/", "%2f")
         headers = (("PRIVATE-TOKEN", os.environ["GITLAB_TOKEN"]),) \
             if os.environ.get("GITLAB_TOKEN") else ()
-        version = json_field(http.get(
+        version = json_field(get(
             f"https://gitlab.com/api/v4/projects/{proj}/releases", headers),
             r'"tag_name": ?"([^"]*)"').lstrip("v")
         if not version:
-            version = json_field(http.get(
+            version = json_field(get(
                 f"https://gitlab.com/api/v4/projects/{proj}"
                 f"/repository/tags?per_page=1", headers),
                 r'"name": ?"([^"]*)"').lstrip("v")
@@ -191,11 +208,11 @@ def resolve(upstream_file, http):
         src = source.split(":", 1)[1]
         base = FORGEJO_API if source.startswith("forgejo:") \
             else "https://codeberg.org/api/v1"
-        version = json_field(http.get(
+        version = json_field(get(
             f"{base}/repos/{src}/releases?limit=1", gh),
             r'"tag_name": ?"([^"]*)"').lstrip("v")
         if not version:
-            version = json_field(http.get(
+            version = json_field(get(
                 f"{base}/repos/{src}/tags?limit=1", gh),
                 r'"name": ?"([^"]*)"').lstrip("v")
         if version:
@@ -204,12 +221,12 @@ def resolve(upstream_file, http):
         return None
 
     if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", source):
-        version = json_field(http.get(
+        version = json_field(get(
             f"https://api.github.com/repos/{source}/releases/latest", gh),
             r'"tag_name": ?"([^"]*)"').lstrip("v")
         if not version:
             # tag-only repos (no GitHub Releases): newest tag fallback
-            version = json_field(http.get(
+            version = json_field(get(
                 f"https://api.github.com/repos/{source}/tags?per_page=1", gh),
                 r'"name": ?"([^"]*)"').lstrip("v")
             if version:

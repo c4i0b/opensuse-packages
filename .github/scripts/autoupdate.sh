@@ -35,38 +35,6 @@ export SUCCESS_DELAY RETRY_BASE
 
 # GitHub throttles bursts with 403/429 even when authenticated; stats lines
 # are single appends, safe across the xargs workers
-get() {
-  local pkg="$1" url="$2" body headers code attempt wait src t0 t1 elapsed
-  shift 2
-  body="$tmp/.body.$$"; headers="$tmp/.hdr.$$"
-  for attempt in 1 2 3 4 5; do
-    t0="$(date +%s%N)"
-    code="$(curl -s -o "$body" -D "$headers" -w '%{http_code}' "$@" "$url")" || true
-    t1="$(date +%s%N)"
-    elapsed=$(( (t1 - t0) / 1000000 ))
-    rlrem="$(tr -d '\r' < "$headers" | awk 'tolower($1)=="x-ratelimit-remaining:"{print $2}' | head -1)"
-    printf 'REQ\t%s\t%s\t%s\t%s\n' "$pkg" "$code" "$attempt" "${rlrem:--}" >> "$stats"
-    if [ "$code" = 200 ]; then
-      sleep "$SUCCESS_DELAY"
-      cat "$body"
-      return 0
-    fi
-    if [ "$code" = 403 ] || [ "$code" = 429 ]; then
-      wait="$(tr -d '\r' < "$headers" | awk 'tolower($1)=="retry-after:"{print $2}' | head -1)"
-      if [ -n "$wait" ]; then
-        src=retry-after
-      else
-        src=computed
-        wait=$(( RETRY_BASE * (1 << (attempt - 1)) + RANDOM % 2 ))
-      fi
-      echo >&2 "::notice::[rate] pkg=$pkg attempt=$attempt status=$code wait=$wait wait_src=$src elapsed=${elapsed}ms rlrem=${rlrem:--}"
-      sleep "$wait"
-    else
-      return 1
-    fi
-  done
-  return 1
-}
 
 
 # spec-bearing packages without an `upstream` file are invisible to the
@@ -91,7 +59,7 @@ fi
 # tests/): same TSV contract as the old bash resolver, threads instead
 # of xargs -P, identical annotation vocabulary
 find "$root/packages" -name upstream -maxdepth 2 \
-  | python3 "$root/tools/upstream_resolver.py" "$resolved"
+  | RESOLVER_STATS="$stats" python3 "$root/tools/upstream_resolver.py" "$resolved"
 
 packages="$(mktemp)"
 bumped=0
