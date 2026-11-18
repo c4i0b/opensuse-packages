@@ -1,5 +1,5 @@
 Name:           mise
-Version:        2026.11.8
+Version:        2026.11.9
 Release:        0
 Summary:        Polyglot runtime and tool version manager (modern asdf)
 License:        MIT
