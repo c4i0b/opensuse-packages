@@ -141,7 +141,7 @@ packages to OBS, where they are built.
 ```
 upstream release
        │
-       ▼  every 4h, per packages/<name>/upstream
+       ▼  3×/day (01:23/09:23/17:23 UTC), per packages/<name>/upstream
 ┌───────────┐   bump spec + _service
 │ autoupdate│──────────────▶ main, after the in-job
 └───────────┘               gate (version + asset
