@@ -69,6 +69,28 @@ PY
             --ignore-scripts) >/dev/null
     done < "$tmp/bundled.txt"
 
+    # npm pack names scoped tarballs WITHOUT the leading @ (it packed
+    # homebridge-ciao-1.3.12.tgz), but the cockpit flat shape — registry
+    # URL renames and local-npm-registry lookups — keeps the @ (the
+    # 2026.11.4 set shipped @homebridge-ciao-1.3.12.tgz). Rename the
+    # packed files to match or the offline registry 404s on scoped deps.
+    python3 - package-lock.json "$tmp/modules" <<'PY'
+import json, os, sys
+lock = json.load(open(sys.argv[1])); moddir = sys.argv[2]
+for path, e in lock.get("packages", {}).items():
+    rest = path[len("node_modules/"):]
+    parts = rest.split("/")
+    if not path.startswith("node_modules/") or len(parts) > 2 \
+            or (len(parts) == 2 and not parts[0].startswith("@")):
+        continue
+    flat = rest.replace("/", "-") + "-" + e.get("version", "") + ".tgz"
+    noat = flat[1:]
+    if not os.path.exists(os.path.join(moddir, flat)) \
+            and os.path.exists(os.path.join(moddir, noat)):
+        os.rename(os.path.join(moddir, noat), os.path.join(moddir, flat))
+        print(f"renamed {noat} -> {flat}", file=sys.stderr)
+PY
+
     # spec.inc lists EVERY tarball as a registry URL Source (cockpit model:
     # OBS download_files fetches them server-side), verifying every
     # top-level lock entry has a tarball (drift fails loud instead of an
