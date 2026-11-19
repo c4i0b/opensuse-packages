@@ -1,5 +1,5 @@
 Name:           dnscontrol
-Version:        5.9.0
+Version:        5.10.0
 Release:        0
 Summary:        Infrastructure as code for DNS
 License:        MIT
