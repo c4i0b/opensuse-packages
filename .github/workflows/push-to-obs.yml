@@ -213,7 +213,9 @@ jobs:
             # has none (gitignored), and without this the P filter would
             # only protect OBS's stale archive from --delete (red: every
             # bot bump before revendor.sh shipped a stale vendor set).
-            if [ -f "$src/fetch.sh" ] || [ -f "$GITHUB_WORKSPACE/tools/pinvendor-$name.py" ] \
+            if { [ -f "$src/fetch.sh" ] \
+                 && grep -q -- '--vendor' "$src/fetch.sh"; } \
+               || [ -f "$GITHUB_WORKSPACE/tools/pinvendor-$name.py" ] \
                || grep -Eq 'go build -mod=vendor|cargo_build|__cargo' "$spec"; then
               # one retry for transient upstream hiccups (codeload serving
               # a non-gzip body for fresh tag tarballs)

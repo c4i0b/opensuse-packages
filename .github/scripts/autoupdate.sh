@@ -129,7 +129,12 @@ while IFS=$'\t' read -r _ pkg latest csha; do
   # committing — a bump that cannot re-vendor ships a stale archive and
   # breaks the OBS build offline (red: solidcraft 0.43.0 with a 0.40.1
   # Cargo.lock). Reverting the worktree drops just this package's bump.
-  if [ -f "$root/packages/$pkg/fetch.sh" ] || [ -f "$root/tools/pinvendor-$pkg.py" ] \
+  # fetch.sh must actually SUPPORT --vendor: omo's is a bare local
+  # pre-flight fetcher (no vendor mode) and would download a 246 MB
+  # upstream binary into the package dir on every bump.
+  if { [ -f "$root/packages/$pkg/fetch.sh" ] \
+       && grep -q -- '--vendor' "$root/packages/$pkg/fetch.sh"; } \
+     || [ -f "$root/tools/pinvendor-$pkg.py" ] \
      || grep -Eq 'go build -mod=vendor|cargo_build|__cargo' "$spec"; then
     # one retry for transient upstream hiccups (red: hermes-agent 0.23.2 —
     # codeload served a non-gzip body for a freshly-generated tag tarball)
@@ -141,6 +146,18 @@ while IFS=$'\t' read -r _ pkg latest csha; do
         continue
       fi
     fi
+  fi
+  # Oversized artifacts must never enter the bump branch: GitHub
+  # rejects the push and EVERY bump of the run is lost (red: omo's
+  # pre-flight fetcher dropped a 246 MB binary; dnscontrol's and mise's
+  # bumps died with it). Revert and skip just the offender.
+  bigfile="$(git -C "$root" ls-files --others --exclude-standard "packages/$pkg" \
+    | while IFS= read -r f; do [ "$(stat -c%s "$root/$f" 2>/dev/null || echo 0)" -gt 20000000 ] && echo "$f" && break; done)"
+  if [ -n "$bigfile" ]; then
+    echo "::warning::$pkg: $bigfile exceeds 20 MB, not committable — reverting bump"
+    git -C "$root" checkout -- "packages/$pkg"
+    git -C "$root" clean -qf -- "packages/$pkg"
+    continue
   fi
   git -C "$root" add "packages/$pkg"
   git -C "$root" commit -m "chore($pkg): update to $latest_rpm"
