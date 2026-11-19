@@ -6,7 +6,7 @@
 ExclusiveArch:  x86_64
 
 Name:           omo
-Version:        5.1.78
+Version:        5.1.79
 Release:        0
 Summary:        AI agent harness with multi-model orchestration and memory
 License:        SUL-1.0
