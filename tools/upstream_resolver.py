@@ -169,6 +169,11 @@ class Http:
                 fh.write(f"REQ\t{pkg}\t{code}\t{attempt}\t{rlrem}\n")
 
     def get(self, url, headers=(), tries=3, pkg="-"):
+        """Returns the body, or '' after exhausting retries — the bash
+        resolver's contract (a failing endpoint downgrades to a
+        per-package warning; it must never kill the whole run; red: a
+        releases/latest 404 on a tag-only repo crashed the Bump step
+        7 s in, before the tags fallback could run)."""
         last = None
         for attempt in range(1, tries + 1):
             try:
@@ -183,10 +188,13 @@ class Http:
                 except urllib.error.HTTPError as e:
                     self._stat(pkg, e.code, attempt,
                                e.headers.get("x-ratelimit-remaining", "-"))
+                    if 400 <= e.code < 500 and e.code != 429:
+                        return ""  # permanent: no retry can fix it
                     raise
             except Exception as e:
                 last = e
-        raise last
+        print(f"::warning::{pkg}: giving up on {url} ({last})")
+        return ""
 
 
 # ---- forge registry -------------------------------------------------------

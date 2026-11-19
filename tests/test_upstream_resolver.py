@@ -144,5 +144,36 @@ class DateToVersion(unittest.TestCase):
         self.assertEqual(date_to_version(None), "")
 
 
+class HttpGetContract(unittest.TestCase):
+    """The bash resolver degraded failures to per-package warnings; the
+    port must keep that contract (red: a releases/latest 404 on a
+    tag-only repo crashed the whole Bump step)."""
+
+    def _http(self):
+        import upstream_resolver as ur
+        return ur.Http()
+
+    def test_permanent_4xx_returns_empty(self):
+        import urllib.error
+        from unittest import mock
+        import upstream_resolver as ur
+        h = ur.Http()
+        err = urllib.error.HTTPError(
+            "url", 404, "Not Found", {}, mock.Mock())
+        with mock.patch.object(ur.urllib.request, "urlopen", side_effect=err):
+            self.assertEqual(h.get("https://x/y"), "")
+
+    def test_gives_up_empty_after_retries(self):
+        import urllib.error
+        from unittest import mock
+        import upstream_resolver as ur
+        h = ur.Http()
+        err = urllib.error.HTTPError(
+            "url", 500, "Server Error", {}, mock.Mock())
+        with mock.patch.object(ur.urllib.request, "urlopen", side_effect=err) as m:
+            self.assertEqual(h.get("https://x/y", pkg="p"), "")
+            self.assertEqual(m.call_count, 3)
+
+
 if __name__ == "__main__":
     unittest.main()
