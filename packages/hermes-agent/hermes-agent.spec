@@ -11,7 +11,7 @@
 %global __requires_exclude ^lib.+-[0-9a-f]{8}\\.so
 
 Name:           hermes-agent
-Version:        0.23.2
+Version:        0.23.3
 Release:        0
 Summary:        The self-improving AI agent by Nous Research
 License:        MIT
