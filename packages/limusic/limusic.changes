@@ -6,3 +6,25 @@ Fri Nov 20 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
   and hicolor icons.
 
 ---
+
+-------------------------------------------------------------------
+Fri Nov 20 14:40:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Add Requires: gstreamer-plugins-good: WebKit asks GStreamer for
+  autoaudiosink on Google sign-in and aborts the WebKitWebProcess without
+  it (no soname requires is generated for GStreamer plugins).
+
+
+-------------------------------------------------------------------
+Fri Nov 20 15:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Fix License tag to GPL-3.0-or-later: upstream Cargo.toml declares
+  "GPL-3.0-or-later" (the LICENSE file is the plain GPL-3 text).
+
+
+-------------------------------------------------------------------
+Fri Nov 20 17:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Capitalize the desktop Name (upstream brands all-lowercase; reads off
+  in application menus).
+

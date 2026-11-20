@@ -20,7 +20,7 @@ ExclusiveArch:  x86_64
 Name:           spotube
 Version:        6.0.0
 Release:        0
-Summary:        Open source, collaborative Spotify client that does not require Premium
+Summary:        Spotify-compatible client that streams from YouTube Music
 License:        AGPL-3.0-only
 URL:            https://spotube.krtirtho.dev
 Source0:        https://github.com/team-spotube/Spotube/releases/download/v%{version}/Spotube-linux-x86_64.rpm
@@ -35,16 +35,38 @@ BuildRequires:  desktop-file-utils
 # with the bundle, so declare them here (rpmlintrc: explicit-lib-dependency)
 Requires:       Mesa-libGL1
 Requires:       libX11-6
+Requires:       libXext6
+Requires:       libXi6
+Requires:       libXrender1
+Requires:       libXtst6
 Requires:       libfontconfig1
 Requires:       libfreetype6
 Requires:       libharfbuzz0
 Requires:       alsa-lib
+Requires:       dbus-1
+# vlcj loads libvlc via JNA/dlopen at runtime: no auto-requires is
+# generated, but the app hard-fails without it (red: spotube 6.0.0 crash
+# on launch, UnsatisfiedLinkError libvlc.so). Minimal set, mirroring the
+# upstream .deb Depends (libvlc5 + vlc-plugin-base): libvlc5 + vlc-noX
+# (plugin set without X/UI) — NOT the full vlc (Qt UI and X video outputs
+# the app never uses). vlc-codecs (ffmpeg plugin) is deliberately NOT
+# required: it lives only in Packman (libavcodec unrestricted) and the
+# native libopus/libfaad plugins in vlc-noX cover YouTube Music's
+# opus/aac streams
+Requires:       libvlc5
+Requires:       vlc-noX
+# Compose webview (Spotify login) dlopens WebKitGTK; the AWT/Swing GTK
+# backend dlopens gtk3 — neither generates soname requires
+Requires:       libwebkit2gtk-4_1-0
+Requires:       gtk3
+# Upstream .deb Recommends it for the tray icon
+Recommends:     libappindicator3-1
 
 %description
-Spotube is an open source, cross-platform Spotify client that plays tracks
-from YouTube/other sources so a Spotify Premium subscription is not needed.
-It keeps the Spotify ecosystem for library, playlists and metadata, streams
-audio ad-free, syncs lyrics and is fully local: no telemetry, no ads.
+Spotube is a lightweight Spotify-compatible client that streams audio from
+YouTube Music, needing no Spotify Premium account. It is a Kotlin Compose
+Multiplatform app that bundles its own JVM/Skiko runtime and plays through
+the system VLC libraries.
 
 %prep
 %setup -T -q -c
@@ -65,13 +87,19 @@ exec %{_libdir}/spotube/spotube "\$@"
 EOF
 chmod 755 %{buildroot}%{_bindir}/spotube
 
-# Upstream desktop Exec points into the bundle; rewrite to our wrapper
-sed -i 's|^Exec=.*|Exec=spotube %U|' usr/share/applications/%{desktop_id}.desktop
-grep -q '^Exec=spotube' usr/share/applications/%{desktop_id}.desktop || {
+# Upstream desktop Exec points into the bundle; rewrite to our wrapper and
+# fix the upstream-generic Name/Categories ("Packaged desktop application",
+# Utility — same fix the fedora-packages twin carries)
+desktop_file=usr/share/applications/%{desktop_id}.desktop
+sed -i -e 's|^Exec=.*|Exec=spotube %U|' \
+       -e 's|^Name=.*|Name=Spotube|' \
+       -e 's|^Comment=.*|Comment=Spotify-compatible client using YouTube Music|' \
+       -e 's|^Categories=.*|Categories=Audio;AudioVideo;Music;|' "$desktop_file"
+grep -q '^Exec=spotube' "$desktop_file" || {
     echo "Exec= rewrite failed in %{desktop_id}.desktop" >&2
     exit 1
 }
-install -Dpm644 usr/share/applications/%{desktop_id}.desktop \
+install -Dpm644 "$desktop_file" \
   %{buildroot}%{_datadir}/applications/%{desktop_id}.desktop
 
 for png in usr/share/icons/hicolor/*/apps/*.png; do

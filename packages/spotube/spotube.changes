@@ -7,3 +7,31 @@ Fri Nov 20 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
   the project builds no aarch64 repo.
 
 ---
+
+-------------------------------------------------------------------
+Fri Nov 20 02:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Add Requires: vlc: vlcj loads libvlc via JNA/dlopen, so no auto-requires
+  is generated and the app crashed on launch (UnsatisfiedLinkError).
+
+
+-------------------------------------------------------------------
+Fri Nov 20 15:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Align runtime deps with the upstream .deb Depends (dlopened libs the
+  bundle's requires-exclude hides): WebKitGTK (Compose login webview),
+  gtk3 (AWT backend), dbus, libXext/libXi/libXrender/libXtst, and
+  Recommends libappindicator3-1 for the tray icon.
+- Fix the upstream-generic desktop Name/Comment/Categories.
+
+
+-------------------------------------------------------------------
+Fri Nov 20 16:30:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Slim the vlc requirement to the runtime set (libvlc5 + vlc-noX,
+  mirroring the upstream .deb libvlc5 + vlc-plugin-base): the full vlc
+  pulls the Qt UI and X video outputs the app never uses. vlc-codecs is
+  deliberately not required: Packman-only (libavcodec unrestricted) and
+  the native libopus/libfaad plugins in vlc-noX already cover YouTube
+  Music's opus/aac streams.
+
