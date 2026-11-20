@@ -541,6 +541,30 @@ def check_go_modules_toolchain(spec: SpecModel) -> list[Finding]:
     return []
 
 
+def check_go_directive_clamp(spec: SpecModel) -> list[Finding]:
+    # red: crush 0.102.0 — upstream bumped go.mod to `go 1.27.4` while the
+    # slowroll build worker runs go 1.27.3 (GOTOOLCHAIN=local, offline: no
+    # toolchain download), so %build died with "go.mod requires go >= 1.27.4"
+    # on slowroll while Tumbleweed stayed green. Any client-side vendored go
+    # package hits this on the next upstream bump; the %prep clamp pins the
+    # directive to the buildroot toolchain.
+    if not re.search(r"go build -mod=vendor", spec.text):
+        return []
+    if "go env GOVERSION" in spec.text:
+        return []
+    i = spec.lines.index(next(l for l in spec.lines
+                              if "go build -mod=vendor" in l)) + 1
+    return [Finding(FAIL, "go-directive-clamp",
+        "client-side vendored go build without a go.mod directive clamp: "
+        "upstream bumps the `go` directive past the oldest build worker's Go "
+        "(slowroll lags Tumbleweed; GOTOOLCHAIN=local cannot download a "
+        "toolchain) and %build dies with `go.mod requires go >= X` (red: "
+        "crush 0.102.0). Add to %prep after %autosetup: "
+        "`sed -i \"s/^go .*/go $(go env GOVERSION | cut -c3-)/\" go.mod` "
+        "(a real language-feature need still fails loud in `go build`).",
+        line=i)]
+
+
 def check_date_tag_service(spec: SpecModel) -> list[Finding]:
     # red: hand-written _service files put the dot-sanitized Version into the
     # download path, but upstream tags carry dashes (2026-08-10 vs 2026.08.10)
@@ -789,6 +813,7 @@ _CHECKS = [
     check_prebuilt_strip,
     check_exclusivearch,
     check_go_modules_toolchain,
+    check_go_directive_clamp,
     check_duplicate_requires,
     check_local_sources,
     check_date_tag_service,

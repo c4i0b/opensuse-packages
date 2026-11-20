@@ -1,0 +1,3 @@
+addFilter("spelling-error .*Agentic")
+# upstream Go binary embeds a shell snippet calling mktemp; not a packaged script
+addFilter("call-to-mktemp /usr/bin/crush")

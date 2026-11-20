@@ -51,6 +51,10 @@ __DESCRIPTION__
 # -a 1 unpacks Source1 (vendor/) into the same dir as Source0.
 %prep
 %autosetup -a 1
+# The oldest build worker (slowroll) lags upstream's go.mod floor; clamp the
+# directive to the buildroot toolchain. A real newer-language-feature need
+# still fails loud in `go build` below.
+sed -i "s/^go .*/go $(go env GOVERSION | cut -c3-)/" go.mod
 
 %build
 export GOFLAGS="-buildmode=pie"

@@ -20,6 +20,10 @@ DoQ transports and cached vs non-cached response measurement.
 # -a 1 unpacks Source1 (vendor/) into the same dir as Source0.
 %prep
 %autosetup -a 1
+# slowroll's Go lags upstream's go.mod floor (GOTOOLCHAIN=local, offline
+# workers); clamp the directive to the buildroot toolchain. A real
+# newer-language-feature need still fails loud in `go build` below.
+sed -i "s/^go .*/go $(go env GOVERSION | cut -c3-)/" go.mod
 
 %build
 export GOFLAGS="-buildmode=pie"
