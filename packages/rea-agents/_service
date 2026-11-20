@@ -5,7 +5,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">registry.npmjs.org</param>
-    <param name="path">/rea-agents/-/rea-agents-6.9.0.tgz</param>
-    <param name="filename">rea-agents-6.9.0.tgz</param>
+    <param name="path">/rea-agents/-/rea-agents-6.10.1.tgz</param>
+    <param name="filename">rea-agents-6.10.1.tgz</param>
   </service>
 </services>

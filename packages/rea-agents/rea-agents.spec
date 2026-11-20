@@ -9,7 +9,7 @@
 %global _missing_build_ids_terminate_build 0
 
 Name:           rea-agents
-Version:        6.9.0
+Version:        6.10.1
 Release:        0
 Summary:        Reverse-engineering CLI and MCP server for AI agents
 License:        MIT
