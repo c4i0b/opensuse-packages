@@ -2,19 +2,19 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/SimoHypers/limusic/releases/download/v1.4.0/limusic-1.4.0-1.x86_64.rpm</param>
-    <param name="filename">limusic-1.4.0-1.x86_64.rpm</param>
+    <param name="path">/SimoHypers/limusic/releases/download/v1.4.1/limusic-1.4.1-1.x86_64.rpm</param>
+    <param name="filename">limusic-1.4.1-1.x86_64.rpm</param>
   </service>
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">raw.githubusercontent.com</param>
-    <param name="path">/SimoHypers/limusic/v1.4.0/LICENSE</param>
+    <param name="path">/SimoHypers/limusic/v1.4.1/LICENSE</param>
     <param name="filename">LICENSE</param>
   </service>
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">raw.githubusercontent.com</param>
-    <param name="path">/SimoHypers/limusic/v1.4.0/THIRD-PARTY-NOTICES.md</param>
+    <param name="path">/SimoHypers/limusic/v1.4.1/THIRD-PARTY-NOTICES.md</param>
     <param name="filename">THIRD-PARTY-NOTICES.md</param>
   </service>
 </services>

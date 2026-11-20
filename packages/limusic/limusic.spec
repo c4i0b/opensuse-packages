@@ -7,7 +7,7 @@
 ExclusiveArch:  x86_64
 
 Name:           limusic
-Version:        1.4.0
+Version:        1.4.1
 Release:        0
 Summary:        Native desktop YouTube Music client (Rust + Tauri, no Electron)
 License:        GPL-3.0-or-later
