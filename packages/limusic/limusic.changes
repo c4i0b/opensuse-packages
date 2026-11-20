@@ -1,0 +1,8 @@
+-------------------------------------------------------------------
+Fri Nov 20 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of limusic 1.4.0: repackage of the upstream official
+  x86_64 RPM (Rust/Tauri single binary) with the upstream desktop file
+  and hicolor icons.
+
+---

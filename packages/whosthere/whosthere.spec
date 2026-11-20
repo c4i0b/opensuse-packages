@@ -26,7 +26,10 @@ as a daemon with an HTTP API, and export scan results as JSON.
 # slowroll's Go lags upstream's go.mod floor (GOTOOLCHAIN=local, offline
 # workers); clamp the directive to the buildroot toolchain. A real
 # newer-language-feature need still fails loud in `go build` below.
-sed -i "s/^go .*/go $(go env GOVERSION | cut -c3-)/" go.mod
+gover="$(go env GOVERSION | cut -c3-)"
+sed -i "s/^go .*/go $gover/" go.mod
+# deps' floors in vendor/modules.txt are checked too; clamp them as well
+sed -i -E "s/^(## (explicit; )?)go .*/\1go $gover/" vendor/modules.txt
 
 %build
 export GOFLAGS="-buildmode=pie"

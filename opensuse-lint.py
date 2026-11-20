@@ -278,6 +278,11 @@ PREBUILT_ORIGIN = {
     "opencode-desktop": "electron",
     "desktop-plus": "electron",
     "hydra-launcher": "electron",
+    # upstream-RPM repackage of the official Rust/Tauri binary: strip-safe
+    "limusic": "rust",
+    # upstream-RPM repackage bundling a JVM + Skiko (Skia) tree: strip off,
+    # tree kept byte-identical
+    "spotube": "native",
     # upstream release tarball with mixed C/Go prebuilt ELFs (32-bit
     # Ventoy2Disk, Go web UI): strip-safe, spec disables strip to keep the
     # upstream tree byte-identical
@@ -559,8 +564,11 @@ def check_go_directive_clamp(spec: SpecModel) -> list[Finding]:
         "upstream bumps the `go` directive past the oldest build worker's Go "
         "(slowroll lags Tumbleweed; GOTOOLCHAIN=local cannot download a "
         "toolchain) and %build dies with `go.mod requires go >= X` (red: "
-        "crush 0.102.0). Add to %prep after %autosetup: "
-        "`sed -i \"s/^go .*/go $(go env GOVERSION | cut -c3-)/\" go.mod` "
+        "crush 0.102.0). Add to %prep after %autosetup (deps' floors in "
+        "vendor/modules.txt are checked too, clamp them as well): "
+        "`gover=\"$(go env GOVERSION | cut -c3-)\"; "
+        "sed -i \"s/^go .*/go $gover/\" go.mod; "
+        "sed -i -E \"s/^(## (explicit; )?)go .*/\\1go $gover/\" vendor/modules.txt` "
         "(a real language-feature need still fails loud in `go build`).",
         line=i)]
 

@@ -1,0 +1,12 @@
+# The bundled JVM/Skiko tree must not be stripped (upstream prebuilt tree
+# kept byte-identical) and its ELFs live under %_libdir, so their
+# system-library deps are declared explicitly on the package — rpmlint
+# cannot see that intent.
+addFilter("spotube.*unstripped-binary-or-object")
+addFilter("spotube.*explicit-lib-dependency")
+# Bundled upstream JVM/Skiko tree, kept byte-identical: its quirks are
+# upstream's, not fixable in the repackage
+addFilter("spotube.*shared-library-not-executable /usr/lib64/spotube/lib/")
+addFilter("spotube.*no-soname /usr/lib64/spotube/lib/")
+addFilter("spotube.*missing-hash-section /usr/lib64/spotube/")
+addFilter("spotube.*hidden-file-or-dir /usr/lib64/spotube/.nucleus-executable-type")
