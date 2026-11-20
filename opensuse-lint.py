@@ -564,12 +564,11 @@ def check_go_directive_clamp(spec: SpecModel) -> list[Finding]:
         "upstream bumps the `go` directive past the oldest build worker's Go "
         "(slowroll lags Tumbleweed; GOTOOLCHAIN=local cannot download a "
         "toolchain) and %build dies with `go.mod requires go >= X` (red: "
-        "crush 0.102.0). Add to %prep after %autosetup (deps' floors in "
-        "vendor/modules.txt are checked too, clamp them as well): "
-        "`gover=\"$(go env GOVERSION | cut -c3-)\"; "
-        "sed -i \"s/^go .*/go $gover/\" go.mod; "
-        "sed -i -E \"s/^(## (explicit; )?)go .*/\\1go $gover/\" vendor/modules.txt` "
-        "(a real language-feature need still fails loud in `go build`).",
+        "crush 0.102.0). Clamp the floors in %prep after %autosetup — DOWN "
+        "only, never up (raising an old go.mod directive activates go >= 1.17 "
+        "module-graph pruning and breaks stale vendored trees; red: ctop "
+        "0.7.7), deps' floors in vendor/modules.txt included: copy the "
+        "clamp() block from packages/crush/crush.spec.",
         line=i)]
 
 

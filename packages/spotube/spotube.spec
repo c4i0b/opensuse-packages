@@ -15,7 +15,7 @@
 %global appdir opt/spotube
 %global desktop_id spotube
 
-ExclusiveArch:  x86_64 aarch64
+ExclusiveArch:  x86_64
 
 Name:           spotube
 Version:        6.0.0
@@ -23,12 +23,7 @@ Release:        0
 Summary:        Open source, collaborative Spotify client that does not require Premium
 License:        AGPL-3.0-only
 URL:            https://spotube.krtirtho.dev
-%ifarch x86_64
 Source0:        https://github.com/team-spotube/Spotube/releases/download/v%{version}/Spotube-linux-x86_64.rpm
-%endif
-%ifarch aarch64
-Source0:        https://github.com/team-spotube/Spotube/releases/download/v%{version}/Spotube-linux-aarch64.rpm
-%endif
 Source1:        https://raw.githubusercontent.com/team-spotube/Spotube/v%{version}/LICENSE
 
 # rpm2archive streams the payload as a tarball (libarchive/bsdtar cannot
