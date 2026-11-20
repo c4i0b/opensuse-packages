@@ -21,7 +21,6 @@ packages to OBS, where they are built.
 <!-- repo-badges end -->
 
 <!-- build-status begin -->
-
 *Updated 2026-11-20 04:54 UTC*
 <!-- build-status end -->
 
@@ -68,7 +67,7 @@ packages to OBS, where they are built.
 [![fisher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffisher.json%3Fv%3D03dccbedr2)](https://github.com/jorgebucaran/fisher/)
 [![fluent-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffluent-icon-theme.json%3Fv%3Dd9d72f7cr2)](https://github.com/vinceliuice/Fluent-icon-theme/)
 [![gridcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fgridcraft.json%3Fv%3D3384bd32r2)](https://github.com/storytold/gridcraft/)
-[![hermes-agent](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhermes-agent.json%3Fv%3Da5d896e0r2)](https://github.com/NousResearch/hermes-agent/)
+[![hermes-agent](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhermes-agent.json%3Fv%3D3ab51e77r2)](https://github.com/NousResearch/hermes-agent/)
 [![httpx](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhttpx.json%3Fv%3D677a2b1fr2)](https://github.com/projectdiscovery/httpx/)
 [![hydra-launcher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhydra-launcher.json%3Fv%3D56bb8867r2)](https://github.com/hydralauncher/hydra/)
 [![jetbrains-mono-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fjetbrains-mono-nerd-fonts.json%3Fv%3D8d6f63a2r2)](https://github.com/ryanoasis/nerd-fonts/)
@@ -97,12 +96,12 @@ packages to OBS, where they are built.
 [![python3-libusb-package](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpython3-libusb-package.json%3Fv%3D7713044fr2)](https://github.com/pyocd/libusb-package/)
 [![qogir-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fqogir-icon-theme.json%3Fv%3D85ce3064r2)](https://github.com/vinceliuice/Qogir-icon-theme/)
 [![rathole](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Frathole.json%3Fv%3D305f670fr2)](https://github.com/rathole-org/rathole/)
-[![rea-agents](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Frea-agents.json%3Fv%3D6bbc74c2r2)](https://github.com/morluto/rea)
+[![rea-agents](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Frea-agents.json%3Fv%3Db126b364r2)](https://github.com/morluto/rea)
 [![rio](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Frio.json%3Fv%3Da2603e61r2)](https://github.com/raphamorim/rio/)
 [![scientifica-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fscientifica-fonts.json%3Fv%3D6ecbac50r2)](https://github.com/oppiliappan/scientifica/)
 [![selawik-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fselawik-fonts.json%3Fv%3Dcfe2ed19r2)](https://github.com/microsoft/Selawik/)
 [![slimbrave](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fslimbrave.json%3Fv%3D4c5dcecar2)](https://github.com/ChaoticSi1ence/SlimBrave-Neo/)
-[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D4c8e8756r2)](https://github.com/tangency-labs/solidcraft/)
+[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D49ae0f9cr2)](https://github.com/tangency-labs/solidcraft/)
 [![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D4f5bc942r2)](https://github.com/storytold/soundcraft/)
 [![spotube](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fspotube.json%3Fv%3D474b47ffr2)](https://github.com/team-spotube/Spotube/)
 [![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D7f00c70br2)](https://github.com/yorukot/superfile/)
