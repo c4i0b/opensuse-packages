@@ -1,5 +1,5 @@
 Name:           fish-pure
-Version:        4.19.2
+Version:        4.19.3
 Release:        0
 Summary:        Minimalistic, fast fish prompt (pure)
 License:        MIT
