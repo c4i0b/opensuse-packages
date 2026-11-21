@@ -3,7 +3,7 @@
 # plain JavaScript with no native addons and no build-time npm install —
 # noarch, no network needed on OBS.
 Name:           devcontainers-cli
-Version:        0.90.0
+Version:        0.91.0
 Release:        0
 Summary:        Reference CLI for building and running Development Containers
 License:        MIT

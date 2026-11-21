@@ -2,7 +2,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">registry.npmjs.org</param>
-    <param name="path">/@devcontainers/cli/-/cli-0.90.0.tgz</param>
-    <param name="filename">devcontainers-cli-0.90.0.tgz</param>
+    <param name="path">/@devcontainers/cli/-/cli-0.91.0.tgz</param>
+    <param name="filename">devcontainers-cli-0.91.0.tgz</param>
   </service>
 </services>
