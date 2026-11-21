@@ -1,5 +1,5 @@
 Name:           wifit3
-Version:        0.7.1
+Version:        0.7.2
 Release:        0
 Summary:        Wireless auditor TUI talking to USB Wi-Fi adapters from userland
 License:        GPL-2.0-only
