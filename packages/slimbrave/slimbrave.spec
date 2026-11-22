@@ -1,5 +1,5 @@
 Name:           slimbrave
-Version:        2.4.1
+Version:        2.4.2
 Release:        0
 Summary:        Debloat and harden Brave Browser using Chromium enterprise policies
 License:        GPL-3.0-only
