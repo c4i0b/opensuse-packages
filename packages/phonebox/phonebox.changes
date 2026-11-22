@@ -1,0 +1,7 @@
+-------------------------------------------------------------------
+Sat Nov 22 00:00:00 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Initial package of phonebox 0.9.27: repackage of the upstream
+  single-file .NET 10 publish (runtime bundled in the ELF, strip off),
+  wrapper in %_bindir plus a systemd user unit mirroring upstream's
+  setup.sh.

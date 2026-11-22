@@ -295,6 +295,10 @@ PREBUILT_ORIGIN = {
     # manylinux wheels installed into the vendored venv: strip-safe .so
     # payloads (openclaw is noarch, exempt from this check)
     "hermes-agent": "native",
+    # upstream single-file .NET publish: the whole runtime + managed payload
+    # are appended to the apphost ELF, so the spec keeps the tree
+    # byte-identical (strip disabled)
+    "phonebox": "dotnet",
 }
 
 _STRIP_GUARD = re.compile(

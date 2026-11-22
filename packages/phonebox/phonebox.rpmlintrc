@@ -1,0 +1,2 @@
+# Upstream product vocabulary the spellchecker does not know.
+addFilter("phonebox.*spelling-error.*(dotnet|systemctl|nvidia|smi)")
