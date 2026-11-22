@@ -12,7 +12,7 @@
 ExclusiveArch:  x86_64
 
 Name:           solidcraft
-Version:        0.45.0
+Version:        0.46.2
 Release:        0
 Summary:        Parametric 3D CAD application with sketches, features and assemblies
 
