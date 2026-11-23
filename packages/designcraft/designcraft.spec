@@ -15,7 +15,7 @@
 ExclusiveArch:  x86_64
 
 Name:           designcraft
-Version:        0.20.1
+Version:        0.21.1
 Release:        0
 Summary:        Page layout and desktop publishing studio
 License:        MIT OR Apache-2.0
