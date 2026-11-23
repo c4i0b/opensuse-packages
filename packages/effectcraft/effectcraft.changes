@@ -1,4 +1,12 @@
 -------------------------------------------------------------------
+Mon Nov 23 22:52:56 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
+
+- Update to 0.25.1
+- Switch to the pinvendor overlay model (vendor-deps/): 0.25.1 pulls
+  craft-audio from two craft-libs revs and plain cargo vendoring
+  rejects the duplicate
+
+-------------------------------------------------------------------
 Sat Nov 14 00:07:56 UTC 2026 - Caio Bruno <cbrunofb@gmail.com>
 
 - Drop aarch64: x86_64-only project.

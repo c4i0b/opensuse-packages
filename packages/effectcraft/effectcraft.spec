@@ -14,7 +14,7 @@
 ExclusiveArch:  x86_64
 
 Name:           effectcraft
-Version:        0.24.1
+Version:        0.25.1
 Release:        0
 Summary:        Motion graphics and compositing tool
 License:        MIT OR Apache-2.0
@@ -47,27 +47,20 @@ pure-Rust codecs and reads Lottie, SVG, PSD and PDF assets.
 %prep
 %autosetup -p1 -a1
 
-# cargo eagerly validates every [patch.crates-io] git entry against its
-# source: crates outside the dependency graph are never vendored and the
-# offline build dies on them — drop patch lines with no vendor/ crate dir
-for crate in $(awk '/^\[patch\.crates-io\]/{f=1;next} /^\[/{f=0} f && /= \{ git/{print $1}' Cargo.toml); do
-    ls -d vendor/"$crate"-* >/dev/null 2>&1 || sed -i "/^$crate = { git = /d" Cargo.toml
-done
-
 %build
-# zbus-lockstep's validate macro looks for ../xml relative to the crate being
-# compiled: in the vendored tree that resolves to the vendored "xml" crate
-# instead of atspi-common's D-Bus XML dir, so point it there explicitly
-for d in vendor/atspi-common-*/xml; do
-    [ -d "$d" ] && export LOCKSTEP_XML_PATH="$PWD/$d"
-done
-# the cargo_build macro is parametric, so passing a package selection flag
-# would parse as an unknown macro option; select the workspace member by cwd
-cd apps/%{name}
+# zbus-lockstep's validate macro looks for ../xml relative to the crate
+# being compiled: in a vendored tree that resolves to the vendored "xml"
+# crate instead of atspi-common's D-Bus XML dir, so point it there
+# explicitly (overlay layout: vendor-deps/, pinvendor pre-cleans the
+# patched Cargo.toml that -a1 unpacks over the source)
+[ -d vendor-deps/atspi-common/xml ] && export LOCKSTEP_XML_PATH="$(pwd)/vendor-deps/atspi-common/xml"
+# select the workspace member via a direct cargo call (the cargo_packaging
+# build macro is parametric and rejects option letters like -p); plain
+# cargo also honors the overlay's .cargo/config.toml source replacement,
+# which the packaging macro does not (pdfcraft red)
 export CARGO_PROFILE_RELEASE_LTO=false
 export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
-%cargo_build
-cd - >/dev/null
+%{__cargo} build %{?_smp_mflags} --offline --release -p %{name}
 
 %install
 install -Dpm 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}

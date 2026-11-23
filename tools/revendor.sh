@@ -107,18 +107,20 @@ if grep -q 'go build -mod=vendor' "$spec"; then
   exit 0
 fi
 
-# 3.5 pinvendor overlays (pdfcraft/photocraft): duplicate git crates and
-# unused [patch.crates-io] entries need the pin/drop logic; the overlay
-# (vendor-deps/, dup-pinned/, .cargo/, patched Cargo.toml, Cargo.lock)
-# is packed as the Source1 archive, unpacked over the source by -a1
-if [ -f "$root/tools/pinvendor-$pkg.py" ]; then
+# 3.5 pinvendor overlay (craft-family rust apps): duplicate git crates
+# and unused [patch.crates-io] entries need the pin/drop logic; the
+# overlay (vendor-deps/, dup-pinned/, .cargo/, patched Cargo.toml,
+# Cargo.lock) is packed as the Source1 archive, unpacked over the source
+# by -a1. Dispatch on the spec's vendor-deps reference (the overlay
+# layout marker) so the next craft app picks this up without new wiring.
+if grep -q 'vendor-deps' "$spec"; then
   ctr="$(container)"
   [ -n "$ctr" ] || { echo "revendor.sh: $pkg needs a container runtime" >&2; exit 1; }
   service_params
   git clone -q --depth 1 --branch "$rev" "$url" "$tmp/work-tree"
   mkdir -p "$tmp/work"
   mv "$tmp/work-tree" "$tmp/work/$pkg-$ver"
-  "$ctr" run --rm -v "$tmp:/work:Z" -v "$root/tools/pinvendor-$pkg.py:/pinvendor.py:ro" \
+  "$ctr" run --rm -v "$tmp:/work:Z" -v "$root/tools/pinvendor.py:/pinvendor.py:ro" \
     "$tw_image" bash -c '
       set -euo pipefail
       zypper -qn in --no-recommends cargo

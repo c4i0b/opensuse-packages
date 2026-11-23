@@ -134,7 +134,7 @@ while IFS=$'\t' read -r _ pkg latest csha; do
   # upstream binary into the package dir on every bump.
   if { [ -f "$root/packages/$pkg/fetch.sh" ] \
        && grep -q -- '--vendor' "$root/packages/$pkg/fetch.sh"; } \
-     || [ -f "$root/tools/pinvendor-$pkg.py" ] \
+     || grep -q 'vendor-deps' "$spec" \
      || grep -Eq 'go build -mod=vendor|cargo_build|__cargo' "$spec"; then
     # one retry for transient upstream hiccups (red: hermes-agent 0.23.2 —
     # codeload served a non-gzip body for a freshly-generated tag tarball)

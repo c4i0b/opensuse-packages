@@ -20,8 +20,10 @@ re-runs revendor before rsync so the fresh archive is uploaded.
 Upstreams shipping their own `vendor/` (path-patched forks): revendor.sh
 passes `--tag vendor2` to cargo_vendor (deps land in `vendor2/` beside
 the upstream tree). Duplicate git crates (pdfcraft, photocraft) go
-through the overlay scripts `tools/pinvendor-*.py`, which revendor.sh
-runs in the container and packs as the Source1 archive.
+through the shared overlay script `tools/pinvendor.py`, which revendor.sh
+runs in the container and packs as the Source1 archive (dispatched by the
+spec's `vendor-deps` reference — effectcraft joined pdfcraft/photocraft on
+that model at 0.25.1).
 
 ## `_service` version detection
 
