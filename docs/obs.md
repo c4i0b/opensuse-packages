@@ -54,7 +54,8 @@ gh-actions-conventions skill.
   build does not guarantee a green OBS build.
 - After pushing, watch the result with `just results <name>` and read
   failures with `just log <name>`.
-- `just status` snapshots the whole project (all packages, both arches);
+- `just status` snapshots the whole project (all packages, both repos —
+  slowroll and tumbleweed, x86_64);
   `just watch` blocks until every in-flight build finishes and exits
   non-zero if any failed.
 - On an OBS failure, follow the `diagnose-obs-failure` skill
