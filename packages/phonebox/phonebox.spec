@@ -14,7 +14,7 @@
 ExclusiveArch:  x86_64
 
 Name:           phonebox
-Version:        0.9.27
+Version:        0.9.29
 Release:        0
 Summary:        Desktop agent that turns an old Android phone into a desk panel
 License:        MIT
