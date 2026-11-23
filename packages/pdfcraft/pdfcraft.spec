@@ -1,7 +1,7 @@
 ExclusiveArch:  x86_64
 
 Name:           pdfcraft
-Version:        0.21.1
+Version:        0.22.0
 Release:        0
 Summary:        PDF reader and editor with annotations, forms and signing
 

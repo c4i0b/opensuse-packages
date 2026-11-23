@@ -134,6 +134,9 @@ def dup_key(crate_v, repo, rev1, rev2):
     return (crate_v, repo, frozenset((rev1, rev2)))
 
 
+TRIED = {}
+
+
 def try_retarget(repo, crate_v, rev1, rev2, skip_lock=False):
     """Unify every pin of `repo` onto one rev. Lock-level first (nested
     git deps), then a full manifest retarget; the lock move alone often
@@ -156,8 +159,13 @@ def try_retarget(repo, crate_v, rev1, rev2, skip_lock=False):
     # revs from the error too: the second source can live inside a git
     # checkout (cargo's cache), invisible to our tree scan
     revs = set(usage) | {rev1, rev2}
-    candidates = sorted(revs, key=lambda rv: (len(rv) < 40, -usage.get(rv, 0)))
+    key = (repo, frozenset((rev1, rev2)))
+    tried = TRIED.setdefault(key, set())
+    candidates = [rv for rv in
+                  sorted(revs, key=lambda rv: (len(rv) < 40, -usage.get(rv, 0)))
+                  if rv not in tried]
     for target in candidates:
+        tried.add(target)
         snapshot = collect_files()
         retarget_repo(repo, target)
         r = vendor(False)
