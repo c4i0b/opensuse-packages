@@ -5,7 +5,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">registry.npmjs.org</param>
-    <param name="path">/openclaw/-/openclaw-2026.11.6.tgz</param>
-    <param name="filename">openclaw-2026.11.6.tgz</param>
+    <param name="path">/openclaw/-/openclaw-2026.11.7.tgz</param>
+    <param name="filename">openclaw-2026.11.7.tgz</param>
   </service>
 </services>
