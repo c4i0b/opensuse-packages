@@ -23,6 +23,11 @@ from pathlib import Path
 
 WS = Path(sys.argv[1])
 
+# manifests rewritten by the retarget (path crates inside the source
+# tree): they must ship in the overlay or OBS's Source0 copy still pins
+# the old revs and diverges from the rewritten lock (effectcraft red)
+MODIFIED = set()
+
 
 def log(m):
     print(f"pinvendor: {m}", file=sys.stderr, flush=True)
@@ -111,6 +116,8 @@ def retarget_repo(repo, target):
         else:
             text = lock_re.sub(rf"\g<1>{target}\g<2>{target}", text)
             text = dedup_lock(text)
+        if text != path.read_text():
+            MODIFIED.add(path)
         path.write_text(text)
 
 
@@ -223,6 +230,7 @@ def drop_unvendored_git_patches():
             out.append(line)
         new = "".join(out)
         if new != text:
+            MODIFIED.add(cm)
             cm.write_text(new)
     return dropped
 
@@ -237,4 +245,9 @@ cfgdir = WS / ".cargo"
 cfgdir.mkdir(exist_ok=True)
 (cfgdir / "config.toml").write_text(r.stdout)
 (WS.parent / "vendor_config.toml").write_text(r.stdout)
+# rewritten path-crate manifests for the overlay (root Cargo.toml and
+# Cargo.lock are packed unconditionally by the caller)
+extra = sorted({p.relative_to(WS).as_posix() for p in MODIFIED
+                if p.name == "Cargo.toml" and p != WS / "Cargo.toml"})
+(WS.parent / "overlay_extra.txt").write_text("\n".join(extra) + "\n")
 log("vendored OK; config written to .cargo/config.toml")

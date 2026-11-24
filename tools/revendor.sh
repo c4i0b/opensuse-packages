@@ -129,9 +129,14 @@ if grep -q 'vendor-deps' "$spec"; then
     '
   ws="$tmp/work/$pkg-$ver"
   # dup-pinned/ only exists when a duplicate git crate was pinned; tar
-  # fails on missing operands, so list only what exists
+  # fails on missing operands, so list only what exists. overlay_extra.txt
+  # lists path-crate manifests the pinvendor rewrote (rev unification):
+  # without them OBS's Source0 copies still pin the old revs
   overlay=(vendor-deps .cargo Cargo.toml Cargo.lock)
   [ -d "$ws/dup-pinned" ] && overlay+=(dup-pinned)
+  while IFS= read -r extra; do
+    [ -n "$extra" ] && [ -f "$ws/$extra" ] && overlay+=("$extra")
+  done < "$tmp/work/overlay_extra.txt"
   (cd "$ws" && tar --zstd -cf "$tmp/overlay.tar.zst" "${overlay[@]}")
   [ -s "$tmp/overlay.tar.zst" ] || { echo "revendor.sh: pinvendor overlay empty for $pkg" >&2; exit 1; }
   mv "$tmp/overlay.tar.zst" "$dir/vendor.tar.zst"
