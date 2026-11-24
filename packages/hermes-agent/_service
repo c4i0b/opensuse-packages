@@ -5,7 +5,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/NousResearch/hermes-agent/archive/refs/tags/v0.23.3.tar.gz</param>
-    <param name="filename">hermes-agent-0.23.3.tar.gz</param>
+    <param name="path">/NousResearch/hermes-agent/archive/refs/tags/v0.23.4.tar.gz</param>
+    <param name="filename">hermes-agent-0.23.4.tar.gz</param>
   </service>
 </services>
