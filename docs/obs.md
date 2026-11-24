@@ -56,8 +56,11 @@ gh-actions-conventions skill.
   failures with `just log <name>`.
 - `just status` snapshots the whole project (all packages, both repos —
   slowroll and tumbleweed, x86_64);
-  `just watch` blocks until every in-flight build finishes and exits
-  non-zero if any failed.
+  `just watch [interval] [timeout]` blocks until every in-flight build
+  finishes and exits non-zero if any fresh build failed. Outdated results
+  (`dirty="true"`) count as pending, not as failures — `osc results --csv`
+  loses that flag and reports stale failures as fresh ones, so the watcher
+  reads the XML instead.
 - On an OBS failure, follow the `diagnose-obs-failure` skill
   (`skills/diagnose-obs-failure/SKILL.md`). If the same class of failure
   bites twice, encode it in the linter (`opensuse-lint.py`) — fix the class,
