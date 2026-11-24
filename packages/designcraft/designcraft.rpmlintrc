@@ -1,0 +1,3 @@
+# winit/wgpu dlopen these at runtime; Rust binaries declare no auto-deps,
+# so the X11/Wayland set is explicit on purpose (templates/rust-gui model)
+addFilter("designcraft.*explicit-lib-dependency")

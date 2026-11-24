@@ -16,9 +16,13 @@
 Output overlay root: vendor-deps/, .cargo/config.toml, patched
 Cargo.toml, Cargo.lock — packed as vendor.tar.zst by the caller.
 """
+import io
+import os
 import re
 import subprocess
 import sys
+import tarfile
+import urllib.request
 from pathlib import Path
 
 WS = Path(sys.argv[1])
@@ -109,6 +113,14 @@ def retarget_repo(repo, target):
             out = []
             for line in text.splitlines(keepends=True):
                 if f'git = "{repo}"' in line:
+                    # rename deps (package = "...") deliberately pair a
+                    # second name with a SECOND source — rewriting their
+                    # rev collapses both names onto one source and the
+                    # feature resolver rejects it ("multiple times with
+                    # different names", effectcraft OBS red)
+                    if 'package = "' in line:
+                        out.append(line)
+                        continue
                     line = re.sub(r'(rev = ")[0-9a-f]{4,40}(")',
                                   rf"\g<1>{target}\g<2>", line)
                 out.append(line)
@@ -142,6 +154,108 @@ def dup_key(crate_v, repo, rev1, rev2):
 
 
 TRIED = {}
+
+
+def package_name(manifest):
+    text = manifest.read_text()
+    if "[package]" not in text:
+        return None
+    m = re.search(r'^name\s*=\s*"([A-Za-z0-9_.-]+)"', text, re.M)
+    return m.group(1) if m else None
+
+
+def find_crate_dir(root, crate):
+    for cm in sorted(root.rglob("Cargo.toml")):
+        if package_name(cm) == crate:
+            return cm.parent
+    return None
+
+
+DEP_KEYS_KEEP = ("package", "features", "default-features", "optional")
+
+
+def exclude_dup_pinned():
+    """Nested workspaces are not supported: without an exclude, the
+    outer workspace claims the whole tree and path deps into dup-pinned/
+    fail their workspace inheritance (effectcraft red)."""
+    root = WS / "Cargo.toml"
+    text = root.read_text()
+    if 'exclude' in text and 'dup-pinned' in text.split("exclude", 1)[1][:200]:
+        return
+    m = re.search(r"(?m)^exclude\s*=\s*\[([^\]]*)\]", text)
+    if m:
+        inner = m.group(1).strip()
+        new = f'exclude = [{inner}{", " if inner else ""}"dup-pinned"]'
+        text = text[:m.start()] + new + text[m.end():]
+    else:
+        text = text.replace("[workspace]\n", '[workspace]\nexclude = ["dup-pinned"]\n', 1)
+    root.write_text(text)
+    MODIFIED.add(root)
+
+
+def divert_to_path(repo, rev):
+    """Rewrite our manifest deps pinned to repo@rev into path deps on a
+    full checkout extracted under dup-pinned/. A regular path dep
+    resolves its nested workspace by walking up (the extracted tree
+    keeps its root manifest), unlike a [patch] path entry which cargo
+    1.99 refuses to inherit through (effectcraft red). Returns False
+    when the rev is only referenced from inside other git checkouts —
+    nothing in our tree to rewrite."""
+    lines_hit = 0
+    dupdir = WS / "dup-pinned" / rev[:8]
+    for path, text in collect_files().items():
+        if path.name != "Cargo.toml":
+            continue
+        out = []
+        for line in text.splitlines(keepends=True):
+            if f'git = "{repo}"' in line and f'rev = "{rev}"' in line:
+                if not dupdir.is_dir():
+                    dupdir.parent.mkdir(parents=True, exist_ok=True)
+                    url = f"{repo}/archive/{rev}.tar.gz"
+                    log(f"diverting {repo}@{rev[:8]}: fetching {url}")
+                    data = io.BytesIO(urllib.request.urlopen(url, timeout=600).read())
+                    with tarfile.open(fileobj=data, mode="r:gz") as tf:
+                        members = [m for m in tf.getmembers()
+                                   if len(m.name.split("/")) > 1]
+                        for m in members:
+                            m.name = "/".join(m.name.split("/")[1:])
+                        tf.extractall(dupdir, members=members)
+                    # the extracted workspace's [patch.crates-io] points
+                    # at vendor/ dirs that git archives do not carry;
+                    # strip them so crates.io versions apply
+                    root_man = dupdir / "Cargo.toml"
+                    if root_man.is_file():
+                        t = root_man.read_text()
+                        t = re.sub(r"(?ms)^\[patch\.[^\]]*\]\n.*?(?=^\[|\Z)", "", t)
+                        root_man.write_text(t)
+                exclude_dup_pinned()
+                m = re.match(r'\s*([A-Za-z0-9_-]+)\s*=\s*\{(.*)\}\s*$', line.rstrip())
+                if not m:
+                    continue
+                alias, body = m.groups()
+                pkg = re.search(r'package\s*=\s*"([^"]+)"', body)
+                pkg = pkg.group(1) if pkg else alias
+                cdir = find_crate_dir(dupdir, pkg)
+                if cdir is None:
+                    log(f"no Cargo.toml declares {pkg} under {dupdir}")
+                    continue
+                # relative to the manifest being rewritten, not the
+                # workspace root (deps live in crates/* submanifests)
+                rel = os.path.relpath(cdir, path.parent).replace(os.sep, "/")
+                kept = [f"{k} = {v.strip()}" for k, v in
+                        re.findall(r'([\w-]+)\s*=\s*("[^"]*"|\[[^\]]*\]|[^,}]+)', body)
+                        if k in DEP_KEYS_KEEP]
+                fields = ", ".join(kept + [f'path = "{rel}"'])
+                line = f'{alias} = {{ {fields} }}\n'
+                MODIFIED.add(path)
+                lines_hit += 1
+            out.append(line)
+        new = "".join(out)
+        if new != text:
+            path.write_text(new)
+    if lines_hit:
+        log(f"diverted {lines_hit} dep line(s) onto {dupdir.relative_to(WS)}")
+    return lines_hit > 0
 
 
 def try_retarget(repo, crate_v, rev1, rev2, skip_lock=False):
@@ -185,6 +299,23 @@ def try_retarget(repo, crate_v, rev1, rev2, skip_lock=False):
     sys.exit("pinvendor: rewiring duplicate git sources failed")
 
 
+def count_refs(repo, rev):
+    n = 0
+    for path, text in collect_files().items():
+        if path.name == "Cargo.toml":
+            for line in text.splitlines():
+                if f'git = "{repo}"' in line and f'rev = "{rev}"' in line:
+                    n += 1
+    return n
+
+
+def revert_divert(snapshot, rev):
+    for p, t in snapshot.items():
+        p.write_text(t)
+    dupdir = WS / "dup-pinned" / rev[:8]
+    subprocess.run(["rm", "-rf", str(dupdir)], check=False)
+
+
 r = vendor(True)
 seen_keys = set()
 for _ in range(20):
@@ -195,11 +326,76 @@ for _ in range(20):
         sys.stderr.write(r.stderr)
         sys.exit("cargo vendor failed (not a duplicate-source error)")
     key = dup_key(dup[0], dup[1], dup[2], dup[4])
-    r = try_retarget(dup[1], dup[0], dup[2], dup[4], skip_lock=key in seen_keys)
+    # path-divert first (keeps the upstream mixed-rev intent, e.g. the
+    # craft-audio-markers rename dep); minority rev first — the dominant
+    # pin is the one the rest of the tree expects. A diverted rev can be
+    # unresolvable standalone (craft-xml left workspace.dependencies at
+    # craft-libs 33be3562), so a hard failure reverts and tries the
+    # other rev before falling back to rev unification
+    handled = False
+    for rev in sorted((dup[2], dup[4]), key=lambda rv: count_refs(dup[1], rv)):
+        snapshot = collect_files()
+        if divert_to_path(dup[1], rev):
+            r2 = vendor(False)
+            if r2.returncode == 0 or dup_sources(r2.stderr):
+                r = r2
+                handled = True
+                break
+            log(f"divert to {rev[:8]} broke resolution, reverting:\n"
+                f"{r2.stderr.strip()[-500:]}")
+            revert_divert(snapshot, rev)
+    if not handled:
+        r = try_retarget(dup[1], dup[0], dup[2], dup[4],
+                         skip_lock=key in seen_keys)
     seen_keys.add(key)
 if r.returncode != 0:
     sys.stderr.write(r.stderr)
     sys.exit("cargo vendor failed after unification retries")
+
+
+def validate_resolution():
+    """cargo vendor resolves without feature unification; the build's
+    resolver additionally rejects one crate reachable under two dep
+    names from a single source. metadata runs the full resolution
+    offline without compiling."""
+    return subprocess.run(
+        ["cargo", "metadata", "--offline", "--format-version", "1"],
+        cwd=WS, capture_output=True, text=True)
+
+
+def divert_rename_dep(crate):
+    """On a 'different names' validation failure, divert the rename dep
+    (alias != crate) onto a path checkout so the two names come from
+    two sources, as upstream intended."""
+    for path, text in collect_files().items():
+        if path.name != "Cargo.toml":
+            continue
+        for line in text.splitlines():
+            if 'package = "' in line and f'package = "{crate}"' in line:
+                m = re.search(r'git = "([^"]+)"', line)
+                rv = re.search(r'rev = "([0-9a-f]{4,40})"', line)
+                if m and rv:
+                    return divert_to_path(m.group(1), rv.group(1))
+    return False
+
+
+for _ in range(5):
+    v = validate_resolution()
+    if v.returncode == 0:
+        break
+    if "multiple times with different names" not in v.stderr:
+        sys.stderr.write(v.stderr)
+        sys.exit("cargo metadata failed after vendoring")
+    crate = re.search(r"crate `([A-Za-z0-9_.-]+) v", v.stderr).group(1)
+    log(f"resolution conflict on {crate}: diverting its rename dep")
+    if not divert_rename_dep(crate):
+        sys.exit(f"pinvendor: no rename dep found to divert for {crate}")
+    r = vendor(False)
+    if r.returncode != 0:
+        sys.stderr.write(r.stderr)
+        sys.exit("cargo vendor failed during rename-divert retry")
+else:
+    sys.exit("pinvendor: rename-divert retries exhausted")
 
 
 def drop_unvendored_git_patches():
