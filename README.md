@@ -21,7 +21,6 @@ packages to OBS, where they are built.
 <!-- repo-badges end -->
 
 <!-- build-status begin -->
-
 *Updated 2026-11-24 21:30 UTC*
 <!-- build-status end -->
 
@@ -87,7 +86,7 @@ packages to OBS, where they are built.
 [![nuclei](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fnuclei.json%3Fv%3Dea99a975r2)](https://github.com/projectdiscovery/nuclei/)
 [![oha](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Foha.json%3Fv%3D1c4e6d29r2)](https://github.com/hatoo/oha/)
 [![omo](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fomo.json%3Fv%3D4b42d770r2)](https://github.com/code-yeongyu/oh-my-openagent/)
-[![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D58e9dcc1r2)](https://github.com/openclaw/openclaw)
+[![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D8fc155b3r2)](https://github.com/openclaw/openclaw)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D003b7420r2)](https://github.com/anomalyco/opencode/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3Db0773d4ar2)](https://github.com/mrjackwills/oxker/)
 [![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D3496705ar2)](https://github.com/storytold/pdfcraft/)
@@ -119,7 +118,7 @@ packages to OBS, where they are built.
 [![wifit3](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fwifit3.json%3Fv%3D2435ff28r2)](https://github.com/derv82/wifit3/)
 [![wifite](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fwifite.json%3Fv%3D155d3e83r2)](https://github.com/derv82/wifite2/)
 [![wordcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fwordcraft.json%3Fv%3Dbda017c2r2)](https://github.com/storytold/wordcraft/)
-[![ytm-player](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fytm-player.json%3Fv%3Db14ec722r2)](https://github.com/peternaame-boop/ytm-player/)
+[![ytm-player](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fytm-player.json%3Fv%3Db3db7315r2)](https://github.com/peternaame-boop/ytm-player/)
 [![zapzap](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fzapzap.json%3Fv%3Dc2c5efd2r2)](https://github.com/rafatosta/zapzap/)
 <!-- package-badges end -->
 
