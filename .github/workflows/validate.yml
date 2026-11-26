@@ -55,7 +55,6 @@ jobs:
           fi
           echo "Detected: ${pkgs:-<none>}"
           echo "packages=${pkgs}" >> "$GITHUB_OUTPUT"
-          echo "Detected: ${pkgs:-<none>}"
 
       - name: Validate version + upstream asset for each package
         if: steps.resolve.outputs.packages != ''

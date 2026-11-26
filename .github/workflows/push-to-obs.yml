@@ -40,9 +40,14 @@ jobs:
     # successful completion means a PR was actually merged
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    # full-fleet commits (15+ packages x ~60s each, vendor uploads included)
-    # need ~20 min; sized for that, not for the typical 1-2 package push
-    timeout-minutes: 35
+    # must exceed the push step's 90-min bound or it is unreachable: the
+    # job timeout kills legitimate slow deliveries mid-fleet and GitHub
+    # reports the run as 'cancelled' (mimics concurrency supersession).
+    # Red: 2026-11-24..26 — vendored packages cost ~2-5 min each and every
+    # run died at 35m21s after ~11 of a 21-package backlog, while the
+    # resolver's bridge from the last success made each retry redo it all.
+    # 100 = 90 (step) + setup/summary headroom.
+    timeout-minutes: 100
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
