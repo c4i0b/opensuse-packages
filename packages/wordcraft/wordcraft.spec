@@ -15,7 +15,7 @@
 ExclusiveArch:  x86_64
 
 Name:           wordcraft
-Version:        0.18.1
+Version:        0.19.1
 Release:        0
 Summary:        Word processor with docx support, track changes and mail merge
 

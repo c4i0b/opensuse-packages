@@ -2,7 +2,7 @@
   <service name="tar_scm" mode="serveronly">
     <param name="url">https://github.com/storytold/wordcraft.git</param>
     <param name="scm">git</param>
-    <param name="revision">v0.18.1</param>
+    <param name="revision">v0.19.1</param>
     <param name="versionformat">@PARENT_TAG@</param>
     <!-- upstream tags are v-prefixed: strip it or set_version cannot
          detect the version -->
