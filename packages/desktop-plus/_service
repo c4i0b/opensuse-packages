@@ -2,7 +2,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/desktop-plus/desktop-plus/releases/download/v3.6.12.0/DesktopPlus-v3.6.12.0-linux-x86_64.rpm</param>
-    <param name="filename">DesktopPlus-v3.6.12.0-linux-x86_64.rpm</param>
+    <param name="path">/desktop-plus/desktop-plus/releases/download/v3.7.1.0/DesktopPlus-v3.7.1.0-linux-x86_64.rpm</param>
+    <param name="filename">DesktopPlus-v3.7.1.0-linux-x86_64.rpm</param>
   </service>
 </services>
