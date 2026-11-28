@@ -16,7 +16,7 @@ packages to OBS, where they are built.
 
 <!-- repo-badges begin -->
 [![packages](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpackages.json%3Fv%3Dcb7456bar2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
-[![tumbleweed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftumbleweed.json%3Fv%3D4ce1e3a0r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
+[![tumbleweed](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ftumbleweed.json%3Fv%3Dd7a0f713r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 [![slowroll](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fslowroll.json%3Fv%3Da5b98dd9r2)](https://build.opensuse.org/project/monitor?project=home%3Acaiobruno)
 <!-- repo-badges end -->
 
@@ -67,7 +67,7 @@ packages to OBS, where they are built.
 [![fisher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffisher.json%3Fv%3D03dccbedr2)](https://github.com/jorgebucaran/fisher/)
 [![fluent-icon-theme](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Ffluent-icon-theme.json%3Fv%3Dd9d72f7cr2)](https://github.com/vinceliuice/Fluent-icon-theme/)
 [![gridcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fgridcraft.json%3Fv%3D3384bd32r2)](https://github.com/storytold/gridcraft/)
-[![hermes-agent](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhermes-agent.json%3Fv%3Df62617b9r2)](https://github.com/NousResearch/hermes-agent/)
+[![hermes-agent](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhermes-agent.json%3Fv%3Da614ef27r2)](https://github.com/NousResearch/hermes-agent/)
 [![httpx](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhttpx.json%3Fv%3D677a2b1fr2)](https://github.com/projectdiscovery/httpx/)
 [![hydra-launcher](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fhydra-launcher.json%3Fv%3D56bb8867r2)](https://github.com/hydralauncher/hydra/)
 [![jetbrains-mono-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fjetbrains-mono-nerd-fonts.json%3Fv%3D8d6f63a2r2)](https://github.com/ryanoasis/nerd-fonts/)
@@ -79,14 +79,14 @@ packages to OBS, where they are built.
 [![masscan](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fmasscan.json%3Fv%3D34c2956dr2)](https://github.com/robertdavidgraham/masscan/)
 [![mdk4](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fmdk4.json%3Fv%3D5aeee3f6r2)](https://github.com/aircrack-ng/mdk4/)
 [![meslo-nerd-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fmeslo-nerd-fonts.json%3Fv%3Dc2212486r2)](https://github.com/ryanoasis/nerd-fonts/)
-[![mise](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fmise.json%3Fv%3Dac748ed2r2)](https://github.com/jdx/mise/)
+[![mise](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fmise.json%3Fv%3De0df04c4r2)](https://github.com/jdx/mise/)
 [![naabu](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fnaabu.json%3Fv%3D12b42637r2)](https://github.com/projectdiscovery/naabu/)
 [![netscanner](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fnetscanner.json%3Fv%3D0b8c187dr2)](https://github.com/Chleba/netscanner/)
 [![nexttrace](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fnexttrace.json%3Fv%3De16d4eb5r2)](https://github.com/nxtrace/NTrace-core/)
 [![nuclei](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fnuclei.json%3Fv%3Dea99a975r2)](https://github.com/projectdiscovery/nuclei/)
 [![oha](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Foha.json%3Fv%3D1c4e6d29r2)](https://github.com/hatoo/oha/)
 [![omo](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fomo.json%3Fv%3D557829bbr2)](https://github.com/code-yeongyu/oh-my-openagent/)
-[![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3D088cf630r2)](https://github.com/openclaw/openclaw)
+[![openclaw](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopenclaw.json%3Fv%3Da8ac1171r2)](https://github.com/openclaw/openclaw)
 [![opencode-desktop](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fopencode-desktop.json%3Fv%3D003b7420r2)](https://github.com/anomalyco/opencode/)
 [![oxker](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Foxker.json%3Fv%3Db0773d4ar2)](https://github.com/mrjackwills/oxker/)
 [![pdfcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fpdfcraft.json%3Fv%3D3496705ar2)](https://github.com/storytold/pdfcraft/)
@@ -102,7 +102,7 @@ packages to OBS, where they are built.
 [![scientifica-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fscientifica-fonts.json%3Fv%3D6ecbac50r2)](https://github.com/oppiliappan/scientifica/)
 [![selawik-fonts](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fselawik-fonts.json%3Fv%3Dcfe2ed19r2)](https://github.com/microsoft/Selawik/)
 [![slimbrave](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fslimbrave.json%3Fv%3D3161a424r2)](https://github.com/ChaoticSi1ence/SlimBrave-Neo/)
-[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3D7aae7f12r2)](https://github.com/tangency-labs/solidcraft/)
+[![solidcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsolidcraft.json%3Fv%3Ddce3d68cr2)](https://github.com/tangency-labs/solidcraft/)
 [![soundcraft](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsoundcraft.json%3Fv%3D4f5bc942r2)](https://github.com/storytold/soundcraft/)
 [![spotube](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fspotube.json%3Fv%3D474b47ffr2)](https://github.com/team-spotube/Spotube/)
 [![superfile](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fc4i0b%2Fopensuse-packages%2Fmain%2Fbadges%2Fsuperfile.json%3Fv%3D1faa1a69r2)](https://github.com/yorukot/superfile/)
