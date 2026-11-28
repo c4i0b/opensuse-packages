@@ -2,13 +2,13 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/ersinkoc/phonebox/releases/download/v0.9.31/PhoneBoxAgent-0.9.31-linux-x64.zip</param>
-    <param name="filename">PhoneBoxAgent-0.9.31-linux-x64.zip</param>
+    <param name="path">/ersinkoc/phonebox/releases/download/v0.9.32/PhoneBoxAgent-0.9.32-linux-x64.zip</param>
+    <param name="filename">PhoneBoxAgent-0.9.32-linux-x64.zip</param>
   </service>
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">raw.githubusercontent.com</param>
-    <param name="path">/ersinkoc/phonebox/v0.9.31/LICENSE</param>
+    <param name="path">/ersinkoc/phonebox/v0.9.32/LICENSE</param>
     <param name="filename">LICENSE</param>
   </service>
 </services>
