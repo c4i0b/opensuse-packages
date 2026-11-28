@@ -1,5 +1,5 @@
 Name:           crush
-Version:        0.103.0
+Version:        0.104.0
 Release:        0
 Summary:        Agentic coding assistant for the terminal
 License:        FSL-1.1-MIT
